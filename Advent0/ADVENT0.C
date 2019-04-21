@@ -11,7 +11,7 @@
 #include        <stdio.h>
 #include        <stdarg.h>
 #include        <string.h>
-#include        "advent.h"
+#include        "..\Adventure\ADVENT.H"
 
 static int      fError                  = 0;
 static FILE     *filIndex, *filTxt1, *filTxt2, *filTxt3, *filTxt4;
