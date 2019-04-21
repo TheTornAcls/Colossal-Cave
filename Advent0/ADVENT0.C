@@ -17,13 +17,15 @@ static int      fError                  = 0;
 static FILE     *filIndex, *filTxt1, *filTxt2, *filTxt3, *filTxt4;
 
 
-void FileError (const char *pszMessage, const char *pszFileName) {
-
+void FileError (const char *pszMessage, const char *pszFileName) 
+{
         char    szError [FILENAME_MAX + 100];
 
-        strcat (strcat (strcpy (szError, pszMessage), " "), pszFileName);
-        perror (szError);
+        strcpy_s (szError, FILENAME_MAX + 100, pszMessage);
+        strcat_s(szError, FILENAME_MAX + 100, " ");
+        strcat_s(szError, FILENAME_MAX + 100, pszFileName);
 
+        perror (szError);
 }
 
 
@@ -31,7 +33,8 @@ FILE *OpenFile (const char *pszName, const char *pszMode) {
 
         FILE    *pfil    = fopen (pszName, pszMode);
 
-        if (!pfil) {
+        if (!pfil) 
+		{
                 FileError ("Error opening", pszName);
                 fError = 1;
         }
@@ -73,12 +76,17 @@ void DoFile (FILE *pfil, const char *pszIDX, const char *pszMAX, const char *psz
         register int    cNumbers        = -1;
 
         OutputF ("long    idx%s[MAX%s] = {\n\t", pszIDX, pszMAX);
-        while (fgets (szInput, sizeof szInput, pfil)) {
-                if (szInput[0] == '#') {
-                        if (szOutput[0])
-                                OutputF ("%s,", szOutput);
+        while (fgets (szInput, sizeof szInput, pfil)) 
+		{
+                if (szInput[0] == '#') 
+				{
+					if (szOutput[0])
+					{
+						OutputF("%s,", szOutput);
+					}
                         sprintf(szOutput, "%ld", ftell(pfil));
-                        if (++cNumbers == 5) {
+                        if (++cNumbers == 5) 
+						{
                                 OutputS ("\n\t");
                                 cNumbers = 0;
                         }
@@ -111,8 +119,10 @@ int main (void) {
         filTxt3  = OpenFile(FD3, "r");
         filTxt4  = OpenFile(FD4, "r");
 
-        if (fError)
-                exit (EXIT_FAILURE);
+		if (fError)
+		{
+			exit(EXIT_FAILURE);
+		}
 
         OutputS ("/*      header: ADVTEXT.H                                      */\n\n");
         OutputS ("#define TEXTDEF\n\n");
