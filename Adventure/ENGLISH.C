@@ -3,6 +3,7 @@
 
 #include        <stdio.h>
 #include        <stdlib.h>
+#include        <ctype.h>
 #include        "advent.h"
 #include        "advep.h"
 #include        "advdec.h"
@@ -12,7 +13,6 @@
 */
 int english(void)
 {
-
         char    *msg;
         int     type1, type2, val1, val2;
 

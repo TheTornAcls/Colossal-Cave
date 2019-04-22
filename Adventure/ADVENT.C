@@ -22,7 +22,7 @@ int main(register int argc, register char **argv)
 #else
 	{
 		int i;
-		strcpy (szFilePath, argv[0]);
+		strcpy_s (szFilePath,  FILENAME_MAX, argv[0]);
 		for (i = strlen(szFilePath) - 1; i >= 0 && szFilePath[i] != '\\'; i--);
 		szFilePath [i + 1] = '\0';
 	}
@@ -182,8 +182,13 @@ void initplay(void)
 void open1(FILE **pfd, char *szName)
 {
 	char szFileName[FILENAME_MAX];
-	*pfd = fopen(strcat (strcpy (szFileName, szFilePath), szName), "r");
-	 if (!*pfd) {
+    errno_t rc;
+	strcpy_s(szFileName, FILENAME_MAX, szFilePath);
+    strcat_s(szFileName, FILENAME_MAX, szName);
+    rc = fopen_s(pfd, szFileName, "r");
+
+	 if (NULL == *pfd) 
+     {
 		printf("Sorry, I can't open %s\n", szFileName);
 		exit(1);
 	}
@@ -203,19 +208,25 @@ void saveadv(void)
 {
         register char   *sptr;
         FILE            *savefd;
-        char            username[256];
+        char            username[MAXNAME];
 
         do {
                 printf("What do you want to name the saved game? ");
-                fflush (stdout); gets(username);
+                fflush (stdout); 
+                gets_s(username, MAXNAME);
         } while (*username == '\0');
         if (sptr = strchr(username, '.'))
-                *sptr = '\0';           /* kill extension       */
+        {
+            *sptr = '\0';           /* kill extension       */
+        }
         if (strlen(username) > 8)
-                username[8] = '\0'; /* max 8 char filename */
-        strcat(username, ".adv");
-        savefd = fopen(username, SAVEMODE);
-        if (savefd == NULL) {
+        {
+            username[8] = '\0'; /* max 8 char filename */
+        }
+        strcat_s(username, MAXNAME, ".adv");
+        fopen_s(&savefd, username, SAVEMODE);
+        if (savefd == NULL) 
+        {
                 printf("Sorry, I can't create the file...%s\n", username);
                 exit(1);
         }
@@ -235,21 +246,23 @@ void saveadv(void)
 */
 void restore(void)
 {
-        char            username[256];
+        char            username[MAXNAME];
         FILE            *restfd;
         register char   *sptr;
         register int    savedebug = dbugflg;
 
         do {
                 printf("What is the name of the saved game? ");
-                fflush (stdout); gets(username);
+                fflush (stdout); 
+                gets_s(username, MAXNAME);
         } while (*username == '\0');
+
         if (sptr = strchr(username, '.'))
                 *sptr = '\0';           /* kill extension       */
         if (strlen(username) > 8)
                 username[8] = '\0'; /* max 8 char filename */
-        strcat(username, ".adv");
-        restfd = fopen(username, RESTMODE);
+        strcat_s(username, MAXNAME, ".adv");
+        fopen_s(&restfd, username, RESTMODE);
         if (restfd == NULL) {
                 printf("Sorry, I can't open the file...%s\n", username);
                 exit(1);

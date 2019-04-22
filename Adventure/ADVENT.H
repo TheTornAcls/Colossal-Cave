@@ -1,7 +1,7 @@
 /*      header ADVENT.H                                         *\
 \*      HEADER file for all adventure modules                   */
 
-
+#define MAXNAME 256      /* max size of name */
 #define MAXOBJ 100       /* max # of objects in cave                 */
 #define MAXWC    295     /* max # of adventure words                 */
 #define MAXLOC 140       /* max # of cave locations                  */
@@ -173,9 +173,9 @@ struct  trav {
 #define RESTMODE "rb"
 #define ISAM     "advtext.h"
 #define ISAMMODE "w"
-#define FD1      "advent1.txx"
-#define FD2      "advent2.txx"
-#define FD3      "advent3.txx"
-#define FD4      "advent4.txx"
+#define FD1      "advent1.txt"
+#define FD2      "advent2.txt"
+#define FD3      "advent3.txt"
+#define FD4      "advent4.txt"
 #endif
 
