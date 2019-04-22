@@ -123,6 +123,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ADVENT.C" />
+    <ClCompile Include="DATABASE.C" />
+    <ClCompile Include="ENGLISH.C" />
+    <ClCompile Include="ITVERB.C" />
+    <ClCompile Include="TURN.C" />
+    <ClCompile Include="VERB.C" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ADVCAVE.H" />
+    <ClInclude Include="ADVDEC.H" />
+    <ClInclude Include="ADVENT.H" />
+    <ClInclude Include="ADVEP.H" />
+    <ClInclude Include="ADVTEXT.H" />
+    <ClInclude Include="ADVWORD.H" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
