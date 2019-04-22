@@ -77,7 +77,8 @@ void DoFile(FILE* pfil, const char* pszIDX, const char* pszMAX, const char* pszF
 
     char            szInput[255];
     char            szOutput[12] = "";
-    register int    cNumbers = -1;
+    int             cNumbers = -1;
+    int             rc;
 
     OutputF("long    idx%s[MAX%s] = {\n\t", pszIDX, pszMAX);
     while (fgets(szInput, sizeof szInput, pfil))
@@ -88,7 +89,7 @@ void DoFile(FILE* pfil, const char* pszIDX, const char* pszMAX, const char* pszF
             {
                 OutputF("%s,", szOutput);
             }
-            sprintf(szOutput, "%ld", ftell(pfil));
+            rc = sprintf_s(szOutput, 12, "%ld", ftell(pfil));
             if (++cNumbers == 5)
             {
                 OutputS("\n\t");
