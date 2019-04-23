@@ -69,7 +69,7 @@ struct {
     int       dbugflg;              /* if game is in debug  */
     int       hinttaken;            /* minus 1 for each hint */
     int       hintavail;            /* masks of hints still available */
-    short int hintloc[MAXHINT+1]; /* moves expended hanging around hint area */
+    int       hintloc[MAXHINT+1]; /* moves expended hanging around hint area */
     } saverec;
 #define turns     saverec.turns
 #define loc       saverec.loc
