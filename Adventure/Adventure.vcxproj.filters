@@ -14,4 +14,44 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ADVENT.C">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DATABASE.C">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ENGLISH.C">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ITVERB.C">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TURN.C">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VERB.C">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ADVCAVE.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ADVDEC.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ADVENT.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ADVEP.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ADVTEXT.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ADVWORD.H">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
 </Project>
