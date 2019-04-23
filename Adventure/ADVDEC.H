@@ -41,8 +41,8 @@ struct {
     int       turns;
     int       loc,oldloc,oldloc2,newloc;      /* location variables */
     short int cond[MAXLOC];         /* location status      */
-    short int place[MAXOBJ];        /* object location      */
-    short int fixed[MAXOBJ];        /* second object loc    */
+    int place[MAXOBJ];        /* object location      */
+    int fixed[MAXOBJ];        /* second object loc    */
     short int visited[MAXLOC];      /* >0 if has been here  */
     short int prop[MAXOBJ];         /* status of object     */
     int       tally,tally2;         /* item counts          */
