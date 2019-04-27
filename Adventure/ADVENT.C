@@ -4,6 +4,7 @@
 #include        <ctype.h>
 #include        <stdlib.h>
 #include        <string.h>
+#include        <stdbool.h>
 #include        "advent.h"      /* #define preprocessor equates */
 #include        "advep.h"       /* define all functions         */
 #include        "advword.h"     /* definition of "word" array   */
@@ -167,7 +168,7 @@ void initplay(void)
     lmwarn = 0;
     foobar = 0;
     dflag = 0;
-    gaveup = 0;
+    gaveup = false;
     saveflg = 0;
     hinttaken = 0;
     hintavail = HINT;

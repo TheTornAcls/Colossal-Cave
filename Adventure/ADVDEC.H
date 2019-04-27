@@ -63,7 +63,7 @@ struct {
     int       bonus;                /* to pass to end       */
     int       numdie;               /* number of deaths     */
     int       object1;              /* to help intrans.     */
-    int       gaveup;               /* 1 if he quit early   */
+    bool      gaveup;               /* 1 if he quit early   */
     int       foobar;               /* fie fie foe foo...   */
     int       saveflg;              /* if game being saved  */
     int       dbugflg;              /* if game is in debug  */

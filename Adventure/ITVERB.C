@@ -2,6 +2,7 @@
 
 
 #include        <stdio.h>
+#include        <stdbool.h>
 #include        "advent.h"
 #include        "advep.h"
 #include        "advdec.h"
@@ -206,8 +207,11 @@ void ivdrink(void)
 */
 void ivquit(void)
 {
-        if(gaveup=yes(22,0,54))
-                normend();
+    gaveup = yes(22, 0, 54);
+    if (gaveup)
+    {
+        normend();
+    }
 }
 
 /*

@@ -2,6 +2,7 @@
 
 
 #include        <stdio.h>
+#include        <stdbool.h>
 #include        "advent.h"
 #include        "advep.h"
 #include        "advdec.h"

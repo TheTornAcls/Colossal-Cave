@@ -4,6 +4,7 @@
 #include        <stdlib.h>
 #include        <string.h>
 #include        <ctype.h>
+#include        <stdbool.h>
 #include        "advent.h"
 #include        "advep.h"
 #include        "advdec.h"
@@ -79,7 +80,7 @@ void rdskip(FILE *fdi, char skipc, register int n, char rewind)
 /*
         Routine to request a yes or no answer to a question.
 */
-yes(register int msg1, int msg2, int msg3)
+bool yes(register int msg1, int msg2, int msg3)
 {
     char            answer[80];
     register int    y = -1;
@@ -108,7 +109,7 @@ yes(register int msg1, int msg2, int msg3)
         else
             rspeak(89);
     }
-    return y;
+    return (1 == y);
 }
 
 /*
@@ -198,7 +199,7 @@ int binary(char *w, struct wac wctable[], int maxwc)
 /*
         Routine to test for darkness
 */
-int dark(void)
+bool dark(void)
 {
         return(!(cond[loc] & LIGHT) &&
                 (!prop[LAMP] ||

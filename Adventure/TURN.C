@@ -3,6 +3,7 @@
 
 #include        <stdio.h>
 #include        <stdlib.h>
+#include        <stdbool.h>
 #include        <string.h>
 #include        "advent.h"
 #include        "advep.h"
@@ -925,7 +926,7 @@ int stimer(void)
         }
         if (limit < 0 && loc <= 8) {
                 rspeak(185);
-                gaveup = 1;
+                gaveup = true;
                 normend();
         }
         if (limit <= 30) {
