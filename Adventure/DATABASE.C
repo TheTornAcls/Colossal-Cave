@@ -3,6 +3,7 @@
 #include        <stdio.h>
 #include        <stdlib.h>
 #include        <string.h>
+#include        <ctype.h>
 #include        "advent.h"
 #include        "advep.h"
 #include        "advdec.h"
@@ -275,11 +276,11 @@ void dstroy(register int obj)
 /*
         Routine to move an object
 */
-void move(register int obj, int where)
+void move(int obj, int where)
 {
-        register int    from;
+        int    from;
 
-        from = (obj<MAXOBJ) ? place[obj] : fixed[obj];
+        from = (obj<MAXOBJ) ? place[obj] : fixed[obj - MAXOBJ];
         if (from>0 && from<=300)
                 carry(obj, from);
         drop(obj, where);

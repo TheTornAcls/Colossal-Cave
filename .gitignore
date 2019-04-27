@@ -6,3 +6,7 @@
 /Adventure/.vs/Adventure/v16/ipch/AutoPCH/44d2c5534f603120
 /Adventure/Debug
 /Adventure/.vs/Adventure/v16/Solution.VC.db
+*.opendb
+*.db-shm
+*.db-wal
+*.ipch

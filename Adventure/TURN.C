@@ -127,7 +127,9 @@ void turn(void)
                         tryhint (180, HINTW, HINTAREAW);
             }
         else
-            memset(hintloc, 0, (sizeof(int)*(MAXHINT+1)));
+        {
+             memset(hintloc, 0, sizeof(hintloc[0])* (MAXHINT + 1));
+        }
 
 
         while (!english())      /* retrieve player instructions */
@@ -249,7 +251,7 @@ void domove(void)
 */
 void goback(void)
 {
-        register int    kk, k2;
+        int    kk, k2;
         int             want, temp;
         struct trav strav[MAXTRAV];
 
@@ -284,7 +286,8 @@ void goback(void)
                                 k2 = 0;
                 }
         }
-        if (k2) {
+        if ((k2 > 0) && (k2 < MAXTRAV))
+        {
                 motion = travel[k2].tverb;
                 dotrav();
         }
@@ -724,7 +727,7 @@ void dwarves(void)
                 for (try = 1; try<20; ++try) {
                         j = rrand(15, 120); /* allowed area */
                         if (j != odloc[i] && j != dloc[i] &&
-                         !(i == (DWARFMAX-1) && cond[j]&NOPIRAT == 1))
+                         !(i == (DWARFMAX-1) && (cond[j] & (NOPIRAT == 1))))
                                 break;
                 }
                 if (j == 0)

@@ -41,8 +41,8 @@ struct {
     int       turns;
     int       loc,oldloc,oldloc2,newloc;      /* location variables */
     short int cond[MAXLOC];         /* location status      */
-    short int place[MAXOBJ];        /* object location      */
-    short int fixed[MAXOBJ];        /* second object loc    */
+    int place[MAXOBJ];        /* object location      */
+    int fixed[MAXOBJ];        /* second object loc    */
     short int visited[MAXLOC];      /* >0 if has been here  */
     short int prop[MAXOBJ];         /* status of object     */
     int       tally,tally2;         /* item counts          */
@@ -69,7 +69,7 @@ struct {
     int       dbugflg;              /* if game is in debug  */
     int       hinttaken;            /* minus 1 for each hint */
     int       hintavail;            /* masks of hints still available */
-    short int hintloc[MAXHINT+1]; /* moves expended hanging around hint area */
+    int       hintloc[MAXHINT+1]; /* moves expended hanging around hint area */
     } saverec;
 #define turns     saverec.turns
 #define loc       saverec.loc

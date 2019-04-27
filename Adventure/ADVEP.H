@@ -20,7 +20,7 @@ int rrand(int low, int high);
 int pct(register int x);
 int at(register int item);
 void dstroy(register int obj);
-void move(register int obj, int where);
+void move(int obj, int where);
 void juggle(register int loc);
 void carry(register int obj, register int where);
 void drop(register int obj, register int where);
