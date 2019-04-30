@@ -11,7 +11,7 @@
 #include        "advtext.h"     /* definition of "text" arrays  */
 #include        "advdec.h"      /* definition of global data    */
 
-int main(register int argc, register char** argv)
+int main(int argc, char** argv)
 {
     int	rflag;		/* user restore request option	*/
 
@@ -206,7 +206,7 @@ void opentxt(void)
 */
 void saveadv(void)
 {
-    register char* sptr;
+    char* sptr;
     FILE* savefd;
     char            username[MAXNAME];
 
@@ -248,8 +248,8 @@ void restore(void)
 {
     char            username[MAXNAME];
     FILE* restfd;
-    register char* sptr;
-    register int    savedebug = dbugflg;
+    char* sptr;
+    int    savedebug = dbugflg;
 
     do {
         printf("What is the name of the saved game? ");
