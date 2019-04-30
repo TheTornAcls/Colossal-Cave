@@ -373,7 +373,7 @@ void von(void)
                 prop[LAMP] = 1;
                 rspeak(39);
                 if (wzdark) {
-                        wzdark = 0;
+                        wzdark = false;
                         describe();
                 }
         }

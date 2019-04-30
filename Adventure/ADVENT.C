@@ -145,7 +145,8 @@ void initplay(void)
     memset(visited, 0, (sizeof(short int)) * MAXLOC);
     memset(prop, 0, (sizeof(short int)) * MAXOBJ);
     memset(&prop[50], 0xff, (sizeof(short int)) * (MAXOBJ - 50));
-    wzdark = closed = closing = holding = detail = 0;
+    wzdark = false;
+    closed = closing = holding = detail = 0;
     limit = 100;
     tally = 15;
     tally2 = 0;

@@ -227,7 +227,7 @@ void domove(void)
                         rspeak(15);
                         detail |= 1;
                 }
-                wzdark = 0;
+                wzdark = false;
                 visited[loc] = (visited[loc]+3) & ~3;
                 testbr = 0;
                 newloc = loc;

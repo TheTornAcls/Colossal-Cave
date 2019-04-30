@@ -48,7 +48,8 @@ struct {
     int       tally,tally2;         /* item counts          */
     int       limit;                /* time limit           */
     int       lmwarn;               /* lamp warning flag    */
-    int       wzdark,closing,closed;/* game state flags     */
+    bool      wzdark;               /* game state flags     */
+    int       closing, closed;      /* game state flags     */
     int       holding;              /* count of held items  */
     int       detail;               /* LOOK count           */
     int       knfloc;               /* knife location       */
