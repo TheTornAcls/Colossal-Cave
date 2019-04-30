@@ -217,7 +217,7 @@ int here(int item)
 /*
         Routine to tell if an item is being carried.
 */
-int toting(int item)
+bool toting(int item)
 {
     return(place[item] == -1);
 }
