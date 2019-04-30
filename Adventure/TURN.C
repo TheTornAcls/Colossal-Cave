@@ -16,138 +16,138 @@ int     totalscore;
 */
 void turn(void)
 {
-        register int    i;
-        /*
-                if closing, then he can't leave except via
-                the main office.
-        */
-        if (newloc < 9 && newloc != 0 && closing) {
-                rspeak(130);
+    int    i;
+    /*
+            if closing, then he can't leave except via
+            the main office.
+    */
+    if (newloc < 9 && newloc != 0 && closing) {
+        rspeak(130);
+        newloc = loc;
+        if (!panic)
+            clock2 = 15;
+        panic = 1;
+    }
+    /*
+            see if a dwarf has seen him and has come
+            from where he wants to go.
+    */
+    if (newloc != loc && !forced(loc) && (cond[loc] & NOPIRAT) == 0)
+        for (i = 1; i < (DWARFMAX - 1); ++i)
+            if (odloc[i] == newloc && dseen[i]) {
                 newloc = loc;
-                if (!panic)
-                        clock2 = 15;
-                panic = 1;
-        }
-        /*
-                see if a dwarf has seen him and has come
-                from where he wants to go.
-        */
-        if (newloc != loc && !forced(loc) && (cond[loc]&NOPIRAT) == 0)
-                for (i = 1; i< (DWARFMAX-1); ++i)
-                        if (odloc[i] == newloc && dseen[i]) {
-                                newloc = loc;
-                                rspeak(2);
-                                break;
-                        }
+                rspeak(2);
+                break;
+            }
 
-        dwarves();      /* & special dwarf(pirate who steals)   */
+    dwarves();      /* & special dwarf(pirate who steals)   */
 
-        /* added by BDS C conversion */
-        if (loc != newloc) {
-                if (loc == 0) visited[newloc] = (visited[newloc]+3) & ~3;
-                ++turns;
-                loc = newloc;
+    /* added by BDS C conversion */
+    if (loc != newloc) {
+        if (loc == 0) visited[newloc] = (visited[newloc] + 3) & ~3;
+        ++turns;
+        loc = newloc;
 
         /* check for death */
         if (loc == 0) {
-                death();
-                return;
+            death();
+            return;
         }
 
         /* check for forced move */
-        if (forced (loc)) {
-                describe();
-                domove();
-                return;
+        if (forced(loc)) {
+            describe();
+            domove();
+            return;
         }
 
         /* check for wandering in dark */
         if (wzdark && dark() && pct(35)) {
-                rspeak(23);
-                oldloc2 = loc;
-                death();
-                return;
+            rspeak(23);
+            oldloc2 = loc;
+            death();
+            return;
         }
 
         /* describe his situation */
         describe();
-        if (!dark ())
-                ++visited[loc];
-        }                               /* if (loc != newloc)   */
+        if (!dark())
+            ++visited[loc];
+    }                               /* if (loc != newloc)   */
 
-        if (closed) {
-                if (prop[OYSTER] < 0 && toting (OYSTER))
-                        pspeak(OYSTER, 1, 0);
-                for (i = 1; i <= MAXOBJ; ++i)
-                        if (toting (i) && prop[i] < 0)
-                                prop[i] = -1-prop[i];
+    if (closed) {
+        if (prop[OYSTER] < 0 && toting(OYSTER))
+            pspeak(OYSTER, 1, 0);
+        for (i = 1; i <= MAXOBJ; ++i)
+            if (toting(i) && prop[i] < 0)
+                prop[i] = -1 - prop[i];
+    }
+
+    wzdark = dark();
+    if (knfloc > 0 && knfloc != loc)
+        knfloc = 0;
+
+    if (stimer())   /* as the grains of sand slip by        */
+        return;
+
+    if (cond[loc] & hintavail)
+        switch (cond[loc] & HINT) {
+        case HINTF:
+            ++hintloc[HINTAREAF];
+            if (hintloc[HINTAREAF] > 20 && visited[8] == 0 /* never in yet */)
+                tryhint(56, HINTF, HINTAREAF);
+            break;
+        case HINTC:
+            ++hintloc[HINTAREAC];
+            if (hintloc[HINTAREAC] > 3 && prop[GRATE] == 0 && !toting(KEYS))
+                tryhint(62, HINTC, HINTAREAC);
+            break;
+        case HINTB:
+            ++hintloc[HINTAREAB];
+            if (hintloc[HINTAREAB] > 4 && place[BIRD] == loc && toting(ROD))
+                tryhint(18, HINTB, HINTAREAB);
+            break;
+        case HINTS:
+            ++hintloc[HINTAREAS];
+            if (hintloc[HINTAREAS] > 5 && place[SNAKE] == loc && !toting(BIRD))
+                tryhint(20, HINTS, HINTAREAS);
+            break;
+        case HINTM:
+            ++hintloc[HINTAREAM];
+            if (hintloc[HINTAREAM] > 15)
+                tryhint(176, HINTM, HINTAREAM);
+            break;
+        case HINTP:
+            ++hintloc[HINTAREAP];
+            if (hintloc[HINTAREAP] > 5 && place[EMERALD] != 100)
+                tryhint(178, HINTP, HINTAREAP);
+            break;
+        case HINTW:
+            ++hintloc[HINTAREAW];
+            if (hintloc[HINTAREAW] > 15)
+                tryhint(180, HINTW, HINTAREAW);
         }
-
-        wzdark = dark();
-        if (knfloc > 0 && knfloc != loc)
-                knfloc = 0;
-
-        if (stimer())   /* as the grains of sand slip by        */
-                return;
-
-        if (cond[loc]&hintavail)
-            switch (cond[loc]&HINT) {
-                case HINTF:
-                    ++hintloc[HINTAREAF];
-                    if (hintloc[HINTAREAF]>20 && visited[8]==0 /* never in yet */)
-                        tryhint (56, HINTF, HINTAREAF);
-                    break;
-                case HINTC:
-                    ++hintloc[HINTAREAC];
-                    if (hintloc[HINTAREAC]>3 && prop[GRATE]==0 && !toting(KEYS))
-                        tryhint (62, HINTC, HINTAREAC);
-                    break;
-                case HINTB:
-                    ++hintloc[HINTAREAB];
-                    if (hintloc[HINTAREAB]>4 && place[BIRD]==loc && toting(ROD))
-                        tryhint (18, HINTB, HINTAREAB);
-                    break;
-                case HINTS:
-                    ++hintloc[HINTAREAS];
-                    if (hintloc[HINTAREAS]>5 && place[SNAKE]==loc && !toting(BIRD))
-                        tryhint (20, HINTS, HINTAREAS);
-                    break;
-                case HINTM:
-                    ++hintloc[HINTAREAM];
-                    if (hintloc[HINTAREAM]>15)
-                        tryhint (176, HINTM, HINTAREAM);
-                    break;
-                case HINTP:
-                    ++hintloc[HINTAREAP];
-                    if (hintloc[HINTAREAP]>5 && place[EMERALD]!=100)
-                        tryhint (178, HINTP, HINTAREAP);
-                    break;
-                case HINTW:
-                    ++hintloc[HINTAREAW];
-                    if (hintloc[HINTAREAW]>15)
-                        tryhint (180, HINTW, HINTAREAW);
-            }
-        else
-        {
-             memset(hintloc, 0, sizeof(hintloc[0])* (MAXHINT + 1));
-        }
+    else
+    {
+        memset(hintloc, 0, sizeof(hintloc[0]) * (MAXHINT + 1));
+    }
 
 
-        while (!english())      /* retrieve player instructions */
-                ;
+    while (!english())      /* retrieve player instructions */
+        ;
 
 #if ! defined(NDEBUG)
-        if (dbugflg)
-                printf("loc = %d, verb = %d, object = %d, motion = %d\n",
-                       loc, verb, object, motion);
+    if (dbugflg)
+        printf("loc = %d, verb = %d, object = %d, motion = %d\n",
+            loc, verb, object, motion);
 #endif
 
-        if (motion)             /* execute player instructions  */
-                domove();
-        else if (object)
-                doobj();
-        else
-                itverb();
+    if (motion)             /* execute player instructions  */
+        domove();
+    else if (object)
+        doobj();
+    else
+        itverb();
 }
 
 /*
@@ -155,20 +155,20 @@ void turn(void)
 */
 void describe(void)
 {
-        if (toting(BEAR))
-                rspeak(141);
-        if (dark())
-                rspeak(16);
-        else {
-            if ((visited[loc] & 3) || ((detail & testbr) && visited[loc]))
-                    descsh(loc);
-            else
-                    desclg(loc);
-            if (!dark())
-                descitem();
-        }
-        if (loc == 33 && pct(25) && !closing)
-                rspeak(8);
+    if (toting(BEAR))
+        rspeak(141);
+    if (dark())
+        rspeak(16);
+    else {
+        if ((visited[loc] & 3) || ((detail & testbr) && visited[loc]))
+            descsh(loc);
+        else
+            desclg(loc);
+        if (!dark())
+            descitem();
+    }
+    if (loc == 33 && pct(25) && !closing)
+        rspeak(8);
 }
 
 /*
@@ -176,38 +176,38 @@ void describe(void)
 */
 void descitem(void)
 {
-        register int    i, init = 0;
-        int             state, prespace;
+    int    i, init = 0;
+    int             state, prespace;
 
-        for (i = 1;i<MAXOBJ; ++i) {
-                if (at(i)) {
-                        if (i == STEPS && toting(NUGGET))
-                                continue;
-                        if (prop[i]<0) {
-                                if (closed)
-                                        continue;
-                                else {
-                                        prop[i] = 0;
-                                        if (i == RUG || i == CHAIN)
-                                                ++prop[i];
-                                        --tally;
-                                }
-                        }
-                        if (i == STEPS && loc == fixed[STEPS])
-                                state = 1;
-                        else
-                                state = prop[i];
-                        if (!init && !(detail & 2)) {
-                                init = 1;
-                                prespace = 1;
-                        }
-                        else
-                                prespace = 0;
-                        pspeak(i, state, prespace);
+    for (i = 1; i < MAXOBJ; ++i) {
+        if (at(i)) {
+            if (i == STEPS && toting(NUGGET))
+                continue;
+            if (prop[i] < 0) {
+                if (closed)
+                    continue;
+                else {
+                    prop[i] = 0;
+                    if (i == RUG || i == CHAIN)
+                        ++prop[i];
+                    --tally;
                 }
+            }
+            if (i == STEPS && loc == fixed[STEPS])
+                state = 1;
+            else
+                state = prop[i];
+            if (!init && !(detail & 2)) {
+                init = 1;
+                prespace = 1;
+            }
+            else
+                prespace = 0;
+            pspeak(i, state, prespace);
         }
-        if (tally == tally2 && tally != 0 && limit > 35)
-                limit = 35;
+    }
+    if (tally == tally2 && tally != 0 && limit > 35)
+        limit = 35;
 }
 
 /*
@@ -215,35 +215,35 @@ void descitem(void)
 */
 void domove(void)
 {
-        gettrav(loc);
-        switch(motion) {
-        case NULLX:
-                break;
-        case BACK:
-                goback();
-                break;
-        case LOOK:
-                if (!detail) {
-                        rspeak(15);
-                        detail |= 1;
-                }
-                wzdark = false;
-                visited[loc] = (visited[loc]+3) & ~3;
-                testbr = 0;
-                newloc = loc;
-                loc = 0;
-                break;
-        case CAVE:
-                if (loc<8)
-                        rspeak(57);
-                else
-                        rspeak(58);
-                break;
-        default:
-                oldloc2 = oldloc;
-                oldloc = loc;
-                dotrav();
+    gettrav(loc);
+    switch (motion) {
+    case NULLX:
+        break;
+    case BACK:
+        goback();
+        break;
+    case LOOK:
+        if (!detail) {
+            rspeak(15);
+            detail |= 1;
         }
+        wzdark = 0;
+        visited[loc] = (visited[loc] + 3) & ~3;
+        testbr = 0;
+        newloc = loc;
+        loc = 0;
+        break;
+    case CAVE:
+        if (loc < 8)
+            rspeak(57);
+        else
+            rspeak(58);
+        break;
+    default:
+        oldloc2 = oldloc;
+        oldloc = loc;
+        dotrav();
+    }
 }
 
 /*
@@ -252,59 +252,59 @@ void domove(void)
 */
 void goback(void)
 {
-        int    kk, k2;
-        int             want, temp;
-        struct trav strav[MAXTRAV];
+    int    kk, k2;
+    int             want, temp;
+    struct trav strav[MAXTRAV];
 
-        if (forced(oldloc))
-                want = oldloc2;
-        else
-                want = oldloc;
-        oldloc2 = oldloc;
-        oldloc = loc;
-        k2 = 0;
-        if (want == loc) {
-                rspeak(91);
-                return;
+    if (forced(oldloc))
+        want = oldloc2;
+    else
+        want = oldloc;
+    oldloc2 = oldloc;
+    oldloc = loc;
+    k2 = 0;
+    if (want == loc) {
+        rspeak(91);
+        return;
+    }
+    copytrv(travel, strav);
+    for (kk = 0; travel[kk].tdest != -1; ++kk) {
+        if (!travel[kk].tcond && travel[kk].tdest == want) {
+            motion = travel[kk].tverb;
+            dotrav();
+            return;
         }
-        copytrv(travel, strav);
-        for (kk = 0; travel[kk].tdest != -1; ++kk) {
-                if (!travel[kk].tcond && travel[kk].tdest == want) {
-                        motion = travel[kk].tverb;
-                        dotrav();
-                        return;
-                }
-                if (!travel[kk].tcond) {
-                        k2 = kk;
-                        temp = travel[kk].tdest;
-                        if (temp <= MAXLOC) {
-                                gettrav(temp);
-                                if (forced(temp) && travel[0].tdest == want)
-                                        k2 = temp;
-                                copytrv(strav, travel);
-                        }
-                        else
-                                k2 = 0;
-                }
+        if (!travel[kk].tcond) {
+            k2 = kk;
+            temp = travel[kk].tdest;
+            if (temp <= MAXLOC) {
+                gettrav(temp);
+                if (forced(temp) && travel[0].tdest == want)
+                    k2 = temp;
+                copytrv(strav, travel);
+            }
+            else
+                k2 = 0;
         }
-        if ((k2 > 0) && (k2 < MAXTRAV))
-        {
-                motion = travel[k2].tverb;
-                dotrav();
-        }
-        else
-                rspeak(140);
+    }
+    if ((k2 > 0) && (k2 < MAXTRAV))
+    {
+        motion = travel[k2].tverb;
+        dotrav();
+    }
+    else
+        rspeak(140);
 }
 
 /*
         Routine to copy a travel array
 */
-void copytrv(struct trav *trav1, struct trav *trav2)
+void copytrv(struct trav* trav1, struct trav* trav2)
 {
-        register int    i;
+    int    i;
 
-        for (i = 0; i<MAXTRAV; ++i)
-                trav2 = trav1;
+    for (i = 0; i < MAXTRAV; ++i)
+        trav2 = trav1;
 }
 
 /*
@@ -313,75 +313,75 @@ void copytrv(struct trav *trav1, struct trav *trav2)
 */
 void dotrav(void)
 {
-        register int    kk, hitflag;
-        int             mvflag;
-        int             rdest, rverb, rcond, robject;
-        int             pctt;
+    int    kk, hitflag;
+    int             mvflag;
+    int             rdest, rverb, rcond, robject;
+    int             pctt;
 
-        newloc = loc;
-        mvflag = hitflag = 0;
-        pctt = rrand(0, 99);
+    newloc = loc;
+    mvflag = hitflag = 0;
+    pctt = rrand(0, 99);
 
-        for (kk = 0; travel[kk].tdest>=0 && !mvflag; ++kk) {
-                rdest = travel[kk].tdest;
-                rverb = travel[kk].tverb;
-                rcond = travel[kk].tcond;
-                robject = rcond%100;
+    for (kk = 0; travel[kk].tdest >= 0 && !mvflag; ++kk) {
+        rdest = travel[kk].tdest;
+        rverb = travel[kk].tverb;
+        rcond = travel[kk].tcond;
+        robject = rcond % 100;
 
 #if ! defined(NDEBUG)
-                if (dbugflg)
-                        printf("rdest = %d, rverb = %d, rcond = %d, robject = %d in dotrav\n",
-                        rdest, rverb, \
-                        rcond, robject);
+        if (dbugflg)
+            printf("rdest = %d, rverb = %d, rcond = %d, robject = %d in dotrav\n",
+                rdest, rverb, \
+                rcond, robject);
 #endif
-                if ((rverb != 1) && (rverb != motion) && !hitflag)
-                        continue;
-                ++hitflag;
-                switch(rcond/100) {
-                case 0:
-                        if ((rcond == 0) || (pctt < rcond))
-                                ++mvflag;
+        if ((rverb != 1) && (rverb != motion) && !hitflag)
+            continue;
+        ++hitflag;
+        switch (rcond / 100) {
+        case 0:
+            if ((rcond == 0) || (pctt < rcond))
+                ++mvflag;
 #if ! defined(NDEBUG)
-                        if (rcond && dbugflg)
-                                printf("%% move %d %d\n",
-                                        pctt, mvflag);
+            if (rcond && dbugflg)
+                printf("%% move %d %d\n",
+                    pctt, mvflag);
 #endif
-                        break;
-                case 1:
-                        if (robject == 0)
-                                ++mvflag;
-                        else if (toting(robject))
-                                ++mvflag;
-                        break;
-                case 2:
-                        if (toting(robject) || at(robject))
-                                ++mvflag;
-                        break;
-                case 3:
-                case 4:
-                case 5:
-                case 7:
-                        if (prop[robject] != (rcond/100)-3)
-                                ++mvflag;
-                        break;
-                default:
-                        bug(37);
-                }
+            break;
+        case 1:
+            if (robject == 0)
+                ++mvflag;
+            else if (toting(robject))
+                ++mvflag;
+            break;
+        case 2:
+            if (toting(robject) || at(robject))
+                ++mvflag;
+            break;
+        case 3:
+        case 4:
+        case 5:
+        case 7:
+            if (prop[robject] != (rcond / 100) - 3)
+                ++mvflag;
+            break;
+        default:
+            bug(37);
         }
-        if (!mvflag)
-                badmove();
-        else if (rdest>500)
-                rspeak(rdest-500);
-        else if (rdest>300)
-                spcmove(rdest);
-        else {
-                newloc = rdest;
+    }
+    if (!mvflag)
+        badmove();
+    else if (rdest > 500)
+        rspeak(rdest - 500);
+    else if (rdest > 300)
+        spcmove(rdest);
+    else {
+        newloc = rdest;
 #if ! defined(NDEBUG)
-                if (dbugflg)
-                        printf("newloc in dotrav = %d\n", newloc);
+        if (dbugflg)
+            printf("newloc in dotrav = %d\n", newloc);
 #endif
         if (newloc == loc) loc = 0;
-        }
+    }
 }
 
 /*
@@ -389,67 +389,67 @@ void dotrav(void)
 */
 void badmove(void)
 {
-        register int    msg;
+    int    msg;
 
-        msg = 12;
-        if (motion >= 43 && motion <=50) msg = 9;
-        if (motion == 29 || motion == 30) msg = 9;
-        if (motion == 7 || motion == 36 || motion == 37) msg = 10;
-        if (motion == 11 || motion == 19) msg = 11;
-        if (verb == FIND || verb == INVENTORY) msg = 59;
-        if (motion == 62 || motion == 65) msg = 42;
-        if (motion == 17) msg = 80;
-        rspeak(msg);
+    msg = 12;
+    if (motion >= 43 && motion <= 50) msg = 9;
+    if (motion == 29 || motion == 30) msg = 9;
+    if (motion == 7 || motion == 36 || motion == 37) msg = 10;
+    if (motion == 11 || motion == 19) msg = 11;
+    if (verb == FIND || verb == INVENTORY) msg = 59;
+    if (motion == 62 || motion == 65) msg = 42;
+    if (motion == 17) msg = 80;
+    rspeak(msg);
 }
 
 /*
         Routine to handle very special movement.
 */
-void spcmove(register int rdest)
+void spcmove(int rdest)
 {
-        switch(rdest-300) {
-        case 1: /* plover movement via alcove */
-                if (!holding || (holding == 1 && toting(EMERALD)))
-                        newloc = (99+100)-loc;
-                else
-                        rspeak(117);
-                break;
-        case 2: /* trying to remove plover, bad route */
-                drop(EMERALD, loc);
-                rspeak (54);
-                break;
-        case 3: /* troll bridge */
-                if (prop[TROLL] == 1) {
-                        pspeak(TROLL, 1, 0);
-                        prop[TROLL] = 0;
-                        move(TROLL2, 0);
-                        move((TROLL2+MAXOBJ), 0);
-                        move(TROLL, 117);
-                        move((TROLL+MAXOBJ), 122);
-                        juggle(CHASM);
-                        newloc = loc;
-                }
-                else {
-                        newloc = (loc == 117 ? 122 : 117);
-                        if (prop[TROLL] == 0)
-                                ++prop[TROLL];
-                        if (!toting (BEAR))
-                                return;
-                        rspeak(162);
-                        prop[CHASM] = 1;
-                        prop[TROLL] = 2;
-                        drop(BEAR, newloc);
-                        fixed[BEAR] = -1;
-                        prop[BEAR] = 3;
-                        if (prop[SPICES]<0)
-                                ++tally2;
-                        oldloc2 = newloc;
-                        death();
-                }
-                break;
-        default:
-                bug(38);
+    switch (rdest - 300) {
+    case 1: /* plover movement via alcove */
+        if (!holding || (holding == 1 && toting(EMERALD)))
+            newloc = (99 + 100) - loc;
+        else
+            rspeak(117);
+        break;
+    case 2: /* trying to remove plover, bad route */
+        drop(EMERALD, loc);
+        rspeak(54);
+        break;
+    case 3: /* troll bridge */
+        if (prop[TROLL] == 1) {
+            pspeak(TROLL, 1, 0);
+            prop[TROLL] = 0;
+            move(TROLL2, 0);
+            move((TROLL2 + MAXOBJ), 0);
+            move(TROLL, 117);
+            move((TROLL + MAXOBJ), 122);
+            juggle(CHASM);
+            newloc = loc;
         }
+        else {
+            newloc = (loc == 117 ? 122 : 117);
+            if (prop[TROLL] == 0)
+                ++prop[TROLL];
+            if (!toting(BEAR))
+                return;
+            rspeak(162);
+            prop[CHASM] = 1;
+            prop[TROLL] = 2;
+            drop(BEAR, newloc);
+            fixed[BEAR] = -1;
+            prop[BEAR] = 3;
+            if (prop[SPICES] < 0)
+                ++tally2;
+            oldloc2 = newloc;
+            death();
+        }
+        break;
+    default:
+        bug(38);
+    }
 }
 
 
@@ -457,12 +457,12 @@ void spcmove(register int rdest)
         Routine to handle player's demise via
         waking up the dwarves...
 */
-void dwarfend(register int msg)
+void dwarfend(int msg)
 {
-        if (msg)
-                rspeak(msg);
-        death();
-        normend();
+    if (msg)
+        rspeak(msg);
+    death();
+    normend();
 }
 
 /*
@@ -470,18 +470,18 @@ void dwarfend(register int msg)
 */
 void normend(void)
 {
-        static short int limits[] = {35, 100, 200, 250, 300, 330, 350, 1000};
-        register short int *i;
-        register int j;
-        int total;
-        total = score();
-        for (i = limits, j = 0; *i <= total; i++, j++);
-        putchar ('\n');
-        rspeak (202+j);
-        j = *i - total;
-        printf ("\nTo achieve the next higher rating, you need %d more point%s.\n",
-                j, j > 1 ? "s" : "");
-        exit(0);
+    static short int limits[] = { 35, 100, 200, 250, 300, 330, 350, 1000 };
+    short int* i;
+    int j;
+    int total;
+    total = score();
+    for (i = limits, j = 0; *i <= total; i++, j++);
+    putchar('\n');
+    rspeak(202 + j);
+    j = *i - total;
+    printf("\nTo achieve the next higher rating, you need %d more point%s.\n",
+        j, j > 1 ? "s" : "");
+    exit(0);
 }
 
 /*
@@ -489,61 +489,61 @@ void normend(void)
 */
 int score(void)
 {
-        register int t, s;
-        s = t = 0;
-        {
-                register int i, k;
-                for (i = 50; i<=MAXTRS; ++i) {
-                        if (i == CHEST)
-                                k = 14;
-                        else if (i > CHEST)
-                                k = 16;
-                        else
-                                k = 12;
-                        if (prop[i] >= 0)
-                                t += 2;
-                        if (place[i] == 3 && prop[i] == 0)
-                                t += k-2;
-                }
+    int t, s;
+    s = t = 0;
+    {
+        int i, k;
+        for (i = 50; i <= MAXTRS; ++i) {
+            if (i == CHEST)
+                k = 14;
+            else if (i > CHEST)
+                k = 16;
+            else
+                k = 12;
+            if (prop[i] >= 0)
+                t += 2;
+            if (place[i] == 3 && prop[i] == 0)
+                t += k - 2;
         }
-        printf("%-22s%4d\n", "Treasures:", s = t);
-        t = (MAXDIE - numdie)*10;
-        if (t)
-                printf("%-22s%4d\n", "Survival:", t);
+    }
+    printf("%-22s%4d\n", "Treasures:", s = t);
+    t = (MAXDIE - numdie) * 10;
+    if (t)
+        printf("%-22s%4d\n", "Survival:", t);
+    s += t;
+    if (!gaveup)
+        s += 4;
+    t = visited[19] ? 25 : 0;
+    if (t)
+        printf("%-22s%4d\n", "Getting well in:", t);
+    s += t;
+    t = closing ? 25 : 0;
+    if (t)
+        printf("%-22s%4d\n", "Masters section:", t);
+    s += t;
+    if (closed) {
+        if (bonus == 0)
+            t = 10;
+        else if (bonus == 135)
+            t = 25;
+        else if (bonus == 134)
+            t = 30;
+        else if (bonus == 133)
+            t = 45;
+        printf("%-22s%4d\n", "Bonus:", t);
         s += t;
-        if (!gaveup)
-                s += 4;
-        t = visited[19] ? 25 : 0;
-        if (t)
-                printf("%-22s%4d\n", "Getting well in:", t);
+    }
+    if (place[MAGAZINE] == 108)
+        s += 1;
+    t = -15 * hinttaken;
+    if (t) {
+        printf("%-22s%4d\n", "Hints & intructions:", t);
         s += t;
-        t = closing ? 25 : 0;
-        if (t)
-                printf("%-22s%4d\n", "Masters section:", t);
-        s += t;
-        if (closed) {
-                if (bonus == 0)
-                        t = 10;
-                else if (bonus == 135)
-                        t = 25;
-                else if (bonus == 134)
-                        t = 30;
-                else if (bonus == 133)
-                        t = 45;
-                printf("%-22s%4d\n", "Bonus:", t);
-                s += t;
-        }
-        if (place[MAGAZINE] == 108)
-                s += 1;
-        t = -15 * hinttaken;
-        if (t) {
-                printf("%-22s%4d\n", "Hints & intructions:", t);
-                s += t;
-        }
-        s += 2;
-        if (s < 0) s = 0;
-        printf("%-22s%4d\n", "Score:", s);
-        return s;
+    }
+    s += 2;
+    if (s < 0) s = 0;
+    printf("%-22s%4d\n", "Score:", s);
+    return s;
 }
 
 /*
@@ -552,33 +552,33 @@ int score(void)
 */
 void death(void)
 {
-        register int    i, j;
-        int             yea;
+    int    i, j;
+    int             yea;
 
-        if (!closing) {
-                yea = yes(81+numdie*2, 82+numdie*2, 54);
-                if (++numdie >= MAXDIE || !yea)
-                        normend();
-                place[WATER] = 0;
-                place[OIL] = 0;
-                if (toting(LAMP))
-                        prop[LAMP] = '\0';
-                for (j = 1; j<101; ++j) {
-                        i = (char) 101-j;
-                        if (toting (i))
-                                drop(i, i == LAMP ? 1:oldloc2);
-                }
-                newloc = 3;
-                oldloc = loc;
-                loc = 0;
-                return;
+    if (!closing) {
+        yea = yes(81 + numdie * 2, 82 + numdie * 2, 54);
+        if (++numdie >= MAXDIE || !yea)
+            normend();
+        place[WATER] = 0;
+        place[OIL] = 0;
+        if (toting(LAMP))
+            prop[LAMP] = '\0';
+        for (j = 1; j < 101; ++j) {
+            i = (char)101 - j;
+            if (toting(i))
+                drop(i, i == LAMP ? 1 : oldloc2);
         }
-        /*
-         closing -- no resurrection...
-        */
-        rspeak(131);
-        ++numdie;
-        normend();
+        newloc = 3;
+        oldloc = loc;
+        loc = 0;
+        return;
+    }
+    /*
+     closing -- no resurrection...
+    */
+    rspeak(131);
+    ++numdie;
+    normend();
 }
 
 /*
@@ -586,72 +586,72 @@ void death(void)
 */
 void doobj(void)
 {
-        /*
-         is object here? if so, transitive
-        */
-        if (fixed[object] == loc || here(object))
-                trobj();
-        /*
-                did he give grate as destination?
-        */
-        else if (object == GRATE) {
-                if (loc == 1 || loc == 4 || loc == 7) {
-                        motion = DEPRESSION;
-                        domove();
-                }
-                else if (loc>9 && loc<15) {
-                        motion = ENTRANCE;
-                        domove();
-                }
+    /*
+     is object here? if so, transitive
+    */
+    if (fixed[object] == loc || here(object))
+        trobj();
+    /*
+            did he give grate as destination?
+    */
+    else if (object == GRATE) {
+        if (loc == 1 || loc == 4 || loc == 7) {
+            motion = DEPRESSION;
+            domove();
         }
-        /*
-                is it a dwarf he is after?
-        */
-        else if (dcheck() && dflag >= 2) {
-                object = DWARF;
-                trobj();
+        else if (loc > 9 && loc < 15) {
+            motion = ENTRANCE;
+            domove();
         }
-        /*
-         is he trying to get/use a liquid?
-        */
-        else if ((liq() == object && here(BOTTLE)) ||
-                 liqloc(loc) == object)
-                trobj();
-        else if (object == PLANT && at(PLANT2) &&
-                prop[PLANT2] == 0) {
-                object = PLANT2;
-                trobj();
-        }
-        /*
-         is he trying to grab a knife?
-        */
-        else if (object == KNIFE && knfloc == loc) {
-                rspeak(116);
-                knfloc = -1;
-        }
-        /*
-         is he trying to get at dynamite?
-        */
-        else if (object == ROD && here(ROD2)) {
-                object = ROD2;
-                trobj();
-        }
-        /*
-         is he trying to get at shadow troll?
-        */
-        else if (object == TROLL && here(TROLL2)) {
-                object = TROLL2;
-                trobj();
-        }
-        /*
-         is he trying to get at shadow plant?
-        */
-        else if (object == PLANT && here(PLANT2)) {
-                object = PLANT2;
-                trobj();
-        }
-        else
-                printf("I see no %s here.\n", probj(object));
+    }
+    /*
+            is it a dwarf he is after?
+    */
+    else if (dcheck() && dflag >= 2) {
+        object = DWARF;
+        trobj();
+    }
+    /*
+     is he trying to get/use a liquid?
+    */
+    else if ((liq() == object && here(BOTTLE)) ||
+        liqloc(loc) == object)
+        trobj();
+    else if (object == PLANT && at(PLANT2) &&
+        prop[PLANT2] == 0) {
+        object = PLANT2;
+        trobj();
+    }
+    /*
+     is he trying to grab a knife?
+    */
+    else if (object == KNIFE && knfloc == loc) {
+        rspeak(116);
+        knfloc = -1;
+    }
+    /*
+     is he trying to get at dynamite?
+    */
+    else if (object == ROD && here(ROD2)) {
+        object = ROD2;
+        trobj();
+    }
+    /*
+     is he trying to get at shadow troll?
+    */
+    else if (object == TROLL && here(TROLL2)) {
+        object = TROLL2;
+        trobj();
+    }
+    /*
+     is he trying to get at shadow plant?
+    */
+    else if (object == PLANT && here(PLANT2)) {
+        object = PLANT2;
+        trobj();
+    }
+    else
+        printf("I see no %s here.\n", probj(object));
 }
 
 /*
@@ -660,298 +660,298 @@ void doobj(void)
 */
 void trobj(void)
 {
-        if (verb)
-                trverb();
-        else
-                printf("What do you want to do with the %s?\n",
-                        probj(object));
+    if (verb)
+        trverb();
+    else
+        printf("What do you want to do with the %s?\n",
+            probj(object));
 }
 
 /*
         Routine to print word corresponding to object
 */
-char *probj(register int object)
+char* probj(int object)
 {
-        int     wtype, wval;
-        analyze(word1, &wtype, &wval);
-        return (wtype == 1 ? word1 : word2);
+    int     wtype, wval;
+    analyze(word1, &wtype, &wval);
+    return (wtype == 1 ? word1 : word2);
 }
 /*
         dwarf stuff.
 */
 void dwarves(void)
 {
-        register int    i, j;
-        int             k, try, attack, stick, dtotal;
-        /*
-                see if dwarves allowed here
-        */
-        if (newloc == 0 || forced(newloc) || cond[newloc]&NOPIRAT)
-                return;
-        /*
-                see if dwarves are active.
-        */
-        if (!dflag) {
-                if (newloc > 15)
-                        ++dflag;
-                return;
+    int    i, j;
+    int             k, try, attack, stick, dtotal;
+    /*
+            see if dwarves allowed here
+    */
+    if (newloc == 0 || forced(newloc) || cond[newloc] & NOPIRAT)
+        return;
+    /*
+            see if dwarves are active.
+    */
+    if (!dflag) {
+        if (newloc > 15)
+            ++dflag;
+        return;
+    }
+    /*
+            if first close encounter (of 3rd kind)
+            kill 0, 1 or 2
+    */
+    if (dflag == 1) {
+        if (newloc < 15 || pct(95))
+            return;
+        ++dflag;
+        for (i = 1; i < 3; ++i)
+            if (pct(50))
+                dloc[rrand(1, 5)] = 0;
+        for (i = 1; i < (DWARFMAX - 1); ++i) {
+            if (dloc[i] == newloc)
+                dloc[i] = daltloc;
+            odloc[i] = dloc[i];
         }
+        rspeak(3);
+        drop(AXE, newloc);
+        return;
+    }
+    dtotal = attack = stick = 0;
+    for (i = 1; i < DWARFMAX; ++i) {
+        if (dloc[i] == 0)
+            continue;
         /*
-                if first close encounter (of 3rd kind)
-                kill 0, 1 or 2
+                move a dwarf at random. we don't
+                have a matrix around to do it
+                as in the original version...
         */
-        if (dflag == 1) {
-                if (newloc < 15 || pct (95))
-                        return;
-                ++dflag;
-                for (i = 1; i<3; ++i)
-                        if (pct (50))
-                                dloc[rrand(1, 5)] = 0;
-                for (i = 1; i< (DWARFMAX-1); ++i) {
-                        if (dloc[i] == newloc)
-                                dloc[i] = daltloc;
-                        odloc[i] = dloc[i];
-                }
-                rspeak(3);
-                drop(AXE, newloc);
-                return;
+        for (try = 1; try < 20; ++try) {
+            j = rrand(15, 120); /* allowed area */
+            if (j != odloc[i] && j != dloc[i] &&
+                !(i == (DWARFMAX - 1) && (cond[j] & (NOPIRAT == 1))))
+                break;
         }
-        dtotal = attack = stick = 0;
-        for (i = 1; i<DWARFMAX; ++i) {
-                if (dloc[i] == 0)
-                        continue;
-                /*
-                        move a dwarf at random. we don't
-                        have a matrix around to do it
-                        as in the original version...
-                */
-                for (try = 1; try<20; ++try) {
-                        j = rrand(15, 120); /* allowed area */
-                        if (j != odloc[i] && j != dloc[i] &&
-                         !(i == (DWARFMAX-1) && (cond[j] & (NOPIRAT == 1))))
-                                break;
-                }
-                if (j == 0)
-                        j = odloc[i];
-                odloc[i] = dloc[i];
-                dloc[i] = j;
-                if ((dseen[i] && newloc >= 15) ||
-                 dloc[i] == newloc || odloc[i] == newloc)
-                        dseen[i] = 1;
-                else
-                        dseen[i] = 0;
-                if (!dseen[i])
-                        continue;
-                dloc[i] = newloc;
-                if (i == 6)
-                        dopirate();
-                else {
-                        ++dtotal;
-                        if (odloc[i] == dloc[i]) {
-                                ++attack;
-                                if (knfloc >= 0)
-                                        knfloc = newloc;
-                                if (rrand(0, 999) < 95*(dflag-2))
-                                        ++stick;
-                        }
-                }
-        }
-        if (dtotal == 0)
-                return;
-        if (dtotal > 1)
-                printf("There are %d threatening little dwarves in the room with you!\n",   dtotal);
+        if (j == 0)
+            j = odloc[i];
+        odloc[i] = dloc[i];
+        dloc[i] = j;
+        if ((dseen[i] && newloc >= 15) ||
+            dloc[i] == newloc || odloc[i] == newloc)
+            dseen[i] = 1;
         else
-                rspeak(4);
-        if (attack == 0)
-                return;
-        if (dflag == 2)
-                ++dflag;
-        if (attack > 1) {
-                printf("%d of them throw knives at you!!\n", attack);
-                k = 6;
-        }
+            dseen[i] = 0;
+        if (!dseen[i])
+            continue;
+        dloc[i] = newloc;
+        if (i == 6)
+            dopirate();
         else {
-                rspeak(5);
-                k = 52;
+            ++dtotal;
+            if (odloc[i] == dloc[i]) {
+                ++attack;
+                if (knfloc >= 0)
+                    knfloc = newloc;
+                if (rrand(0, 999) < 95 * (dflag - 2))
+                    ++stick;
+            }
         }
-        if (stick <= 1) {
-                rspeak(stick+k);
-                if (stick == 0)
-                        return;
-        }
-        else
-                printf("%d of them get you !!!\n", stick);
-        oldloc2 = newloc;
-        death();
+    }
+    if (dtotal == 0)
+        return;
+    if (dtotal > 1)
+        printf("There are %d threatening little dwarves in the room with you!\n", dtotal);
+    else
+        rspeak(4);
+    if (attack == 0)
+        return;
+    if (dflag == 2)
+        ++dflag;
+    if (attack > 1) {
+        printf("%d of them throw knives at you!!\n", attack);
+        k = 6;
+    }
+    else {
+        rspeak(5);
+        k = 52;
+    }
+    if (stick <= 1) {
+        rspeak(stick + k);
+        if (stick == 0)
+            return;
+    }
+    else
+        printf("%d of them get you !!!\n", stick);
+    oldloc2 = newloc;
+    death();
 }
 /*
         pirate stuff
 */
 void dopirate(void)
 {
-        register int    j, k;
-        if (newloc == chloc || prop[CHEST] >= 0)
-                return;
-        k = 0;
-        for (j = 50; j<=MAXTRS; ++j)
-                if (j != PYRAMID ||
-                 (newloc != place[PYRAMID] &&
-                 newloc != place[EMERALD])) {
-                        if (toting(j))
-                                goto stealit;
-                        if (here(j))
-                                ++k;
-                }
-        if (tally == tally2+1 && k == 0 && place[CHEST] == 0 &&
-         here(LAMP) && prop[LAMP] == 1) {
-                rspeak(186);
-                move(CHEST, chloc);
-                move(MESSAGE, chloc2);
-                dloc[6] = chloc;
-                odloc[6] = chloc;
-                dseen[6] = 0;
-                return;
-        }
-        if (odloc[6] != dloc[6] && pct(20)) {
-                rspeak(127);
-                return;
-        }
+    int    j, k;
+    if (newloc == chloc || prop[CHEST] >= 0)
         return;
-
-stealit:
-
-        rspeak(128);
-        if (place[MESSAGE] == 0)
-                move(CHEST, chloc);
-        move(MESSAGE, chloc2);
-        for (j = 50; j<=MAXTRS; ++j) {
-                if (j == PYRAMID &&
-                 (newloc == place[PYRAMID] ||
-                 newloc == place[EMERALD]))
-                        continue;
-                if (at(j) && fixed[j] == 0)
-                        carry(j, newloc);
-                if (toting(j))
-                        drop(j, chloc);
+    k = 0;
+    for (j = 50; j <= MAXTRS; ++j)
+        if (j != PYRAMID ||
+            (newloc != place[PYRAMID] &&
+                newloc != place[EMERALD])) {
+            if (toting(j))
+                goto stealit;
+            if (here(j))
+                ++k;
         }
+    if (tally == tally2 + 1 && k == 0 && place[CHEST] == 0 &&
+        here(LAMP) && prop[LAMP] == 1) {
+        rspeak(186);
+        move(CHEST, chloc);
+        move(MESSAGE, chloc2);
         dloc[6] = chloc;
         odloc[6] = chloc;
         dseen[6] = 0;
+        return;
+    }
+    if (odloc[6] != dloc[6] && pct(20)) {
+        rspeak(127);
+        return;
+    }
+    return;
+
+stealit:
+
+    rspeak(128);
+    if (place[MESSAGE] == 0)
+        move(CHEST, chloc);
+    move(MESSAGE, chloc2);
+    for (j = 50; j <= MAXTRS; ++j) {
+        if (j == PYRAMID &&
+            (newloc == place[PYRAMID] ||
+                newloc == place[EMERALD]))
+            continue;
+        if (at(j) && fixed[j] == 0)
+            carry(j, newloc);
+        if (toting(j))
+            drop(j, chloc);
+    }
+    dloc[6] = chloc;
+    odloc[6] = chloc;
+    dseen[6] = 0;
 }
 /*
         special time limit stuff...
 */
 int stimer(void)
 {
-        register int    i;
-        foobar = foobar > 0 ? -foobar : 0;
-        testbr = 2;
-        if (tally == 0 && loc >= 15 && loc != 33)
-                --clock1;
-        if (clock1 == 0) {
-                /*
-                        start closing the cave
-                */
-                prop[GRATE] = 0;
-                prop[FISSURE] = 0;
-                for (i = 1; i<DWARFMAX; ++i)
-                        dseen[i] = 0;
-                move(TROLL, 0);
-                move((TROLL+MAXOBJ), 0);
-                move(TROLL2, 117);
-                move((TROLL2+MAXOBJ), 122);
-                juggle(CHASM);
-                if (prop[BEAR] != 3)
-                        dstroy(BEAR);
-                prop[CHAIN] = 0;
-                fixed[CHAIN] = 0;
-                prop[AXE] = 0;
-                fixed[AXE] = 0;
-                rspeak(129);
-                clock1 = -1;
-                closing = 1;
-                return(0);
-        }
-        if (clock1 < 0)
-                --clock2;
-        if (clock2 == 0) {
-                /*
-                        set up storage room...
-                        and close the cave...
-                */
-                prop[BOTTLE] = put(BOTTLE, 115, 1);
-                prop[PLANT] = put(PLANT, 115, 0);
-                prop[OYSTER] = put(OYSTER, 115, 0);
-                prop[LAMP] = put(LAMP, 115, 0);
-                prop[ROD] = put(ROD, 115, 0);
-                prop[DWARF] = put(DWARF, 115, 0);
-                loc = 115;
-                oldloc = 115;
-                newloc = 115;
-                put(GRATE, 116, 0);
-                prop[SNAKE] = put(SNAKE, 116, 1);
-                prop[BIRD] = put(BIRD, 116, 1);
-                prop[CAGE] = put(CAGE, 116, 0);
-                prop[ROD2] = put(ROD2, 116, 0);
-                prop[PILLOW] = put(PILLOW, 116, 0);
-                prop[MIRROR] = put(MIRROR, 115, 0);
-                fixed[MIRROR] = 116;
-                for (i = 1; i<= MAXOBJ; ++i)
-                        if (toting(i))
-                                dstroy(i);
-                rspeak(132);
-                closed = 1;
-                loc = 0;
-                return(1);
-        }
-        if (prop[LAMP] == 1)
-                --limit;
-        if (limit <= 30 &&
-         here(BATTERIES) && prop[BATTERIES] == 0 &&
-         here(LAMP)) {
-                rspeak(188);
-                prop[BATTERIES] = 1;
-                if (toting(BATTERIES))
-                        drop(BATTERIES, loc);
-                limit += 2500;
-                lmwarn = 0;
-                return(0);
-        }
-        if (limit == 0) {
-                --limit;
-                prop[LAMP] = 0;
-                if (here(LAMP))
-                        rspeak(184);
-                return(0);
-        }
-        if (limit < 0 && loc <= 8) {
-                rspeak(185);
-                gaveup = true;
-                normend();
-        }
-        if (limit <= 30) {
-                if (lmwarn || !here(LAMP))
-                        return(0);
-                lmwarn = 1;
-                i = 187;
-                if (place[BATTERIES] == 0)
-                        i = 183;
-                if (prop[BATTERIES] == 1)
-                        i = 189;
-                rspeak(i);
-                return(0);
-        }
+    int    i;
+    foobar = foobar > 0 ? -foobar : 0;
+    testbr = 2;
+    if (tally == 0 && loc >= 15 && loc != 33)
+        --clock1;
+    if (clock1 == 0) {
+        /*
+                start closing the cave
+        */
+        prop[GRATE] = 0;
+        prop[FISSURE] = 0;
+        for (i = 1; i < DWARFMAX; ++i)
+            dseen[i] = 0;
+        move(TROLL, 0);
+        move((TROLL + MAXOBJ), 0);
+        move(TROLL2, 117);
+        move((TROLL2 + MAXOBJ), 122);
+        juggle(CHASM);
+        if (prop[BEAR] != 3)
+            dstroy(BEAR);
+        prop[CHAIN] = 0;
+        fixed[CHAIN] = 0;
+        prop[AXE] = 0;
+        fixed[AXE] = 0;
+        rspeak(129);
+        clock1 = -1;
+        closing = 1;
         return(0);
+    }
+    if (clock1 < 0)
+        --clock2;
+    if (clock2 == 0) {
+        /*
+                set up storage room...
+                and close the cave...
+        */
+        prop[BOTTLE] = put(BOTTLE, 115, 1);
+        prop[PLANT] = put(PLANT, 115, 0);
+        prop[OYSTER] = put(OYSTER, 115, 0);
+        prop[LAMP] = put(LAMP, 115, 0);
+        prop[ROD] = put(ROD, 115, 0);
+        prop[DWARF] = put(DWARF, 115, 0);
+        loc = 115;
+        oldloc = 115;
+        newloc = 115;
+        put(GRATE, 116, 0);
+        prop[SNAKE] = put(SNAKE, 116, 1);
+        prop[BIRD] = put(BIRD, 116, 1);
+        prop[CAGE] = put(CAGE, 116, 0);
+        prop[ROD2] = put(ROD2, 116, 0);
+        prop[PILLOW] = put(PILLOW, 116, 0);
+        prop[MIRROR] = put(MIRROR, 115, 0);
+        fixed[MIRROR] = 116;
+        for (i = 1; i <= MAXOBJ; ++i)
+            if (toting(i))
+                dstroy(i);
+        rspeak(132);
+        closed = 1;
+        loc = 0;
+        return(1);
+    }
+    if (prop[LAMP] == 1)
+        --limit;
+    if (limit <= 30 &&
+        here(BATTERIES) && prop[BATTERIES] == 0 &&
+        here(LAMP)) {
+        rspeak(188);
+        prop[BATTERIES] = 1;
+        if (toting(BATTERIES))
+            drop(BATTERIES, loc);
+        limit += 2500;
+        lmwarn = 0;
+        return(0);
+    }
+    if (limit == 0) {
+        --limit;
+        prop[LAMP] = 0;
+        if (here(LAMP))
+            rspeak(184);
+        return(0);
+    }
+    if (limit < 0 && loc <= 8) {
+        rspeak(185);
+        gaveup = 1;
+        normend();
+    }
+    if (limit <= 30) {
+        if (lmwarn || !here(LAMP))
+            return(0);
+        lmwarn = 1;
+        i = 187;
+        if (place[BATTERIES] == 0)
+            i = 183;
+        if (prop[BATTERIES] == 1)
+            i = 189;
+        rspeak(i);
+        return(0);
+    }
+    return(0);
 }
 
 /*
         Routine to request whether a hint is desired.
 */
-void tryhint (register int imsg, int mask, register int i)
+void tryhint(int imsg, int mask, int i)
 {
-    putchar ('\n');
-    if (yes (imsg, 0, 54))
-        if (yes (87, imsg+1, 54)) {
+    putchar('\n');
+    if (yes(imsg, 0, 54))
+        if (yes(87, imsg + 1, 54)) {
             ++hinttaken;
             hintavail &= ~mask;
         }

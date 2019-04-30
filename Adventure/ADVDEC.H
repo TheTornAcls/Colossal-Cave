@@ -25,7 +25,7 @@ FILE	   *fd1, *fd2, *fd3, *fd4;
 #if !defined (MVS)
 char	   szFilePath[FILENAME_MAX];
 #endif
-short int  actmsg[33];             /* action messages      */
+short int  actmsg[ACTMSG];             /* action messages      */
 
 /*
         English variables

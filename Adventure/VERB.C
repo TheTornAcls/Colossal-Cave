@@ -102,7 +102,7 @@ void trverb(void)
 */
 void vtake(void)
 {
-        register int    msg, i;
+        int    msg, i;
 
         if (toting(object)) {
                 actspk(verb);
@@ -177,7 +177,7 @@ void vtake(void)
 */
 void vdrop(void)
 {
-        register int    i, msg = 54;
+        int    i, msg = 54;
 
         /*
          check for dynamite
@@ -268,7 +268,7 @@ void vdrop(void)
 */
 void vopen(void)
 {
-        register int    msg,oyclam;
+        int    msg,oyclam;
 
         switch(object) {
         case CLAM:
@@ -414,7 +414,7 @@ void vwave(void)
 */
 void vkill(void)
 {
-        register int    msg, i;
+        int    msg, i;
 
         switch(object) {
         case BIRD:
@@ -519,7 +519,7 @@ void vpour(void)
 */
 void veat(void)
 {
-        register int    msg;
+        int    msg;
 
         switch(object) {
         case FOOD:
@@ -558,7 +558,7 @@ void vdrink(void)
 */
 void vthrow(void)
 {
-        register int    msg, i;
+        int    msg, i;
 
         if (toting(ROD2) && object == ROD && !toting(ROD))
                 object = ROD2;
@@ -653,7 +653,7 @@ void vthrow(void)
 */
 void vfind(void)
 {
-        register int    msg;
+        int    msg;
         if (toting(object))
                 msg = 24;
         else if (closed)
@@ -676,7 +676,7 @@ void vfind(void)
 */
 void vfill(void)
 {
-        register int    msg, i;
+        int    msg, i;
 
         switch(object) {
         case BOTTLE:
@@ -715,7 +715,7 @@ void vfill(void)
 */
 void vfeed(void)
 {
-        register int    msg;
+        int    msg;
 
         switch(object) {
         case BIRD:
@@ -774,7 +774,7 @@ void vfeed(void)
 */
 void vread(void)
 {
-        register int    msg;
+        int    msg;
 
         msg = 0;
         if (dark()) {
@@ -835,7 +835,7 @@ void vblast(void)
 */
 void vbreak(void)
 {
-        register int    msg;
+        int    msg;
         if (object == MIRROR) {
                 msg = 148;
                 if (closed) {
@@ -871,15 +871,20 @@ void vwake(void)
 /*
         Routine to speak default verb message
 */
-void actspk(register int verb)
+void actspk(int verb)
 {
-        register int i;
+        int i;
 
-        if (verb<1 || verb>32)
-                bug(39);
-        i = actmsg[verb];
-        if (i)
+        if (verb < 1 || verb>32)
+        {
+            bug(39);
+        }
+        if ((verb >= 0) && (verb < ACTMSG))
+        {
+            i = actmsg[verb];
+            if (i)
                 rspeak(i);
+        }
 }
 
 /*
