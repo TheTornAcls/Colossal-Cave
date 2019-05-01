@@ -209,7 +209,7 @@ bool dark(void)
 /*
         Routine to tell if an item is present.
 */
-int here(int item)
+bool here(int item)
 {
     return(place[item] == loc || toting(item));
 }
@@ -217,7 +217,7 @@ int here(int item)
 /*
         Routine to tell if an item is being carried.
 */
-int toting(int item)
+bool toting(int item)
 {
     return(place[item] == -1);
 }
@@ -261,7 +261,7 @@ int pct(int x)
         Routine to tell if player is on
         either side of a two sided object.
 */
-int at(int item)
+bool at(int item)
 {
     return(place[item] == loc || fixed[item] == loc);
 }
