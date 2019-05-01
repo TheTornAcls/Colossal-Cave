@@ -13,7 +13,7 @@ void descsh(int loc);
 int vocab(char *word);
 int binary(char *w, struct wac wctable[], int maxwc);
 bool dark(void);
-int here(int item);
+bool here(int item);
 bool toting(int item);
 int forced(int atloc);
 int rrand(int low, int high);

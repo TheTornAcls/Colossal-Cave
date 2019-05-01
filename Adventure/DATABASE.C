@@ -209,7 +209,7 @@ bool dark(void)
 /*
         Routine to tell if an item is present.
 */
-int here(int item)
+bool here(int item)
 {
     return(place[item] == loc || toting(item));
 }
