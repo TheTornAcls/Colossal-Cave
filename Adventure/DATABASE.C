@@ -261,7 +261,7 @@ int pct(int x)
         Routine to tell if player is on
         either side of a two sided object.
 */
-int at(int item)
+bool at(int item)
 {
     return(place[item] == loc || fixed[item] == loc);
 }

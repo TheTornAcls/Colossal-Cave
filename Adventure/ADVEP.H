@@ -18,7 +18,7 @@ bool toting(int item);
 int forced(int atloc);
 int rrand(int low, int high);
 int pct(int x);
-int at(int item);
+bool at(int item);
 void dstroy(int obj);
 void move(int obj, int where);
 void juggle(int loc);
