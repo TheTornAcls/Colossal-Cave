@@ -35,7 +35,7 @@ void gettrav(int iloc)
         Function to scan a file up to a specified
         point and either print or return a string.
 */
-int rdupto(FILE * fdi, char uptoc, char print, char* string, int prespace)
+bool rdupto(FILE * fdi, char uptoc, char print, char* string, int prespace)
 {
     int    c;
 
@@ -45,7 +45,7 @@ int rdupto(FILE * fdi, char uptoc, char print, char* string, int prespace)
             prespace = 0;
         }
         if (c == EOF)
-            return(0);
+            return false;
         if (c == '\r')
             continue;
         if (print)
@@ -55,7 +55,7 @@ int rdupto(FILE * fdi, char uptoc, char print, char* string, int prespace)
     }
     if (!print)
         * string = '\0';
-    return(1);
+    return true;
 }
 
 /*

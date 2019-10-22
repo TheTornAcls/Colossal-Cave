@@ -3,7 +3,7 @@ void opentxt(void);
 void saveadv(void);
 void restore(void);
 void gettrav(int loc);
-int rdupto(FILE *fdi, char uptoc, char print, char *string, int prespace);
+bool rdupto(FILE *fdi, char uptoc, char print, char *string, int prespace);
 void rdskip(FILE *fdi, char skipc, int n, char rewind);
 bool yes(int msg1, int msg2, int msg3);
 void rspeak(int msg);
