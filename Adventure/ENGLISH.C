@@ -94,7 +94,7 @@ bool english(void)
 /*
                 Routine to analyze a word.
 */
-int analyze(char* word, int* type, int* value)
+bool analyze(char* word, int* type, int* value)
 {
     int    wordval, msg;
 
@@ -111,11 +111,11 @@ int analyze(char* word, int* type, int* value)
             msg = 13;
         }
         rspeak(msg);
-        return(0);
+        return false;
     }
     *type = wordval / 1000;
     *value = wordval % 1000;
-    return(1);
+    return true;
 }
 
 /*

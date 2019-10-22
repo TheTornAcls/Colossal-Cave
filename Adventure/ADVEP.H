@@ -31,7 +31,7 @@ int liqloc(int loc);
 int liq2(int pbottle);
 void bug(int n);
 bool english(void);
-int analyze(char *word, int *type, int *value);
+bool analyze(char *word, int *type, int *value);
 void getwords(void);
 void outwords(void);
 void itverb(void);
