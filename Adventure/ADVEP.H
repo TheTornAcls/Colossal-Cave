@@ -15,7 +15,7 @@ int binary(char *w, struct wac wctable[], int maxwc);
 bool dark(void);
 bool here(int item);
 bool toting(int item);
-int forced(int atloc);
+bool forced(int atloc);
 int rrand(int low, int high);
 int pct(int x);
 bool at(int item);

@@ -226,7 +226,7 @@ bool toting(int item)
         Routine to tell if a location causes
         a forced move.
 */
-int forced(int atloc)
+bool forced(int atloc)
 {
     return((cond[atloc] & FORCED) != 0);
 }
