@@ -146,7 +146,9 @@ void initplay(void)
     memset(prop, 0, (sizeof(short int)) * MAXOBJ);
     memset(&prop[50], 0xff, (sizeof(short int)) * (MAXOBJ - 50));
     wzdark = false;
-    closed = closing = holding = detail = 0;
+    closed = false;
+    closing = false;
+    holding = detail = 0;
     limit = 100;
     tally = 15;
     tally2 = 0;
