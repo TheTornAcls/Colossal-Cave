@@ -25,7 +25,7 @@ FILE	   *fd1, *fd2, *fd3, *fd4;
 #if !defined (MVS)
 char	   szFilePath[FILENAME_MAX];
 #endif
-short int  actmsg[33];             /* action messages      */
+short int  actmsg[ACTMSG];             /* action messages      */
 
 /*
         English variables
@@ -48,7 +48,8 @@ struct {
     int       tally,tally2;         /* item counts          */
     int       limit;                /* time limit           */
     int       lmwarn;               /* lamp warning flag    */
-    int       wzdark,closing,closed;/* game state flags     */
+    bool      wzdark;               /* game state flags     */
+    int       closing, closed;      /* game state flags     */
     int       holding;              /* count of held items  */
     int       detail;               /* LOOK count           */
     int       knfloc;               /* knife location       */
@@ -63,7 +64,7 @@ struct {
     int       bonus;                /* to pass to end       */
     int       numdie;               /* number of deaths     */
     int       object1;              /* to help intrans.     */
-    int       gaveup;               /* 1 if he quit early   */
+    bool      gaveup;               /* 1 if he quit early   */
     int       foobar;               /* fie fie foe foo...   */
     int       saveflg;              /* if game being saved  */
     int       dbugflg;              /* if game is in debug  */

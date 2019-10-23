@@ -4,6 +4,7 @@
 #include        <ctype.h>
 #include        <stdlib.h>
 #include        <string.h>
+#include        <stdbool.h>
 #include        "advent.h"      /* #define preprocessor equates */
 #include        "advep.h"       /* define all functions         */
 #include        "advword.h"     /* definition of "word" array   */
@@ -11,7 +12,7 @@
 #include        "advtext.h"     /* definition of "text" arrays  */
 #include        "advdec.h"      /* definition of global data    */
 
-int main(register int argc, register char** argv)
+int main(int argc, char** argv)
 {
     int	rflag;		/* user restore request option	*/
 
@@ -144,7 +145,8 @@ void initplay(void)
     memset(visited, 0, (sizeof(short int)) * MAXLOC);
     memset(prop, 0, (sizeof(short int)) * MAXOBJ);
     memset(&prop[50], 0xff, (sizeof(short int)) * (MAXOBJ - 50));
-    wzdark = closed = closing = holding = detail = 0;
+    wzdark = false;
+    closed = closing = holding = detail = 0;
     limit = 100;
     tally = 15;
     tally2 = 0;
@@ -167,7 +169,7 @@ void initplay(void)
     lmwarn = 0;
     foobar = 0;
     dflag = 0;
-    gaveup = 0;
+    gaveup = false;
     saveflg = 0;
     hinttaken = 0;
     hintavail = HINT;
@@ -206,7 +208,7 @@ void opentxt(void)
 */
 void saveadv(void)
 {
-    register char* sptr;
+    char* sptr;
     FILE* savefd;
     char            username[MAXNAME];
 
@@ -248,8 +250,8 @@ void restore(void)
 {
     char            username[MAXNAME];
     FILE* restfd;
-    register char* sptr;
-    register int    savedebug = dbugflg;
+    char* sptr;
+    int    savedebug = dbugflg;
 
     do {
         printf("What is the name of the saved game? ");

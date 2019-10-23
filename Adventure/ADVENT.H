@@ -7,7 +7,7 @@
 #define MAXLOC 140       /* max # of cave locations                  */
 #define WORDSIZE 20      /* max # of chars in commands               */
 #define MAXMSG 209       /* max # of long location descr             */
-
+#define ACTMSG 33      /* action message size */
 #define MAXTRAV (16+1) /* max # of travel directions from loc        */
                          /* +1 for terminator travel[x].tdest=-1 */
 #define DWARFMAX 7       /* max # of nasty dwarves                   */
