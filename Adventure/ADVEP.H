@@ -87,5 +87,5 @@ void trobj(void);
 char *probj(int object);
 void dwarves(void);
 void dopirate(void);
-int stimer(void);
+bool stimer(void);
 void tryhint(int imsg, int mask, int i);

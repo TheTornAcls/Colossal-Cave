@@ -49,7 +49,8 @@ struct {
     int       limit;                /* time limit           */
     int       lmwarn;               /* lamp warning flag    */
     bool      wzdark;               /* game state flags     */
-    int       closing, closed;      /* game state flags     */
+    bool      closing;              /* game state flags     */
+    bool      closed;               /* game state flags     */
     int       holding;              /* count of held items  */
     int       detail;               /* LOOK count           */
     int       knfloc;               /* knife location       */
@@ -87,9 +88,9 @@ struct {
 #define limit     saverec.limit
 #define lmwarn    saverec.lmwarn
 #define wzdark    saverec.wzdark
-#define closing saverec.closing
+#define closing   saverec.closing
 #define closed    saverec.closed
-#define holding saverec.holding
+#define holding   saverec.holding
 #define detail    saverec.detail
 #define knfloc    saverec.knfloc
 #define clock1    saverec.clock1
