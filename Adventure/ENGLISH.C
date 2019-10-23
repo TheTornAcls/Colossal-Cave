@@ -12,7 +12,7 @@
 /*
         Analyze a two word sentence
 */
-int english(void)
+bool english(void)
 {
     char* msg;
     int     type1, type2, val1, val2;
@@ -25,38 +25,38 @@ int english(void)
     getwords();
 
     if (!(*word1))
-        return(0);              /* ignore whitespace    */
+        return false;              /* ignore whitespace    */
     if (!analyze(word1, &type1, &val1))     /* check word1  */
-        return(0);              /* didn't know it       */
+        return false;              /* didn't know it       */
 
     if (type1 == 2 && val1 == SAY) {
         verb = SAY;     /* repeat word & act upon if..  */
         object = 1;
-        return(1);
+        return true;
     }
 
     if (*word2)
         if (!analyze(word2, &type2, &val2))
-            return(0);      /* didn't know it       */
+            return false;      /* didn't know it       */
 
 /* check his grammar */
     if ((type1 == 3) && (type2 == 3) && \
         (val1 == HELP) && (val2 == HELP)) {
         outwords();
-        return(0);
+        return false;
     }
     else if (type1 == 3) {
         rspeak(val1);
-        return(0);
+        return false;
     }
     else if (type2 == 3) {
         rspeak(val2);
-        return(0);
+        return false;
     }
     else if (type1 == 0) {
         if (type2 == 0) {
             printf("%s\n", msg);
-            return(0);
+            return false;
         }
         else
             motion = val1;
@@ -72,7 +72,7 @@ int english(void)
                 verb = POUR;
             else {
                 printf("%s\n", msg);
-                return(0);
+                return false;
             }
         }
     }
@@ -82,19 +82,19 @@ int english(void)
             object = val2;
         if (type2 == 2) {
             printf("%s\n", msg);
-            return(0);
+            return false;
         }
     }
     else
         bug(36);
-    return(1);
+    return true;
 }
 
 
 /*
                 Routine to analyze a word.
 */
-int analyze(char* word, int* type, int* value)
+bool analyze(char* word, int* type, int* value)
 {
     int    wordval, msg;
 
@@ -111,11 +111,11 @@ int analyze(char* word, int* type, int* value)
             msg = 13;
         }
         rspeak(msg);
-        return(0);
+        return false;
     }
     *type = wordval / 1000;
     *value = wordval % 1000;
-    return(1);
+    return true;
 }
 
 /*

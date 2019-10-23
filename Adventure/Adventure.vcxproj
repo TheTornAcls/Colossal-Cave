@@ -82,7 +82,7 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y ..\advent0\*.txt $(OutputPath)</Command>
+      <Command>xcopy /Y ..\advent0\*.txt "$(OutputPath)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
