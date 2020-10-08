@@ -210,7 +210,7 @@ void saveadv(void)
 {
     char* sptr;
     FILE* savefd;
-    char            username[MAXNAME];
+    char  username[MAXNAME];
 
     do {
         printf("What do you want to name the saved game? ");
@@ -248,10 +248,10 @@ void saveadv(void)
 */
 void restore(void)
 {
-    char            username[MAXNAME];
+    char  username[MAXNAME];
     FILE* restfd;
     char* sptr;
-    int    savedebug = dbugflg;
+    int   savedebug = dbugflg;
 
     do {
         printf("What is the name of the saved game? ");
@@ -278,4 +278,3 @@ void restore(void)
     }
     dbugflg |= savedebug; loc = 0; putchar('\n');
 }
-
