@@ -12,7 +12,7 @@
         A saved game may be restarted by typing "ADVENT -r<cr>".
 
         Debug data will be output by typing "ADVENT -d -d -d<cr>", but only if
-        the program is recompiled with the NDEBUG flag off.
+        the program is recompiled with the DEBUG flag on.
 
         The above-mentioned options can use '/' instead of '-'.
 

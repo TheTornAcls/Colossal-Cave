@@ -147,7 +147,7 @@ void getwords(void)
         wptr++, wptr2++, j++)
         * wptr2 = *wptr;
     *wptr2 = '\0';
-#if ! defined(NDEBUG)
+#ifdef DEBUG
     if (dbugflg)
         printf("WORD1 = %s, WORD2 = %s\n", word1, word2);
 #endif

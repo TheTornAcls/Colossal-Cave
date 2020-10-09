@@ -23,7 +23,7 @@ void gettrav(int iloc)
         i->tdest = (int)((*j / 1000000) % 1000);
     }
     i->tdest = -1; /* end of array */
-#if ! defined(NDEBUG)
+#ifdef DEBUG
     if (dbugflg)
         for (i = &travel[0]; i->tdest != -1; ++i)
             printf("cave[%d] = %d %d %d\n",
@@ -121,7 +121,7 @@ void rspeak(int msg)
     if (msg == 54)
         printf("ok.\n");
     else {
-#if ! defined(NDEBUG)
+#ifdef DEBUG
         if (dbugflg)
             printf("Seek loc msg #%d @ %ld\n", msg, idx4[msg]);
 #endif
