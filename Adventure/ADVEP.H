@@ -17,7 +17,7 @@ bool here(int item);
 bool toting(int item);
 bool forced(int atloc);
 int rrand(int low, int high);
-int pct(int x);
+bool pct(int x);
 bool at(int item);
 void dstroy(int obj);
 void move(int obj, int where);

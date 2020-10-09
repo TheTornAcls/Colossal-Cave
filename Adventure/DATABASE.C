@@ -252,7 +252,7 @@ int rrand(int low, int high)
 /*
         Routine true x% of the time.
 */
-int pct(int x)
+bool pct(int x)
 {
     return(rrand(0, 99) < x);
 }
