@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     szFilePath[0] = '\0';
 #else
     {
-        int i;
+        size_t i;
         strcpy_s(szFilePath, FILENAME_MAX, argv[0]);
         for (i = strlen(szFilePath) - 1; i >= 0 && szFilePath[i] != '\\'; i--);
         szFilePath[i + 1] = '\0';

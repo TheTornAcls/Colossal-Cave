@@ -89,9 +89,10 @@ bool yes(int msg1, int msg2, int msg3)
         rspeak(msg1);
     while (y == -1) {
         char* i;
-        int   l;
+        size_t   l;
         putchar('>');
-        fflush(stdout); fgets(answer, 80, stdin);
+        fflush(stdout); 
+        fgets(answer, 80, stdin);
         for (i = answer; *i != '\n'; i++) * i = (char)tolower(*i);
         l = i - answer;
         if (l == 0)
