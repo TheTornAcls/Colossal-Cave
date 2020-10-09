@@ -1,11 +1,12 @@
 ﻿################################################################################
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
-
+**/.vs/
 /Advent0/Debug
-/Adventure/.vs/Adventure/v16/ipch/AutoPCH/44d2c5534f603120
+/Advent0/Release
+/Adventure/.vs
 /Adventure/Debug
-/Adventure/.vs/Adventure/v16/Solution.VC.db
+/Adventure/Release
 *.opendb
 *.db-shm
 *.db-wal

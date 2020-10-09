@@ -841,7 +841,7 @@ stealit:
 /*
         special time limit stuff...
 */
-int stimer(void)
+bool stimer(void)
 {
     int    i;
     foobar = foobar > 0 ? -foobar : 0;
@@ -869,8 +869,8 @@ int stimer(void)
         fixed[AXE] = 0;
         rspeak(129);
         clock1 = -1;
-        closing = 1;
-        return(0);
+        closing = true;
+        return false;
     }
     if (clock1 < 0)
         --clock2;
@@ -900,9 +900,9 @@ int stimer(void)
             if (toting(i))
                 dstroy(i);
         rspeak(132);
-        closed = 1;
+        closed = true;
         loc = 0;
-        return(1);
+        return true;
     }
     if (prop[LAMP] == 1)
         --limit;
@@ -915,14 +915,14 @@ int stimer(void)
             drop(BATTERIES, loc);
         limit += 2500;
         lmwarn = 0;
-        return(0);
+        return false;
     }
     if (limit == 0) {
         --limit;
         prop[LAMP] = 0;
         if (here(LAMP))
             rspeak(184);
-        return(0);
+        return false;
     }
     if (limit < 0 && loc <= 8) {
         rspeak(185);
@@ -939,9 +939,9 @@ int stimer(void)
         if (prop[BATTERIES] == 1)
             i = 189;
         rspeak(i);
-        return(0);
+        return false;
     }
-    return(0);
+    return false;
 }
 
 /*

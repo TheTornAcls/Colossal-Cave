@@ -89,9 +89,10 @@ bool yes(int msg1, int msg2, int msg3)
         rspeak(msg1);
     while (y == -1) {
         char* i;
-        int   l;
+        size_t   l;
         putchar('>');
-        fflush(stdout); fgets(answer, 80, stdin);
+        fflush(stdout); 
+        fgets(answer, 80, stdin);
         for (i = answer; *i != '\n'; i++) * i = (char)tolower(*i);
         l = i - answer;
         if (l == 0)
@@ -252,7 +253,7 @@ int rrand(int low, int high)
 /*
         Routine true x% of the time.
 */
-int pct(int x)
+bool pct(int x)
 {
     return(rrand(0, 99) < x);
 }

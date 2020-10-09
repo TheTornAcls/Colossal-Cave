@@ -22,7 +22,7 @@ int main(int argc, char** argv)
     szFilePath[0] = '\0';
 #else
     {
-        int i;
+        size_t i;
         strcpy_s(szFilePath, FILENAME_MAX, argv[0]);
         for (i = strlen(szFilePath) - 1; i >= 0 && szFilePath[i] != '\\'; i--);
         szFilePath[i + 1] = '\0';
@@ -146,7 +146,9 @@ void initplay(void)
     memset(prop, 0, (sizeof(short int)) * MAXOBJ);
     memset(&prop[50], 0xff, (sizeof(short int)) * (MAXOBJ - 50));
     wzdark = false;
-    closed = closing = holding = detail = 0;
+    closed = false;
+    closing = false;
+    holding = detail = 0;
     limit = 100;
     tally = 15;
     tally2 = 0;
@@ -210,7 +212,7 @@ void saveadv(void)
 {
     char* sptr;
     FILE* savefd;
-    char            username[MAXNAME];
+    char  username[MAXNAME];
 
     do {
         printf("What do you want to name the saved game? ");
@@ -248,10 +250,10 @@ void saveadv(void)
 */
 void restore(void)
 {
-    char            username[MAXNAME];
+    char  username[MAXNAME];
     FILE* restfd;
     char* sptr;
-    int    savedebug = dbugflg;
+    int   savedebug = dbugflg;
 
     do {
         printf("What is the name of the saved game? ");
@@ -278,4 +280,3 @@ void restore(void)
     }
     dbugflg |= savedebug; loc = 0; putchar('\n');
 }
-
