@@ -3,7 +3,7 @@ and Don Woods at SAIL in the early seventies.  This Public Domain
 version has been translated from BDS C to CII by Jerry Pohl and then
 to C Set++ C by John Kennedy.
 
-See ADVENT.DOC for info on how the program was modified and how you can
+See ADVENT.TXT for info on how the program was modified and how you can
 change the source.
 
 All the .C files are C source code. The .TXT files are data used
@@ -44,7 +44,7 @@ ADVENT.EXE is the executable adventure program.
 The *.C files are the source files for the adventure program,
 and the files it uses.
 
-ADVENT.DOC will tell you what files you must have on a disk in
+ADVENT.TXT will tell you what files you must have on a disk in
 order to run and to modify the program.
 
 The *.TXX files provide the text you see on the screen when
@@ -52,13 +52,13 @@ you're playing adventure.
 
 -----------------------------------------------------------------------------
 
-CHEAT.DOC --
+CHEAT.TXT --
 
 >>>>  PLEASE TRY TO PLAY THE GAME FIRST WITHOUT READING THIS FILE !  <<<<
 
 But if you really need some help in the very beginning, enter --
 
-TYPE CHEAT.DOC
+TYPE CHEAT.TXT
 
 for adventure clues.
 
