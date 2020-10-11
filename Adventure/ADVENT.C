@@ -36,7 +36,7 @@ int main(int argc, char** argv)
         case 'r':
             ++rflag;
             continue;
-#if ! defined(NDEBUG)
+#ifdef DEBUG
         case 'd':
             ++dbugflg;
             continue;
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
             continue;
         }                               /* switch       */
     }                                       /* while        */
-#if ! defined(NDEBUG)
+#ifdef DEBUG
     if (dbugflg < 2)
         dbugflg = 0;    /* must request three times     */
 #endif

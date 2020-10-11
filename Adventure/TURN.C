@@ -136,7 +136,7 @@ void turn(void)
     while (!english())      /* retrieve player instructions */
         ;
 
-#if ! defined(NDEBUG)
+#ifdef DEBUG
     if (dbugflg)
         printf("loc = %d, verb = %d, object = %d, motion = %d\n",
             loc, verb, object, motion);
@@ -328,7 +328,7 @@ void dotrav(void)
         rcond = travel[kk].tcond;
         robject = rcond % 100;
 
-#if ! defined(NDEBUG)
+#ifdef DEBUG
         if (dbugflg)
             printf("rdest = %d, rverb = %d, rcond = %d, robject = %d in dotrav\n",
                 rdest, rverb, \
@@ -341,7 +341,7 @@ void dotrav(void)
         case 0:
             if ((rcond == 0) || (pctt < rcond))
                 ++mvflag;
-#if ! defined(NDEBUG)
+#ifdef DEBUG
             if (rcond && dbugflg)
                 printf("%% move %d %d\n",
                     pctt, mvflag);
@@ -376,7 +376,7 @@ void dotrav(void)
         spcmove(rdest);
     else {
         newloc = rdest;
-#if ! defined(NDEBUG)
+#ifdef DEBUG
         if (dbugflg)
             printf("newloc in dotrav = %d\n", newloc);
 #endif
