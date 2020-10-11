@@ -1,3 +1,5 @@
+# Adventure
+
 This is the real, full-blown adventure program written by Will Crowther
 and Don Woods at SAIL in the early seventies.  This Public Domain
 version has been translated from BDS C to CII by Jerry Pohl and then
@@ -47,14 +49,14 @@ and the files it uses.
 ADVENT.TXT will tell you what files you must have on a disk in
 order to run and to modify the program.
 
-The *.TXX files provide the text you see on the screen when
+The *.TXT files provide the text you see on the screen when
 you're playing adventure.
 
 -----------------------------------------------------------------------------
 
 CHEAT.TXT --
 
->>>>  PLEASE TRY TO PLAY THE GAME FIRST WITHOUT READING THIS FILE !  <<<<
+>>>>  PLEASE TRY TO PLAY THE GAME FIRST WITHOUT READING THIS FILE ! 
 
 But if you really need some help in the very beginning, enter --
 
@@ -74,4 +76,3 @@ and then come back later for more help if you need it.
 
         The best of luck, and may the pirate give up his chest and all
               your nasty dwarves turn into puffs of black smoke!
-

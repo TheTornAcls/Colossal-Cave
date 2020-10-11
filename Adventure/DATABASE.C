@@ -93,7 +93,7 @@ bool yes(int msg1, int msg2, int msg3)
         putchar('>');
         fflush(stdout); 
         fgets(answer, 80, stdin);
-        for (i = answer; *i != '\n'; i++) * i = (char)tolower(*i);
+        for (i = answer; *i != '\n'; i++) *i = (char)tolower(*i);
         l = i - answer;
         if (l == 0)
             rspeak(89);
