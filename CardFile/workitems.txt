@@ -1,0 +1,26 @@
+Replace OpenFile with CreateFile
+Replace _lclose with CloseHandle
+Replace _llseek with SetFilePointer
+
+indos.asm contains the assembly functions for file I/O.  Replace with WriteFile.
+
+indos2.asm contains RepMove and RepMoveDown. These functions are used to move data around in the "Card" block.  Need to be rewritten in C.  hCards 
+is the global memory used to store the cards.  This whole system can probably be rewritten, but after we get it working.
+
+I commented out the Pen for Windows code, should we replace with Tablet APIs??
+
+Printing code needs to be rewritten.
+
+OLE1 to OLE 2. This is going to be interesting.  Need to find good documentation on converting.  Most of the compile errors concern OLE1.
+
+There is code to do dialing.  This need to be removed.  
+
+Delete calls to FreeProcInstance
+
+Replace GetProfileString and WriteProfileString with appropriate Registry calls
+
+Good URL for Obsolete APIs
+http://msdn.microsoft.com/library/default.asp?url=/library/en-us/winprog/winprog/obsolete_windows_programming_elements.asp
+
+Some Assembly Function Replacements - replacing DOSCALLS
+; http://msdn.microsoft.com/library/default.asp?url=/library/en-us/vccore/html/_core_porting_ms.2d.dos_system_calls.asp

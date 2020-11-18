@@ -1,0 +1,55 @@
+NAME    CARDFILE WINDOWAPI
+
+DESCRIPTION     'Index Card Handler'
+EXETYPE         WINDOWS
+STUB            'WINSTUB.EXE'
+
+CODE MOVEABLE DISCARDABLE
+DATA MOVEABLE MULTIPLE		; Should we add a PRELOAD here?
+
+SEGMENTS
+    _INIT       PRELOAD MOVEABLE
+    _TEXT       PRELOAD MOVEABLE
+    _INDEX      MOVEABLE
+    _INPUT      MOVEABLE
+    _FILE       MOVEABLE
+    _READ       MOVEABLE
+    _WRITE      MOVEABLE
+    _OBJECT     MOVEABLE
+    _FIND       MOVEABLE
+    _DLGBOX     MOVEABLE
+    _DIAL       MOVEABLE
+    _PRINT      MOVEABLE
+    _PAGE       MOVEABLE
+    _SPECIAL    MOVEABLE
+    _INSERT     MOVEABLE
+
+HEAPSIZE    2048
+STACKSIZE   8192
+
+EXPORTS
+    IndexWndProc    @1
+    EditWndProc     @2
+    CardWndProc     @3
+    DlgProc         @4
+    fnAbortDlgProc  @5
+    fnAbortProc     @6
+    fnDial          @7
+    PageSetupDlgProc   @8
+    HookProc        @9
+;
+; eCDA functions
+;
+    CallBack        @10
+    READSTREAM      @11
+    WRITESTREAM     @12
+    READOLDSTREAM   @13
+    fnLinksDlg      @14
+    fnInvalidLink   @15
+    PasteSpecialDlgProc @16
+    InsertObjectDlgProc @17
+
+; BOGUS
+; Temp until libw.lib is rebuilt
+IMPORTS
+    GetSysColorBrush    =   USER.281
