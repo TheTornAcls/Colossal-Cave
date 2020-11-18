@@ -1,0 +1,40 @@
+[ASSOCIATION]
+workspacefile=C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\Lab1.dsw
+workspacetype=microsoft visual c++
+[CurrentProject]
+curproj=Lab1.vpj
+[ProjectDates]
+Lab1.dsp=20020313220325379
+[State]
+SCREEN: 1024 768 0 0 1024 692 0 0 M 0 0 0 0 866 644
+CWD: C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1
+BUFFER: BN="C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\Answers\MyString.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0
+VIEW: LN=.771 CL=22 LE=0 CX=21 CY=19 WI=5 BI=15 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\mystring.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0
+VIEW: LN=.111 CL=18 LE=0 CX=17 CY=4 WI=5 BI=16 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\Test1.cpp"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0
+VIEW: LN=.426 CL=12 LE=0 CX=11 CY=8 WI=5 BI=13 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\mystring.h"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C	HM=0 MF=8 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0
+VIEW: LN=.684 CL=1 LE=0 CX=0 CY=17 WI=5 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 858 318 -1 -1 N  WF=0 WT=2 "OEM Fixed Font,10,0,1"
+BUFFER: BN="C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\mystring.h"
+VIEW: LN=.688 CL=1 LE=0 CX=0 CY=18 WI=94 BI=18 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 318 858 318 -1 -1 M  WF=0 WT=2 "OEM Fixed Font,10,0,1"
+BUFFER: BN="C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\Answers\MyString.h"
+VIEW: LN=.771 CL=22 LE=0 CX=21 CY=19 WI=93 BI=15 HT=0 HN=0 HF=0 HC=4
+FILEHIST: 9
+C:\Program Files\Microsoft Visual Studio\VC98\include\WINNT.H
+C:\Program Files\Microsoft SDK\Samples\Begin\FindFirst\findfirst.h
+C:\Program Files\Microsoft SDK\Samples\Begin\FindFirst\findfirst.cpp
+C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\lab1.dsp
+C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\Answers\mystring.h
+C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\Answers\mystring.cpp
+C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\mystring.cpp
+C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\Test1.cpp
+C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\mystring.h
+[TreeExpansion]
+Lab1.dsp 1 1 1 0 0 0
