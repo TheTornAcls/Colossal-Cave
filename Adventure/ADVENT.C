@@ -12,6 +12,12 @@
 #include        "advtext.h"     /* definition of "text" arrays  */
 #include        "advdec.h"      /* definition of global data    */
 
+#if defined(_WIN64) 
+typedef __int64 INT_PTR;
+#else 
+typedef int INT_PTR;
+#endif
+
 int main(int argc, char** argv)
 {
     int	rflag;		/* user restore request option	*/
@@ -22,7 +28,7 @@ int main(int argc, char** argv)
     szFilePath[0] = '\0';
 #else
     {
-        size_t i;
+        INT_PTR i;
         strcpy_s(szFilePath, FILENAME_MAX, argv[0]);
         for (i = strlen(szFilePath) - 1; i >= 0 && szFilePath[i] != '\\'; i--);
         szFilePath[i + 1] = '\0';
