@@ -1,7 +1,7 @@
 /*      program ADVENT0.C                                       *\
 \*      execution will read the four adventure text files       *\
-\*      files; "advent1.txx", "advent2.txx", "advent3.txx" &    *\
-\*      "advent4.txx". it will create the file "advtext.h"      *\
+\*      files; "advent1.txt", "advent2.txt", "advent3.txt" &    *\
+\*      "advent4.txt". it will create the file "advtext.h"      *\
 \*      which is an Index Sequential Access Method (ISAM)       *\
 \*      header to be #included into "advent.c" before the       *\
 \*      header "advdec.h" is #included.                         */
