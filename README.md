@@ -9,13 +9,16 @@ See ADVENT.TXT for info on how the program was modified and how you can
 change the source.
 
 All the .C files are C source code. The .TXT files are data used
-by the program ADVENT.EXE.
+by the program ADVENT0.EXE.
 
 To run ADVENTURE simply enter --
 
-ADVENT<cr> and you're on your way.
+```
+ADVENTURE.exe
+``` 
+and you're on your way.
 
-Before you begin, a few suggestions:
+## Before you begin, a few suggestions:
 
 1. Make a map. There are two common ways to handle this. You can
 use a piece of butcher paper and a pencil and sketch in all the
@@ -33,15 +36,23 @@ of moves getting nowhere).
 this one. They were spending 2 or 3 hours a day and they weren't
 beginners!
 
-Try everything!
+>>>>> Try everything!
 
-Sometimes you will have to go back to a previous location to be able to do
-something.  The game parser uses simple two word (verb-noun) commands
-(after all, this is the first text adventure game. Infocom wasn't to be
-for a while yet!)
+
+Sometimes you will have to go back to a previous location to be able to do something.  The game parser uses simple two word (verb-noun) commands (after all, this is the first text adventure game. Infocom wasn't to be for a while yet!)
+
 -----------------------------------------------------------------------------
+Load the Adventure.sln file into Visual Studio (I used Visual Studio 2019 Community Edition)
 
-ADVENT.EXE is the executable adventure program.
+Build for you platform (x86/x64/ARM64)
+The Adventure.exe will be in (repo)\Adventure\(Configuration)\(Platform)
+For example:
+```
+Adventure\Debug\x64
+```
+
+ADVENTURE.EXE is the executable adventure program.
+>**NOTE:** You must run Adventure.exe in the directory where it built, because is uses data files located there.
 
 The *.C files are the source files for the adventure program,
 and the files it uses.
@@ -54,7 +65,7 @@ you're playing adventure.
 
 -----------------------------------------------------------------------------
 
-CHEAT.TXT --
+## CHEAT.TXT --
 
 >>>>  PLEASE TRY TO PLAY THE GAME FIRST WITHOUT READING THIS FILE ! 
 
