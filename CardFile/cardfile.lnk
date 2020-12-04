@@ -1,7 +1,0 @@
-card dial dragdrop file find fixmenu indb indos +
-indos2 init index input insert lstrfns main object +
-page picture print read register special write,
-cardfile.exe
-cardfile.map
-libw mlibcew olecli commdlg shell /NOE/NOD /M
-cardfile.def
