@@ -1,0 +1,9 @@
+<!DOCTYPE Workspace SYSTEM "http://www.slickedit.com/dtd/vse/9.1/vpw.dtd">
+<Workspace Version="9.1" VendorName="SlickEdit">
+	<Projects>
+		<Project File="advent.vpj"/>
+	</Projects>
+	<CompatibleVersions>
+		<PrevVersion VersionNumber="9.0"/>
+	</CompatibleVersions>
+</Workspace>

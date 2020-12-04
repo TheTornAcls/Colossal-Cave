@@ -1,0 +1,37 @@
+[ASSOCIATION]
+workspacefile=C:\Program Files\Microsoft Visual Studio\MyProjects\adventure.2\Adventure.dsw
+workspacetype=microsoft visual c++
+[CurrentProject]
+curproj=Adventure.vpj
+[ProjectDates]
+Adventure.dsp=20020531234324056
+[State]
+SCREEN: 1024 768 0 0 1024 740 0 0 N 0 0 0 0 1012 636
+CWD: C:\Program Files\Microsoft SDK\Samples\tetris\CSharp_Tetris
+BUFFER: BN="C:\Program Files\Microsoft SDK\temp\hello.cs"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C#	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0
+VIEW: LN=.9447 CL=22 LE=0 CX=21 CY=3 WI=5 BI=5 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Program Files\Microsoft SDK\Samples\tetris\CSharp_Tetris\LayoutForm.cs"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C#	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0
+VIEW: LN=.13431 CL=43 LE=0 CX=42 CY=46 WI=5 BI=8 HT=0 HN=0 HF=0 HC=4
+BUFFER: BN="C:\Program Files\Microsoft SDK\Samples\tetris\CSharp_Tetris\Shape.cs"
+BI: MA=1 74 1  TABS=1 5  WWS=1 IWT=0 ST=0 IN=2 BW=0 US=32000 RO=0 SE=1 SN=0 BIN=0 MN=C#	HM=0 MF=0 TL=0 MLL=0 ASE=0 LNL=6 LCF=0 CAPS=0
+VIEW: LN=.0 CL=1 LE=0 CX=0 CY=1 WI=5 BI=10 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 322 1020 322 -1 -1 N  WF=0 WT=2 "OEM Fixed Font,10,0,1"
+BUFFER: BN="C:\Program Files\Microsoft SDK\temp\hello.cs"
+VIEW: LN=.8699 CL=30 LE=0 CX=29 CY=2 WI=35 BI=5 HT=0 HN=0 HF=0 HC=4
+WINDOW: 0 0 1020 322 -1 -1 N  WF=0 WT=2 "OEM Fixed Font,10,0,1"
+BUFFER: BN="C:\Program Files\Microsoft SDK\temp\hello.cs"
+VIEW: LN=.5018 CL=33 LE=0 CX=32 CY=18 WI=34 BI=5 HT=0 HN=0 HF=0 HC=4
+FILEHIST: 9
+C:\Program Files\Microsoft SDK\Samples\tetris\CSharp_Tetris\Shape.cs
+C:\Program Files\Microsoft Visual Studio\MyProjects\Tiles\queue.cpp
+C:\Program Files\Microsoft Visual Studio\MyProjects\Tiles\queue.h
+C:\Program Files\Microsoft Visual Studio\MyProjects\Tiles\tiles.cpp
+C:\Program Files\Microsoft SDK\Samples\tetris\CSharp_Tetris\LayoutForm.cs
+C:\Program Files\Microsoft SDK\Samples\TabletPC\InkZoom\InkZoom.cs
+C:\Program Files\Microsoft SDK\Samples\Security\capicom\c_sharp\chainsh\chainsh.cs
+C:\Program Files\Microsoft SDK\Samples\Security\capicom\c_sharp\storesh\storesh.cs
+C:\Program Files\Microsoft SDK\temp\hello.cs
+[TreeExpansion]
+ADVENTURE.dsp 1 1 1 0 0 1

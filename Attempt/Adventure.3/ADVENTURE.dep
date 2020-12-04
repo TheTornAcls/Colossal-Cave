@@ -1,0 +1,52 @@
+# Microsoft Developer Studio Generated Dependency File, included by ADVENTURE.mak
+
+.\ADVENT.C : \
+	".\ADVCAVE.H"\
+	".\ADVDEF.H"\
+	".\ADVENT.H"\
+	".\ADVWORD.H"\
+	".\database.h"\
+	".\turn.h"\
+	
+
+.\DATABASE.C : \
+	".\ADVDEC.H"\
+	".\ADVENT.H"\
+	".\database.h"\
+	
+
+.\ENGLISH.C : \
+	".\ADVDEC.H"\
+	".\ADVENT.H"\
+	".\database.h"\
+	".\english.h"\
+	
+
+.\ITVERB.C : \
+	".\ADVDEC.H"\
+	".\ADVENT.H"\
+	".\database.h"\
+	".\itverb.h"\
+	".\turn.h"\
+	".\verb.h"\
+	
+
+.\TURN.C : \
+	".\ADVDEC.H"\
+	".\ADVENT.H"\
+	".\database.h"\
+	".\english.h"\
+	".\itverb.h"\
+	".\turn.h"\
+	".\verb.h"\
+	
+
+.\VERB.C : \
+	".\ADVDEC.H"\
+	".\ADVENT.H"\
+	".\database.h"\
+	".\english.h"\
+	".\itverb.h"\
+	".\turn.h"\
+	".\verb.h"\
+	
