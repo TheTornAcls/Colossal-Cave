@@ -1,0 +1,22 @@
+[ASSOCIATION]
+workspacefile=C:\Program Files\Microsoft Visual Studio\MyProjects\adventure\ADVENTURE.dsw
+workspacetype=microsoft visual c++
+[CurrentProject]
+curproj=Adventure.vpj
+[ProjectDates]
+ADVENTURE.dsp=20020321004427910
+[State]
+SCREEN: 1024 768 0 0 1024 692 0 0 N 0 0 0 0 858 588
+CWD: C:\Program Files\Microsoft Visual Studio\MyProjects\adventure
+FILEHIST: 9
+C:\Program Files\Microsoft Visual Studio\MyProjects\C++\Lab1\test1.cpp
+C:\Program Files\Microsoft Visual Studio\MyProjects\adventure\ADVENT.C
+C:\Program Files\Microsoft SDK\Samples\Begin\windiff\sources
+C:\Program Files\Microsoft SDK\Samples\Begin\windiff\makefile
+C:\Program Files\Microsoft SDK\Samples\Begin\windiff\complist.c
+C:\Program Files\Microsoft SDK\Samples\Begin\windiff\windiff.c
+C:\Program Files\Microsoft SDK\SetEnv.Bat
+C:\Program Files\Microsoft Visual Studio\MyProjects\adventure\TURN.C
+C:\Program Files\Microsoft Visual Studio\MyProjects\adventure\VERB.C
+[TreeExpansion]
+ADVENTURE.dsp 1 1 0 0 0 1
