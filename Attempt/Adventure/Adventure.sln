@@ -1,12 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adventure", "Adventure.vcproj", "{2B7A9139-1C1B-444F-952E-ADB46CCAB6BE}"
-	ProjectSection(ProjectDependencies) = postProject
-		{38E5EB5A-468D-44A4-9EA8-955F485DB2F9} = {38E5EB5A-468D-44A4-9EA8-955F485DB2F9}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Adventure", "Adventure.vcxproj", "{2B7A9139-1C1B-444F-952E-ADB46CCAB6BE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "advent0", "advent0.vcproj", "{38E5EB5A-468D-44A4-9EA8-955F485DB2F9}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "advent0", "advent0.vcxproj", "{38E5EB5A-468D-44A4-9EA8-955F485DB2F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,5 +34,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D12CE55D-53BD-4771-93CA-A1D4B6E2FC67}
 	EndGlobalSection
 EndGlobal
