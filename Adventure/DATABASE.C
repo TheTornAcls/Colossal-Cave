@@ -142,7 +142,15 @@ void pspeak(int item, int state, int prespace)
 }
 
 /*
-        Print a long location description from "advent1.txt"
+    desclg
+    ------
+    Prints a long location description from "advent1.txt" for the given location index (iloc).
+    The function seeks to the file offset for the location's description using the idx1 array,
+    then prints characters from the file up to the next '#' character (which marks the end of the description).
+    This is used to display the full description of a location to the player.
+
+    Parameters:
+        iloc - The location index for which to print the long description.
 */
 void desclg(int iloc)
 {
@@ -387,4 +395,3 @@ void bug(int n)
     printf("Fatal error number %d\n", n);
     exit(1);
 }
-
