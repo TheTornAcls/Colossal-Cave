@@ -72,7 +72,20 @@ void OutputF(const char* pszFormat, ...) {
 
 }
 
+/*
+    DoFile
+    -------
+    Processes an adventure text file and writes an index array to the output header file.
+    For each line in the input file that starts with '#', it records the file offset (using ftell)
+    into an index array. This array is written as a C array definition to the output file.
+    The function is used to generate index arrays for locations, objects, and messages in the game.
 
+    Parameters:
+        pfil       - Pointer to the input FILE to process (advent1.txt, etc.)
+        pszIDX     - String used in the index array name (e.g., "1", "2", "3", "4")
+        pszMAX     - String used for the array size macro (e.g., "LOC", "OBJ", "MSG")
+        pszFileName- Name of the input file (for error reporting)
+*/
 void DoFile(FILE* pfil, const char* pszIDX, const char* pszMAX, const char* pszFileName) {
 
     char            szInput[255];
@@ -149,4 +162,3 @@ int main(void) {
     exit(EXIT_SUCCESS);
 
 }
-
