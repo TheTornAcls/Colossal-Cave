@@ -84,6 +84,22 @@ int main(int argc, char** argv)
 */
 void initplay(void)
 {
+    /*
+        icond[MAXLOC]:
+            Initial status flags for each location in the game. Used to initialize the 'cond' array, which tracks conditions such as darkness, visited status, and other special properties for each location.
+
+        iplace[MAXOBJ]:
+            Initial locations for each object in the game. Used to initialize the 'place' array, which determines where each object starts in the game world.
+
+        ifixed[MAXOBJ]:
+            Secondary (fixed) locations for certain objects. Used to initialize the 'fixed' array, indicating objects that are immovable or have a special fixed position.
+
+        iactmsg[33]:
+            Default message numbers for actions/verbs. Used to initialize the 'actmsg' array, which determines what message to display for specific player actions.
+
+        idloc[DWARFMAX]:
+            Initial locations for the dwarves (NPCs). Used to initialize the 'dloc' array, setting the starting positions of the dwarves in the game.
+    */
     static const short int icond[MAXLOC] =
         /*   0 */{ 0, 2053, 2049, 2053, 2053, 2049, 2049, 2053,   33,    1,
         /*  10 */      1,    0,    0,   64,    0,    0,   16,    0,    0,  128,
@@ -123,7 +139,6 @@ void initplay(void)
         /*  70 */      0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         /*  80 */      0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         /*  90 */      0,    0,    0,    0,    0,    0,    0,    0,    0,    0 };
-
 
     static const short int iactmsg[33] =
         /*   0 */{ 0,   24,   29,    0,   33,    0,   33,   38,   38,   42,
