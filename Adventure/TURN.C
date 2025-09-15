@@ -155,6 +155,20 @@ void turn(void)
 */
 void describe(void)
 {
+    /*
+    describe
+    --------
+    Describes the current location to the player. This function:
+      - Prints a special message if the player is carrying the bear.
+      - Prints a message if the location is dark.
+      - Otherwise, prints either the short or long description of the location:
+          * If the location has been visited before, or if the player has requested more detail, prints the short description (descsh).
+          * Otherwise, prints the long description (desclg).
+      - If the location is not dark, also describes any visible items (descitem).
+      - Occasionally prints a random message in location 33 if the cave is not closing.
+
+    This function is called at the start of each turn or after a move to update the player's view of their surroundings.
+    */
     if (toting(BEAR))
         rspeak(141);
     if (dark())
