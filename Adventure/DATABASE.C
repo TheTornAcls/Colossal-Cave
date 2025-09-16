@@ -55,8 +55,24 @@ void gettrav(int locationIndex)
 }
 
 /*
-        Function to scan a file up to a specified
-        point and either print or return a string.
+    rdupto
+    ------
+    Reads characters from a file up to a specified delimiter character. Optionally prints the characters or stores them in a string. Handles newlines and carriage returns, and can insert a leading newline if prespace is set.
+
+    Parameters:
+        fdi      - Pointer to the input FILE to read from.
+        uptoc    - Character to read up to (delimiter, not included in output).
+        print    - If nonzero, prints the characters to stdout; otherwise, stores them in 'string'.
+        string   - Pointer to a buffer to store the string (if print is zero); ignored if print is nonzero.
+        prespace - If nonzero, prints a newline before the output (only on the first character).
+
+    Returns:
+        true if the delimiter was found, false if EOF was reached first.
+
+    Side Effects:
+        - Reads from the input file stream 'fdi'.
+        - May print to stdout if 'print' is nonzero.
+        - May write to the buffer pointed to by 'string' if 'print' is zero.
 */
 bool rdupto(FILE * fdi, char uptoc, char print, char* string, int prespace)
 {
@@ -82,10 +98,19 @@ bool rdupto(FILE * fdi, char uptoc, char print, char* string, int prespace)
 }
 
 /*
-        Function to read a file skipping
-        a given character a specified number
-        of times, with or without repositioning
-        the file.
+    rdskip
+    ------
+    Reads and skips over a specified character in a file a given number of times. Optionally rewinds the file before skipping. Used to position the file pointer for reading specific data.
+
+    Parameters:
+        fdi    - Pointer to the input FILE to read from.
+        skipc  - Character to skip over.
+        n      - Number of times to skip the character.
+        rewind - If nonzero, rewinds the file to the beginning before skipping.
+
+    Side Effects:
+        - Reads from and may reposition the input file stream 'fdi'.
+        - May call bug(31) or bug(32) and exit on file errors or EOF.
 */
 void rdskip(FILE * fdi, char skipc, int n, char rewind)
 {
