@@ -8,7 +8,18 @@
 #include        "advdec.h"
 
 /*
-        Routine to process a transitive verb
+    trverb
+    ------
+    Processes a transitive verb command (a verb that acts on an object) entered by the player. Dispatches to the appropriate handler function for the current verb and object, updating the game state as needed.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads the global variable 'verb' to determine which action to perform.
+        - Uses and may update global variables such as 'object', 'loc', and others depending on the verb.
+        - Calls various handler functions (e.g., vtake(), vdrop(), vopen(), etc.) that may update inventory, object properties, player state, or print messages.
+        - May update the game world, inventory, or end the game depending on the verb processed.
 */
 void trverb(void)
 {
@@ -98,7 +109,18 @@ void trverb(void)
 }
 
 /*
-        CARRY TAKE etc.
+    vtake
+    -----
+    Handles the TAKE (or CARRY) command for a specific object. Attempts to pick up the specified object, updating the player's inventory and the game state as appropriate. Handles special cases for certain objects (e.g., liquids, bird, cage) and inventory limits.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variables 'object', 'loc', 'holding', and arrays such as 'prop', 'fixed', 'place'.
+        - May update inventory, object properties, and print messages to the player.
+        - Calls carry(), drop(), vfill(), rspeak(), pspeak(), and other functions to update the game state.
+        - May affect the state of special objects (e.g., BIRD, CAGE, BOTTLE, liquids).
 */
 void vtake(void)
 {
