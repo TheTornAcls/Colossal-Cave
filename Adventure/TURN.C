@@ -319,8 +319,21 @@ void copytrv(struct trav* trav1, struct trav* trav2)
 }
 
 /*
-        Routine to figure out a new location
-        given current location and a motion.
+    dotrav
+    ------
+    Determines the new player location based on the current location and the player's intended motion.
+    This function examines the global 'travel' array (which should be filled for the current location)
+    and checks each possible travel option to see if the player's motion matches and if any conditions are met.
+    If a valid move is found, updates 'newloc' to the destination, or triggers special movement or messages.
+    If no valid move is found, calls badmove() to handle the failed attempt.
+
+    Parameters:
+        None (uses and updates global variables such as loc, newloc, motion, travel, etc.)
+
+    Side Effects:
+        - Updates 'newloc' to the new location if a valid move is found.
+        - May call rspeak(), spcmove(), or badmove() to handle special cases or errors.
+        - May update other global state depending on the move.
 */
 void dotrav(void)
 {
