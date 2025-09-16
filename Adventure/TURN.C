@@ -563,8 +563,8 @@ int score(void)
 */
 void death(void)
 {
-    int    i, j;
-    int             yea;
+    int i, j;
+    int yea;
 
     if (!closing) {
         yea = yes(81 + numdie * 2, 82 + numdie * 2, 54);
