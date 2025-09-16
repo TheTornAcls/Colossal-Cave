@@ -100,7 +100,18 @@ void itverb(void)
 }
 
 /*
-        CARRY, TAKE etc.
+    ivtake
+    ------
+    Handles the intransitive TAKE command. Searches for a unique object at the player's current location that can be taken. If exactly one object is found, sets it as the target object and calls vtake(). If no object or multiple objects are found, prompts the player for clarification.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variables 'object' and 'anobj' to determine and set the object to take.
+        - May call needobj() to prompt the player if no or multiple objects are found.
+        - Calls vtake() to process the take action if a unique object is found.
+        - May use or update other global variables such as 'dflag' and the result of dcheck().
 */
 void ivtake(void)
 {
