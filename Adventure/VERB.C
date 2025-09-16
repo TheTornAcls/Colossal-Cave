@@ -297,7 +297,18 @@ void vdrop(void)
 }
 
 /*
-        LOCK, UNLOCK, OPEN, CLOSE etc.
+    vopen
+    -----
+    Handles the OPEN, LOCK, UNLOCK, and CLOSE commands for a specific object. Attempts to perform the requested action on the specified object, updating its state and the game world as appropriate. Handles special cases for certain objects (e.g., CLAM, OYSTER, DOOR, CAGE, KEYS, CHAIN, GRATE) and updates object properties and locations.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variables 'object', 'verb', 'loc', and arrays such as 'prop', 'fixed', 'place', 'clock2', 'panic'.
+        - May update object properties, locations, and print messages to the player.
+        - Calls drop(), dstroy(), move(), pspeak(), rspeak(), and other functions to update the game state.
+        - May affect the state of special objects (e.g., CLAM, OYSTER, DOOR, CAGE, KEYS, CHAIN, GRATE).
 */
 void vopen(void)
 {
@@ -422,7 +433,16 @@ void von(void)
 }
 
 /*
-        OFF etc.
+    voff
+    ----
+    Handles the OFF command, specifically for turning off the lamp. Checks if the lamp is present and, if so, updates its state and prints appropriate messages.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variable 'prop' to set the lamp's state to off.
+        - Prints messages to the player using rspeak().
 */
 void voff(void)
 {
@@ -435,7 +455,16 @@ void voff(void)
 }
 
 /*
-        WAVE etc.
+    vwave
+    -----
+    Handles the WAVE command for a specific object. Checks if the player is holding the object (typically a rod) and, if appropriate, toggles the state of the fissure. Prints messages to the player based on the action taken.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variables 'object', 'prop', and may call pspeak() and rspeak() to print messages.
+        - May update the state of the fissure if the correct object is waved at the correct location.
 */
 void vwave(void)
 {
@@ -873,7 +902,18 @@ void vblast(void)
 }
 
 /*
-        BREAK etc.
+    vbreak
+    ------
+    Handles the BREAK command for a specific object. Attempts to break the specified object, updating its state and the game world as appropriate. Handles special cases for MIRROR and VASE, updating their properties and locations, and may end the game if the mirror is broken while the cave is closed.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variables 'object', 'closed', and arrays such as 'prop', 'fixed'.
+        - Calls drop(), rspeak(), dstroy(), and dwarfend() to update the game state and print messages.
+        - May end the game if the mirror is broken while the cave is closed.
+        - May update the state of the VASE and MIRROR objects.
 */
 void vbreak(void)
 {
@@ -911,7 +951,17 @@ void vwake(void)
 }
 
 /*
-        Routine to speak default verb message
+    actspk
+    ------
+    Prints the default message associated with a given verb. Looks up the message for the specified verb and prints it to the player, if available.
+
+    Parameters:
+        verb - The verb code (integer) for which to print the default message.
+
+    Side Effects:
+        - Reads the global array 'actmsg' to look up the message for the verb.
+        - Calls rspeak() to print the message to the player.
+        - May call bug() if the verb code is out of range.
 */
 void actspk(int verb)
 {
@@ -930,9 +980,17 @@ void actspk(int verb)
 }
 
 /*
-        Routine to indicate no reasonable
-        object for verb found. Used mostly by
-        intransitive verbs.
+    needobj
+    -------
+    Prints a prompt asking the player to specify an object for the current verb. Analyzes the player's input words to generate an appropriate prompt.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads the global variables 'word1' and 'word2' to determine the player's input.
+        - Calls analyze() to process the input words.
+        - Prints a prompt to the player using printf().
 */
 void needobj(void)
 {
