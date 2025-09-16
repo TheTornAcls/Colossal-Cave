@@ -151,24 +151,21 @@ void turn(void)
 }
 
 /*
-        Routine to describe current location
+describe - Routine to describe current location
+--------
+Describes the current location to the player. This function:
+  - Prints a special message if the player is carrying the bear.
+  - Prints a message if the location is dark.
+  - Otherwise, prints either the short or long description of the location:
+      * If the location has been visited before, or if the player has requested more detail, prints the short description (descsh).
+      * Otherwise, prints the long description (desclg).
+  - If the location is not dark, also describes any visible items (descitem).
+  - Occasionally prints a random message in location 33 if the cave is not closing.
+
+This function is called at the start of each turn or after a move to update the player's view of their surroundings.
 */
 void describe(void)
 {
-    /*
-    describe
-    --------
-    Describes the current location to the player. This function:
-      - Prints a special message if the player is carrying the bear.
-      - Prints a message if the location is dark.
-      - Otherwise, prints either the short or long description of the location:
-          * If the location has been visited before, or if the player has requested more detail, prints the short description (descsh).
-          * Otherwise, prints the long description (desclg).
-      - If the location is not dark, also describes any visible items (descitem).
-      - Occasionally prints a random message in location 33 if the cave is not closing.
-
-    This function is called at the start of each turn or after a move to update the player's view of their surroundings.
-    */
     if (toting(BEAR))
         rspeak(141);
     if (dark())
@@ -970,4 +967,94 @@ void tryhint(int imsg, int mask, int i)
             hintavail &= ~mask;
         }
     hintloc[i] = 0;
+}
+
+/*
+    dotrav
+    ------
+    Determines the new player location based on the current location and the player's intended motion.
+    This function examines the global 'travel' array (which should be filled for the current location)
+    and checks each possible travel option to see if the player's motion matches and if any conditions are met.
+    If a valid move is found, updates 'newloc' to the destination, or triggers special movement or messages.
+    If no valid move is found, calls badmove() to handle the failed attempt.
+
+    Parameters:
+        None (uses and updates global variables such as loc, newloc, motion, travel, etc.)
+
+    Side Effects:
+        - Updates 'newloc' to the new location if a valid move is found.
+        - May call rspeak(), spcmove(), or badmove() to handle special cases or errors.
+        - May update other global state depending on the move.
+*/
+void dotrav(void)
+{
+    int    kk, hitflag;
+    int             mvflag;
+    int             rdest, rverb, rcond, robject;
+    int             pctt;
+
+    newloc = loc;
+    mvflag = hitflag = 0;
+    pctt = rrand(0, 99);
+
+    for (kk = 0; travel[kk].tdest >= 0 && !mvflag; ++kk) {
+        rdest = travel[kk].tdest;
+        rverb = travel[kk].tverb;
+        rcond = travel[kk].tcond;
+        robject = rcond % 100;
+
+#ifdef DEBUG
+        if (dbugflg)
+            printf("rdest = %d, rverb = %d, rcond = %d, robject = %d in dotrav\n",
+                rdest, rverb, \
+                rcond, robject);
+#endif
+        if ((rverb != 1) && (rverb != motion) && !hitflag)
+            continue;
+        ++hitflag;
+        switch (rcond / 100) {
+        case 0:
+            if ((rcond == 0) || (pctt < rcond))
+                ++mvflag;
+#ifdef DEBUG
+            if (rcond && dbugflg)
+                printf("%% move %d %d\n",
+                    pctt, mvflag);
+#endif
+            break;
+        case 1:
+            if (robject == 0)
+                ++mvflag;
+            else if (toting(robject))
+                ++mvflag;
+            break;
+        case 2:
+            if (toting(robject) || at(robject))
+                ++mvflag;
+            break;
+        case 3:
+        case 4:
+        case 5:
+        case 7:
+            if (prop[robject] != (rcond / 100) - 3)
+                ++mvflag;
+            break;
+        default:
+            bug(37);
+        }
+    }
+    if (!mvflag)
+        badmove();
+    else if (rdest > 500)
+        rspeak(rdest - 500);
+    else if (rdest > 300)
+        spcmove(rdest);
+    else {
+        newloc = rdest;
+#ifdef DEBUG
+        if (dbugflg)
+            printf("newloc in dotrav = %d\n", newloc);
+#endif
+        if (newloc == loc) loc = 0;
+    }
 }
