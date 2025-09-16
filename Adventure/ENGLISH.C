@@ -146,8 +146,17 @@ bool analyze(char* word, int* type, int* value)
 }
 
 /*
-        retrieve input line (max 80 chars), convert to lower case
-         & rescan for first two words (max. WORDSIZE-1 chars).
+    getwords
+    --------
+    Reads a line of input from the player, converts it to lowercase, and extracts the first two words into the global variables 'word1' and 'word2'. Handles input up to 80 characters and words up to WORDSIZE-1 characters.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads input from stdin.
+        - Updates the global variables 'word1' and 'word2' with the first and second words from the input line.
+        - May print a prompt ('>') to the player.
 */
 void getwords(void)
 {
@@ -182,8 +191,17 @@ void getwords(void)
 }
 
 /*
-        output adventure word list (motion/0xxx & verb/2xxx) only
-        6 words/line pausing at 20th line until keyboard active
+    outwords
+    --------
+    Prints the list of adventure words (motions and verbs) to the player, six words per line, pausing every 20 lines for user input. Useful for displaying the available commands.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads the global array 'wc' for the word list.
+        - Prints words to stdout.
+        - Pauses for user input every 20 lines.
 */
 void outwords(void)
 {
@@ -209,4 +227,3 @@ void outwords(void)
         }
     }
 }
-
