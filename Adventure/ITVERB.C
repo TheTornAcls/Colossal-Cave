@@ -136,7 +136,18 @@ void ivtake(void)
 }
 
 /*
-        OPEN, LOCK, UNLOCK
+    ivopen
+    ------
+    Handles intransitive OPEN, LOCK, and UNLOCK commands. Attempts to identify a unique object at the player's location that can be opened, locked, or unlocked (such as CLAM, OYSTER, DOOR, GRATE, or CHAIN). If multiple or no objects are found, prompts the player for clarification. If a unique object is found, sets it as the target and calls vopen().
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variable 'object' to determine and set the object to open/lock/unlock.
+        - May call needobj() to prompt the player if no or multiple objects are found.
+        - Calls vopen() to process the open/lock/unlock action if a unique object is found.
+        - May use or update other global variables depending on the object being manipulated.
 */
 void ivopen(void)
 {
@@ -340,6 +351,7 @@ void addobj(int obj)
     }
     object = obj;
 }
+
 /*
         turn on brief switch
 */
