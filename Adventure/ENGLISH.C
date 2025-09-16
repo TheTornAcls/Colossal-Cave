@@ -10,7 +10,19 @@
 #include        "advdec.h"
 
 /*
-        Analyze a two word sentence
+    english
+    -------
+    Parses and analyzes a two-word player command, determines the intended action, and sets the appropriate global variables for verb, object, and motion. Handles grammar checking, special cases (such as SAY and HELP), and prints error messages for invalid input.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variables 'verb', 'object', and 'motion' to represent the parsed command.
+        - Reads and updates 'word1' and 'word2' for the input words.
+        - Calls getwords() to read input, analyze() to interpret words, and rspeak()/printf() to print messages.
+        - May call outwords() to print the word list.
+        - May return false for invalid or unrecognized input.
 */
 bool english(void)
 {
@@ -92,7 +104,22 @@ bool english(void)
 
 
 /*
-                Routine to analyze a word.
+    analyze
+    -------
+    Analyzes a single word from player input, determines its type and value, and returns whether it is recognized. If the word is not recognized, prints an error message.
+
+    Parameters:
+        word  - Pointer to the word to analyze (char*)
+        type  - Pointer to an int to receive the word type (0=motion, 1=object, 2=verb, 3=special)
+        value - Pointer to an int to receive the word value (index or code)
+
+    Returns:
+        true if the word is recognized, false otherwise
+
+    Side Effects:
+        - May call vocab() to look up the word in the vocabulary.
+        - May call rspeak() to print an error message if the word is not recognized.
+        - Updates the values pointed to by 'type' and 'value'.
 */
 bool analyze(char* word, int* type, int* value)
 {
