@@ -8,7 +8,18 @@
 #include        "advdec.h"
 
 /*
-        Routines to process intransitive verbs
+    itverb
+    ------
+    Processes intransitive verb commands entered by the player (such as TAKE, DROP, EAT, INVENTORY, etc.). Determines the appropriate action or prompts for an object if needed, and dispatches to the correct handler function for each verb.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variable 'verb' to determine the action to take.
+        - May update or use global variables such as 'object', 'object1', 'saveflg', and 'gaveup' depending on the verb.
+        - May call functions that print messages, update the world, or end the game (e.g., needobj(), rspeak(), normend(), score(), etc.).
+        - May update inventory, game state, or trigger other side effects depending on the verb processed.
 */
 void itverb(void)
 {
