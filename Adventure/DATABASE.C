@@ -10,24 +10,47 @@
 #include        "advdec.h"
 
 /*
-        Routine to fill travel array for a given location
+    gettrav
+    -------
+    Fills the global 'travel' array with possible travel options for a given location.
+    For the specified location index (iloc), this function reads the encoded travel data
+    from the 'cave' array and decodes each entry into destination, verb, and condition fields
+    in the 'travel' array. The function stops when it encounters a -1 sentinel value.
+    The last entry in 'travel' is set to indicate the end of the array.
+
+    Parameters:
+        iloc - The location index (1-based) for which to fill the travel array.
+
+    Side Effects:
+        - Modifies the global 'travel' array with the decoded travel options for the given location.
+        - May print debug information if compiled with DEBUG and dbugflg is set.
+        - Calls bug(33) if the travel array overflows.
 */
-void gettrav(int iloc)
+void gettrav(int locationIndex)
 {
-    struct trav* i;
-    long int* j;
-    for (i = &travel[0], j = cave[iloc - 1]; *j != -1; i++, j++) {
-        if (i >= &travel[MAXTRAV]) bug(33);
-        i->tcond = (int)(*j % 1000);
-        i->tverb = (int)((*j / 1000) % 1000);
-        i->tdest = (int)((*j / 1000000) % 1000);
+    struct trav* travelPtr;
+    long int* cavePtr;
+    // Each entry in cave[locationIndex - 1] encodes travel information as a single integer:
+    // Bits 0-2:   Condition (tcond)   = value % 1000
+    // Bits 3-5:   Verb (tverb)        = (value / 1000) % 1000
+    // Bits 6-8:   Destination (tdest) = (value / 1000000) % 1000
+    // This section decodes each field for the travel array.
+    for (travelPtr = &travel[0], cavePtr = cave[locationIndex - 1]; *cavePtr != -1; travelPtr++, cavePtr++) {
+        if (travelPtr >= &travel[MAXTRAV]) bug(33);
+        long int encodedValue = *cavePtr;
+        // Decode travel condition (lowest 3 digits)
+        travelPtr->tcond = (int)(encodedValue % 1000);
+        // Decode verb (next 3 digits)
+        travelPtr->tverb = (int)((encodedValue / 1000) % 1000);
+        // Decode destination (next 3 digits)
+        travelPtr->tdest = (int)((encodedValue / 1000000) % 1000);
     }
-    i->tdest = -1; /* end of array */
+    travelPtr->tdest = -1; /* end of array */
 #ifdef DEBUG
     if (dbugflg)
-        for (i = &travel[0]; i->tdest != -1; ++i)
+        for (travelPtr = &travel[0]; travelPtr->tdest != -1; ++travelPtr)
             printf("cave[%d] = %d %d %d\n",
-                iloc, i->tdest, i->tverb, i->tcond);
+                locationIndex, travelPtr->tdest, travelPtr->tverb, travelPtr->tcond);
 #endif
 }
 
