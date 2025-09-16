@@ -931,6 +931,7 @@ void dwarves(void)
     oldloc2 = newloc;
     death();
 }
+
 /*
     pirate stuff
 */
