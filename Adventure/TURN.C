@@ -12,7 +12,17 @@
 int     totalscore;
 
 /*
-        Routine to take 1 turn
+    turn
+    ----
+    Processes a single turn in the game. Handles player movement, checks for special conditions (such as closing the cave, dwarf encounters, forced moves, death, hints), updates game state, and executes player commands.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Updates player location, state, and turn counters
+        - May call functions that print messages, update the world, or end the game
+        - Handles hints, death, and forced moves
 */
 void turn(void)
 {
@@ -162,7 +172,12 @@ Describes the current location to the player. This function:
   - If the location is not dark, also describes any visible items (descitem).
   - Occasionally prints a random message in location 33 if the cave is not closing.
 
-This function is called at the start of each turn or after a move to update the player's view of their surroundings.
+    Parameters:
+        None (uses global state for location and inventory)
+
+    Side Effects:
+        - Prints messages to the player
+        - May update visited locations
 */
 void describe(void)
 {
@@ -183,7 +198,16 @@ void describe(void)
 }
 
 /*
-        Routine to describe visible items
+    descitem
+    --------
+    Describes visible items at the current location. Handles special cases for certain items and updates tally if items are revealed.
+
+    Parameters:
+        None (uses global state for location and items)
+
+    Side Effects:
+        - Prints item descriptions
+        - Updates tally and item properties
 */
 void descitem(void)
 {
@@ -222,7 +246,15 @@ void descitem(void)
 }
 
 /*
-        Routine to handle motion requests
+    domove
+    ------
+    Handles the player's motion request. Calls gettrav to fill the travel array, then processes the motion command (e.g., BACK, LOOK, CAVE, or a regular move).
+
+    Parameters:
+        None (uses and updates global state)
+
+    Side Effects:
+        - May update player location, print messages, or call other movement functions
 */
 void domove(void)
 {
@@ -258,8 +290,15 @@ void domove(void)
 }
 
 /*
-        Routine to handle request to return
-        from whence we came!
+    goback
+    ------
+    Handles the player's request to return to the previous location. Searches the travel array for a valid move back, and updates motion and location accordingly.
+
+    Parameters:
+        None (uses and updates global state)
+
+    Side Effects:
+        - May update player location, print messages, or call dotrav
 */
 void goback(void)
 {
@@ -308,7 +347,16 @@ void goback(void)
 }
 
 /*
-        Routine to copy a travel array
+    copytrv
+    -------
+    Copies one travel array to another.
+
+    Parameters:
+        trav1 - Source travel array
+        trav2 - Destination travel array
+
+    Side Effects:
+        - Modifies the destination travel array
 */
 void copytrv(struct trav* trav1, struct trav* trav2)
 {
@@ -409,7 +457,15 @@ void dotrav(void)
 }
 
 /*
-        The player tried a poor move option.
+    badmove
+    -------
+    Handles the case where the player attempts an invalid move. Selects and prints an appropriate error message.
+
+    Parameters:
+        None (uses global state for motion and verb)
+
+    Side Effects:
+        - Prints an error message to the player
 */
 void badmove(void)
 {
@@ -427,7 +483,15 @@ void badmove(void)
 }
 
 /*
-        Routine to handle very special movement.
+    spcmove
+    -------
+    Handles very special movement cases (e.g., plover movement, troll bridge). Updates location and game state as needed.
+
+    Parameters:
+        rdest - Encoded destination value for special movement
+
+    Side Effects:
+        - Updates newloc, may print messages, update inventory, or end the game
 */
 void spcmove(int rdest)
 {
@@ -478,8 +542,15 @@ void spcmove(int rdest)
 
 
 /*
-        Routine to handle player's demise via
-        waking up the dwarves...
+    dwarfend
+    --------
+    Handles the player's demise due to dwarves. Prints a message, calls death, and ends the game.
+
+    Parameters:
+        msg - Message number to print (if nonzero)
+
+    Side Effects:
+        - Prints a message, ends the game
 */
 void dwarfend(int msg)
 {
@@ -490,7 +561,15 @@ void dwarfend(int msg)
 }
 
 /*
-        normal end of game
+    normend
+    -------
+    Handles the normal end of the game. Calculates and prints the player's score and rating, then exits.
+
+    Parameters:
+        None
+
+    Side Effects:
+        - Prints score and rating, exits the program
 */
 void normend(void)
 {
@@ -509,7 +588,18 @@ void normend(void)
 }
 
 /*
-        scoring
+    score
+    -----
+    Calculates and prints the player's score, including treasures, survival, hints, and bonuses.
+
+    Parameters:
+        None
+
+    Returns:
+        The total score as an integer
+
+    Side Effects:
+        - Prints score breakdown to the player
 */
 int score(void)
 {
@@ -571,8 +661,15 @@ int score(void)
 }
 
 /*
-        Routine to handle the passing on of one
-        of the player's incarnations...
+    death
+    -----
+    Handles the player's death. Asks if the player wants to continue, resets inventory and location if so, or ends the game if not.
+
+    Parameters:
+        None
+
+    Side Effects:
+        - Updates inventory, location, and game state; may end the game
 */
 void death(void)
 {
@@ -606,7 +703,15 @@ void death(void)
 }
 
 /*
-        Routine to process an object.
+    doobj
+    -----
+    Processes an object-related command. Handles special cases for certain objects and calls trobj for transitive actions.
+
+    Parameters:
+        None (uses global state for object and location)
+
+    Side Effects:
+        - May update inventory, print messages, or call trobj
 */
 void doobj(void)
 {
@@ -679,8 +784,15 @@ void doobj(void)
 }
 
 /*
-        Routine to process an object being
-        referred to.
+    trobj
+    -----
+    Processes an object being referred to. Calls trverb if a verb is present, or prompts the player for clarification.
+
+    Parameters:
+        None (uses global state for object and verb)
+
+    Side Effects:
+        - May print a prompt or call trverb
 */
 void trobj(void)
 {
@@ -692,7 +804,18 @@ void trobj(void)
 }
 
 /*
-        Routine to print word corresponding to object
+    probj
+    -----
+    Returns the word corresponding to the given object.
+
+    Parameters:
+        object - The object number
+
+    Returns:
+        Pointer to the object's word (char*)
+
+    Side Effects:
+        - None
 */
 char* probj(int object)
 {
@@ -969,7 +1092,17 @@ bool stimer(void)
 }
 
 /*
-        Routine to request whether a hint is desired.
+    tryhint
+    -------
+    Handles hint logic, prompting the player and updating hint state if accepted.
+
+    Parameters:
+        imsg - Message number for the hint prompt
+        mask - Bitmask for the hint
+        i    - Index for the hint location
+
+    Side Effects:
+        - May update hint state and print messages
 */
 void tryhint(int imsg, int mask, int i)
 {
