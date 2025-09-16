@@ -195,7 +195,18 @@ void vtake(void)
 }
 
 /*
-        DROP etc.
+    vdrop
+    -----
+    Handles the DROP command for a specific object. Attempts to drop the specified object at the player's current location, updating the player's inventory and the game state as appropriate. Handles special cases for certain objects (e.g., bird, snake, coins, bear, vase, liquids) and updates object properties and locations.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variables 'object', 'loc', and arrays such as 'prop', 'fixed', 'place'.
+        - May update inventory, object properties, and print messages to the player.
+        - Calls drop(), dstroy(), move(), pspeak(), rspeak(), and other functions to update the game state.
+        - May affect the state of special objects (e.g., BIRD, SNAKE, COINS, BEAR, VASE, BOTTLE, liquids).
 */
 void vdrop(void)
 {
@@ -372,7 +383,16 @@ void vopen(void)
 }
 
 /*
-        SAY etc.
+    vsay
+    ----
+    Handles the SAY command. Prints the word or phrase the player wants to say. Analyzes the input words and prints the appropriate response.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads the global variables 'word1' and 'word2' to determine what the player said.
+        - May print a message to the player using printf().
 */
 void vsay(void)
 {
