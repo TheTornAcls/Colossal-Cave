@@ -162,7 +162,7 @@ void turn(void)
 
 /*
 describe - Routine to describe current location
---------
+    --------
 Describes the current location to the player. This function:
   - Prints a special message if the player is carrying the bear.
   - Prints a message if the location is dark.
@@ -824,7 +824,7 @@ char* probj(int object)
     return (wtype == 1 ? word1 : word2);
 }
 /*
-        dwarf stuff.
+    dwarf stuff.
 */
 void dwarves(void)
 {
@@ -932,7 +932,7 @@ void dwarves(void)
     death();
 }
 /*
-        pirate stuff
+    pirate stuff
 */
 void dopirate(void)
 {
@@ -986,7 +986,7 @@ stealit:
     dseen[6] = 0;
 }
 /*
-        special time limit stuff...
+    special time limit stuff...
 */
 bool stimer(void)
 {
