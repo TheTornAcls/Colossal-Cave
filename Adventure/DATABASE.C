@@ -534,6 +534,7 @@ int put(int obj, int where, int pval)
     move(obj, where);
     return((-1) - pval);
 }
+
 /*
         Routine to check for presence
         of dwarves..
@@ -549,7 +550,19 @@ int dcheck(void)
 }
 
 /*
-        Determine liquid in the bottle
+    liq
+    ---
+    Determines the type of liquid currently in the bottle by examining its property value. Returns a constant representing the liquid type (WATER, OIL, or nothing).
+
+    Parameters:
+        None (uses global state for bottle property)
+
+    Returns:
+        The constant representing the liquid type in the bottle (WATER, OIL, or nothing).
+
+    Side Effects:
+        - Reads the global array 'prop' for the bottle property and uses the constant 'BOTTLE'.
+        - Calls liq2() to convert the property value to a liquid type.
 */
 int liq(void)
 {
