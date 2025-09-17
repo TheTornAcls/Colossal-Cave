@@ -245,8 +245,19 @@ void desclg(int iloc)
 }
 
 /*
-        look-up vocabulary word in lex-ordered table.
-        word is the word to look up.
+    vocab
+    -----
+    Looks up a word in the adventure's vocabulary table and returns its associated code if found, or -1 if not found.
+
+    Parameters:
+        word - Pointer to the word (string) to look up.
+
+    Returns:
+        The code associated with the word if found, or -1 if not found.
+
+    Side Effects:
+        - Calls binary() to perform the lookup.
+        - Reads the global vocabulary array 'wc'.
 */
 int vocab(char* word)
 {
@@ -258,6 +269,22 @@ int vocab(char* word)
         return(-1);
 }
 
+/*
+    binary
+    ------
+    Performs a binary search for a word in a sorted vocabulary table and returns its index if found, or -1 if not found.
+
+    Parameters:
+        w        - Pointer to the word (string) to search for.
+        wctable  - Array of vocabulary entries to search (struct wac[]).
+        maxwc    - Number of entries in the vocabulary array.
+
+    Returns:
+        The index of the word in the array if found, or -1 if not found.
+
+    Side Effects:
+        - None (does not modify global variables or state).
+*/
 int binary(char* w, struct wac wctable[], int maxwc)
 {
     int             check;
