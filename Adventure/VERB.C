@@ -922,7 +922,22 @@ void vread(void)
 }
 
 /*
-        BLAST etc.
+    vblast
+    ------
+    Executes the BLAST command, checking the state of the second rod and whether the cave is closed; if conditions are met, it delivers a special bonus message and ends the game.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Global Variables Used:
+        - prop: Array of object properties, used to check the state of ROD2.
+        - closed: Indicates whether the cave is closed.
+        - loc: The player's current location, used to determine the bonus message.
+        - bonus: Sets the message code to be delivered.
+    
+    Side Effects:
+        - May print a default action message or a special bonus message to the player.
+        - Calls normend() to end the game if the BLAST is successful.
 */
 void vblast(void)
 {
