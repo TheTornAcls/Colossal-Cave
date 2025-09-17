@@ -536,8 +536,18 @@ int put(int obj, int where, int pval)
 }
 
 /*
-        Routine to check for presence
-        of dwarves..
+    dcheck
+    ------
+    Checks for the presence of dwarves at the player's current location. Returns the index of the first dwarf found at the current location, or 0 if no dwarves are present.
+
+    Parameters:
+        None (uses global state for dwarf locations and player location)
+
+    Returns:
+        The index (integer) of the first dwarf present at the current location, or 0 if none are present.
+
+    Side Effects:
+        - Reads the global arrays 'dloc' (dwarf locations) and the variable 'loc' (player location).
 */
 int dcheck(void)
 {
