@@ -320,7 +320,19 @@ bool dark(void)
 }
 
 /*
-        Routine to tell if an item is present.
+    here
+    ----
+    Determines if a specified item is present at the current location or is being carried by the player.
+
+    Parameters:
+        item - The item number to check for presence.
+
+    Returns:
+        true if the item is at the current location or being carried, false otherwise.
+
+    Side Effects:
+        - Reads the global variables 'place' and 'loc' to check item location.
+        - Calls toting() to check if the item is being carried.
 */
 bool here(int item)
 {
@@ -328,7 +340,18 @@ bool here(int item)
 }
 
 /*
-        Routine to tell if an item is being carried.
+    toting
+    ----__
+    Determines if a specified item is currently being carried by the player.
+
+    Parameters:
+        item - The item number to check.
+
+    Returns:
+        true if the item is being carried (i.e., its place is -1), false otherwise.
+
+    Side Effects:
+        - Reads the global variable 'place' to check the item's status.
 */
 bool toting(int item)
 {
