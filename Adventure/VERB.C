@@ -557,7 +557,17 @@ void vkill(void)
 }
 
 /*
-        POUR
+    vpour
+    -----
+    Handles the POUR command for a specific object. Attempts to pour the contents of the bottle or a specific liquid, updating the game state and object properties as appropriate. Handles special cases for pouring on the plant or door, and prints messages to the player.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variables 'object', 'prop', 'place', and others.
+        - Calls functions such as liq(), at(), pspeak(), rspeak(), and needobj() to update the game state and print messages.
+        - May update the state of the BOTTLE, PLANT, DOOR, and other objects depending on the action.
 */
 void vpour(void)
 {
@@ -596,7 +606,17 @@ void vpour(void)
 }
 
 /*
-        EAT
+    veat
+    ----
+    Handles the EAT command for a specific object. Attempts to eat the specified object, updating the game state and object properties as appropriate. Handles special cases for FOOD and inedible objects, and prints messages to the player.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variable 'object'.
+        - Calls functions such as dstroy(), rspeak(), and actspk() to update the game state and print messages.
+        - May update the state of the FOOD object or print a message for inedible objects.
 */
 void veat(void)
 {
