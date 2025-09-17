@@ -126,7 +126,22 @@ void rdskip(FILE * fdi, char skipc, int n, char rewind)
 }
 
 /*
-        Routine to request a yes or no answer to a question.
+    yes
+    ---
+    Prompts the player for a yes or no answer, processes the response, and prints appropriate messages. Handles input, converts it to lowercase, and checks for 'yes' or 'no'.
+
+    Parameters:
+        msg1 - Message number to print before prompting (0 for none).
+        msg2 - Message number to print if the answer is 'yes' (0 for none).
+        msg3 - Message number to print if the answer is 'no' (0 for none).
+
+    Returns:
+        true if the player answers 'yes', false if 'no'.
+
+    Side Effects:
+        - Prints messages to the player using rspeak().
+        - Reads input from stdin.
+        - May update the game state depending on how the result is used by the caller.
 */
 bool yes(int msg1, int msg2, int msg3)
 {
@@ -162,7 +177,17 @@ bool yes(int msg1, int msg2, int msg3)
 }
 
 /*
-        Print a location description from "advent4.txt"
+    rspeak
+    ------
+    Prints a location or general message to the player, using a message number to look up the text in the message file. Handles special case for message 54 (prints "ok.").
+
+    Parameters:
+        msg - The message number to print.
+
+    Side Effects:
+        - Prints the message to stdout.
+        - Seeks and reads from the message file (fd4) using the global index array 'idx4'.
+        - May print debug information if DEBUG and dbugflg are set.
 */
 void rspeak(int msg)
 {
