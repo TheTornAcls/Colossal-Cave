@@ -639,7 +639,17 @@ void veat(void)
 }
 
 /*
-        DRINK
+    vdrink
+    ------
+    Handles the DRINK command for a specific object. Attempts to drink water if available, updating the game state and object properties as appropriate. Prints messages to the player based on the outcome.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variables 'object', 'prop', and 'place'.
+        - Calls functions such as liq(), here(), actspk(), and rspeak() to update the game state and print messages.
+        - May update the state of the BOTTLE and WATER objects depending on the action.
 */
 void vdrink(void)
 {
