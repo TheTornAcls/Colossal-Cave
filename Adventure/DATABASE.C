@@ -560,7 +560,19 @@ int liq(void)
 }
 
 /*
-        Determine liquid at a location
+    liqloc
+    ------
+    Determines the type of liquid present at a given location based on the location's condition flags.
+
+    Parameters:
+        iloc - The location index to check for liquid (integer).
+
+    Returns:
+        The constant representing the liquid type at the location (WATER, OIL, or nothing).
+
+    Side Effects:
+        - Reads the global variable 'cond' to check the location's condition flags.
+        - Calls liq2() to convert the condition to a liquid type.
 */
 int liqloc(int iloc)
 {
@@ -571,9 +583,18 @@ int liqloc(int iloc)
 }
 
 /*
-        Convert 0 to WATER
-                 1 to nothing
-                 2 to OIL
+    liq2
+    ----
+    Converts a bottle property value or condition code to a liquid type constant (WATER, nothing, or OIL).
+
+    Parameters:
+        pbottle - The property value or condition code to convert (integer).
+
+    Returns:
+        The constant representing the liquid type (WATER, OIL, or nothing).
+
+    Side Effects:
+        - None (does not modify global variables or state).
 */
 int liq2(int pbottle)
 {
