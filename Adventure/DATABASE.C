@@ -467,7 +467,18 @@ void dstroy(int obj)
 }
 
 /*
-        Routine to move an object
+    move
+    ----
+    Moves an object to a specified location. If the object is being carried or is at a valid location, it is first removed from its current location and then placed at the new location.
+
+    Parameters:
+        obj   - The object number to move.
+        where - The destination location number.
+
+    Side Effects:
+        - Updates the global arrays 'place' and 'fixed' to reflect the object's new location.
+        - May call carry() and drop() to update inventory and object state.
+        - May affect the global variable 'holding' if the object is picked up or dropped.
 */
 void move(int obj, int where)
 {
