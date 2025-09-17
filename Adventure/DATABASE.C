@@ -205,7 +205,19 @@ void rspeak(int msg)
 }
 
 /*
-        Print an item message for a given state from "advent3.txt"
+    pspeak
+    ------
+    Prints an item-specific message for a given state from the item message file ("advent3.txt"). Seeks to the correct message for the item and state, and prints it to the player. Optionally prints a leading newline if prespace is set.
+
+    Parameters:
+        item     - The item number for which to print the message.
+        state    - The state index for the message (which variant to print).
+        prespace - If nonzero, prints a newline before the message.
+
+    Side Effects:
+        - Seeks and reads from the item message file (fd3) using the global index array 'idx3'.
+        - Calls rdskip() and rdupto() to position and print the message.
+        - Prints the message to stdout.
 */
 void pspeak(int item, int state, int prespace)
 {
@@ -217,27 +229,19 @@ void pspeak(int item, int state, int prespace)
 /*
     desclg
     ------
-    Prints a long location description from "advent1.txt" for the given location index (iloc).
-    The function seeks to the file offset for the location's description using the idx1 array,
-    then prints characters from the file up to the next '#' character (which marks the end of the description).
-    This is used to display the full description of a location to the player.
+    Prints a long location description from the location description file ("advent1.txt") for the given location index. Seeks to the correct offset and prints the description up to the next '#' character.
 
     Parameters:
         iloc - The location index for which to print the long description.
+
+    Side Effects:
+        - Seeks and reads from the location description file (fd1) using the global index array 'idx1'.
+        - Calls rdupto() to print the description to stdout.
 */
 void desclg(int iloc)
 {
     fseek(fd1, idx1[iloc - 1], 0);
     rdupto(fd1, '#', 1, 0, 0);
-}
-
-/*
-        Print a short location description from "advent2.txt"
-*/
-void descsh(int iloc)
-{
-    fseek(fd2, idx2[iloc - 1], 0);
-    rdupto(fd2, '#', 1, 0, 0);
 }
 
 /*
