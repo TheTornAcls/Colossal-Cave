@@ -245,6 +245,15 @@ void desclg(int iloc)
 }
 
 /*
+        Print a short location description from "advent2.txt"
+*/
+void descsh(int iloc)
+{
+    fseek(fd2, idx2[iloc - 1], 0);
+    rdupto(fd2, '#', 1, 0, 0);
+}
+
+/*
     vocab
     -----
     Looks up a word in the adventure's vocabulary table and returns its associated code if found, or -1 if not found.
