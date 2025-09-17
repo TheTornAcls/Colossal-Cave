@@ -820,7 +820,23 @@ void vfill(void)
 }
 
 /*
-        FEED
+    vfeed
+    -----
+    Handles the FEED command for a specific object, determining the outcome based on the object type and the current game state.
+    This function checks if the player is attempting to feed an object (such as a bird, dwarf, bear, dragon, troll, or snake),
+    and updates the game state, object properties, and prints the appropriate message to the player.
+
+    Parameters:
+        None (operates on and updates global game state variables; does not take explicit parameters).
+
+    Global Variables Affected:
+        - object: Determines which object is being fed and controls the logic flow.
+        - prop[]: Updates properties of objects such as BEAR, AXE, BIRD, and DRAGON based on the feeding action.
+        - fixed[]: May update the fixed status of AXE when feeding the bear.
+        - dflag: Increments if the dwarf is fed.
+        - tally2: Increments if the snake is fed a bird.
+        - FOOD, BIRD: May be destroyed (removed from the game) if used as food.
+        - Calls rspeak() and actspk() to print messages to the player.
 */
 void vfeed(void)
 {
