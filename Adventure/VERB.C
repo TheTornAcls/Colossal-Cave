@@ -413,9 +413,7 @@ void vsay(void)
         printf("Okay.\n%s\n",wval == SAY ? word2 : word1);
 }
 
-/*
-        ON etc.
-*/
+
 void von(void)
 {
         if (!here(LAMP))
@@ -980,7 +978,21 @@ void vbreak(void)
 }
 
 /*
-        WAKE etc.
+    vwake
+    -----
+    Triggers an action based on the state of the object and game closure, either invoking a default action or ending the game if the player tries to wake a dwarf after the cave is closed.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Global Variables Used:
+        - object: The current object the verb is acting upon.
+        - closed: Indicates whether the cave is closed.
+        - verb: The current verb code (used by actspk()).
+
+    Side Effects:
+        - Calls actspk(verb) to print a default message if the object is not a dwarf or the cave is not closed.
+        - Calls dwarfend(199) to end the game if the player tries to wake a dwarf after the cave is closed.
 */
 void vwake(void)
 {
