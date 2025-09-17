@@ -781,7 +781,21 @@ void vfind(void)
 }
 
 /*
-        FILL
+    vfill
+    -----
+    Handles the FILL command for a specific object, allowing the player to fill containers such as the bottle or vase with available liquids at the current location. Determines the appropriate message or action based on the object, its state, and the environment.
+
+    Parameters:
+        None (operates on and updates global game state variables; does not take explicit parameters).
+
+    Global Variables Used and Modified:
+        - object: Determines which object (BOTTLE, VASE, or other) is being filled.
+        - loc: The player's current location, used to check for available liquids.
+        - prop[]: Updates the properties of BOTTLE and VASE based on the fill action.
+        - cond[]: Used to determine the type of liquid available at the current location.
+        - place[]: May update the location of the liquid object (OIL or WATER) when filling the bottle.
+        - WATOIL, OIL: Used to identify and set the type of liquid.
+        - Functions called: liq(), liqloc(), toting(), vdrop(), rspeak().
 */
 void vfill(void)
 {
