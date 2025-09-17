@@ -488,7 +488,18 @@ void juggle(int iloc)
 }
 
 /*
-        Routine to carry an object
+    carry
+    -----
+    Picks up an object and adds it to the player's inventory. Updates the object's location to indicate it is being carried.
+
+    Parameters:
+        obj   - The object number to carry.
+        where - The location from which the object is being picked up.
+
+    Side Effects:
+        - Updates the global array 'place' to set the object's location to -1 (carried).
+        - Increments the global variable 'holding' to reflect the number of items carried.
+        - Does nothing if the object is already being carried.
 */
 void carry(int obj, int where)
 {
@@ -525,9 +536,22 @@ void drop(int obj, int where)
 }
 
 /*
-        routine to move an object and return a
-        value used to set the negated prop values
-        for the repository.
+    put
+    ---
+    Moves an object to a specified location and returns a value used to set the negated property values for the repository.
+
+    Parameters:
+        obj   - The object number to move.
+        where - The destination location number.
+        pval  - The property value to be negated and returned.
+
+    Returns:
+        The negated property value (as -1 - pval).
+
+    Side Effects:
+        - Calls move() to update the object's location.
+        - Updates the global arrays 'place' and 'fixed' to reflect the object's new location.
+        - May affect the global variable 'holding' if the object is picked up or dropped.
 */
 int put(int obj, int where, int pval)
 {
