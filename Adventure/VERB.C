@@ -758,7 +758,24 @@ void vthrow(void)
 }
 
 /*
-        INVENTORY, FIND etc.
+    vfind
+    -----
+    Handles the FIND and INVENTORY commands for a specific object, determining if the player is carrying, can see, or otherwise access the object, and prints an appropriate message based on the game state.
+
+    Parameters:
+        None (operates on and updates global game state variables; does not take explicit parameters).
+
+    Global Variables Used:
+        - object: The object being searched for or inventoried.
+        - closed: Indicates whether the cave is closed.
+        - dflag: Used to determine if dwarves are active.
+        - verb: The current verb code (used by actspk()).
+        - DWARF: Constant representing the dwarf object.
+        - Other functions and variables such as toting(), at(), liq(), here(), liqloc(), dcheck() are used to check the state and location of objects.
+
+    Side Effects:
+        - May print a message to the player using rspeak() or actspk().
+        - Does not modify any global variables.
 */
 void vfind(void)
 {
