@@ -481,7 +481,17 @@ void vwave(void)
 }
 
 /*
-        ATTACK, KILL etc.
+    vkill
+    ------
+    Handles the KILL (or ATTACK) command for a specific object. Attempts to attack or kill the specified object, updating its state and the game world as appropriate. Handles special cases for BIRD, CLAM, OYSTER, SNAKE, DWARF, TROLL, BEAR, DRAGON, and default cases. May end the game if certain conditions are met (e.g., breaking the mirror while the cave is closed).
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Side Effects:
+        - Reads and updates the global variables 'object', 'closed', 'prop', 'place', 'tally2', 'newloc', and others.
+        - Calls functions such as dstroy(), rspeak(), pspeak(), move(), yes(), actspk(), and dwarfend() to update the game state and print messages.
+        - May end the game or move objects depending on the outcome of the attack.
 */
 void vkill(void)
 {
