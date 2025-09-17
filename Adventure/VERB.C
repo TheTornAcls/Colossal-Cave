@@ -879,7 +879,23 @@ void vfeed(void)
 }
 
 /*
-        READ etc.
+    vread
+    -----
+    Handles the READ command for a specific object. Determines if the object can be read based on the current game state (e.g., darkness, object type, inventory, and closure status), and prints the appropriate message or hint to the player.
+
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Global Variables Used:
+        - object: The current object the verb is acting upon.
+        - closed: Indicates whether the cave is closed.
+        - hintavail: Bitmask indicating which hints are available.
+        - hinttaken: Counter for the number of hints taken.
+        - verb: The current verb code (used by actspk()).
+
+    Side Effects:
+        - May print messages to the player using printf(), rspeak(), or actspk().
+        - May update hinttaken and hintavail if a hint is given for the OYSTER object.
 */
 void vread(void)
 {
