@@ -310,7 +310,17 @@ int binary(char* w, struct wac wctable[], int maxwc)
 */
 
 /*
-        Routine to test for darkness
+    Determines if the current location is dark (i.e., not lit and the lamp is not present or not on).
+
+    Parameters:
+        None (uses global state for location, lamp, and conditions)
+
+    Returns:
+        true if the location is dark, false otherwise.
+
+    Side Effects:
+        - Reads the global variables 'cond', 'loc', 'prop', and 'LAMP' to determine darkness.
+
 */
 bool dark(void)
 {
@@ -359,8 +369,16 @@ bool toting(int item)
 }
 
 /*
-        Routine to tell if a location causes
-        a forced move.
+    Determines if a specified location causes a forced move (i.e., the player must move upon entering).
+
+    Parameters:
+        atloc - The location index to check.
+
+    Returns:
+        true if the location is a forced-move location, false otherwise.
+
+    Side Effects:
+        - Reads the global variable 'cond' to check the forced move flag for the location.
 */
 bool forced(int atloc)
 {
@@ -368,7 +386,17 @@ bool forced(int atloc)
 }
 
 /*
-        Routine to supply a random number in a selected range
+    Generates a random integer in the specified inclusive range [low, high]. Uses the standard C library rand() function and ensures uniform distribution.
+
+    Parameters:
+        low  - The lower bound of the range (inclusive).
+        high - The upper bound of the range (inclusive).
+
+    Returns:
+        A random integer between low and high, inclusive.
+
+    Side Effects:
+        - Calls the standard library rand() function, which may update the global random seed/state.
 */
 int rrand(int low, int high)
 {
