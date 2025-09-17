@@ -245,7 +245,16 @@ void desclg(int iloc)
 }
 
 /*
-        Print a short location description from "advent2.txt"
+    descsh
+    ------
+    Prints a short location description from the short description file ("advent2.txt") for the given location index. Seeks to the correct offset and prints the description up to the next '#' character.
+
+    Parameters:
+        iloc - The location index for which to print the short description.
+
+    Side Effects:
+        - Seeks and reads from the short description file (fd2) using the global index array 'idx2'.
+        - Calls rdupto() to print the description to stdout.
 */
 void descsh(int iloc)
 {
@@ -431,8 +440,18 @@ bool pct(int x)
 }
 
 /*
-        Routine to tell if player is on
-        either side of a two sided object.
+    at
+    --
+    Determines if a specified item is present at the current location or is fixed at the current location (for two-sided objects).
+
+    Parameters:
+        item - The item number to check.
+
+    Returns:
+        true if the item is at the current location or fixed at the current location, false otherwise.
+
+    Side Effects:
+        - Reads the global variables 'place', 'fixed', and 'loc' to check item location and fixed status.
 */
 bool at(int item)
 {
@@ -482,7 +501,17 @@ void carry(int obj, int where)
 }
 
 /*
-        Routine to drop an object
+    drop
+    ----
+    Drops an object at a specified location. Updates the object's location and removes it from the player's inventory if necessary.
+
+    Parameters:
+        obj   - The object number to drop.
+        where - The location number where the object will be dropped.
+
+    Side Effects:
+        - Updates the global array 'place' to set the object's new location, or 'fixed' for fixed objects.
+        - Decrements the global variable 'holding' if the object was being carried.
 */
 void drop(int obj, int where)
 {
