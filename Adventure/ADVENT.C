@@ -232,6 +232,7 @@ void open1(FILE * *pfd, char* szName)
         exit(1);
     }
 }
+
 void opentxt(void)
 {
     open1(&fd1, FD1);
@@ -240,9 +241,29 @@ void opentxt(void)
     open1(&fd4, FD4);
 }
 
-/*
-                save adventure game
-*/
+/**
+ * @brief Saves the current game state to a user-specified file.
+ *
+ * This function prompts the user for a filename, appends the ".adv" extension,
+ * and writes the current game state (contained in the global variable `saverec`)
+ * to the specified file. It ensures the filename is valid, handles file creation,
+ * and reports errors if the file cannot be created or written to.
+ *
+ * @details
+ * - Prompts the user for a save game filename (without extension).
+ * - Ensures the filename does not exceed 8 characters and appends ".adv".
+ * - Opens the file in write mode and saves the current game state.
+ * - Handles errors for file creation, writing, and closing, printing messages and exiting on failure.
+ *
+ * @param None
+ *
+ * @global
+ * - Uses and modifies the following global variables:
+ *   - `saverec`: The structure containing the entire current game state, which is written to the save file.
+ *
+ * @note
+ * No parameters are passed to this function. All required data is accessed via global variables.
+ */
 void saveadv(void)
 {
     char* sptr;
