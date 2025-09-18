@@ -680,7 +680,27 @@ void vdrink(void)
 }
 
 /*
-        THROW etc.
+    vthrow
+    ------
+    Handles the THROW command for a specific object, determining the outcome based on the object type, location, and game state.
+    This function processes the action of throwing an object, with special logic for treasures, food, the axe, and interactions with creatures such as trolls, bears, dwarves, and dragons.
+    If the object is not the axe, it defaults to the DROP command; if it is the axe, it checks for special targets and may trigger combat or other effects.
+
+    Parameters:
+        None (operates on and updates global game state variables; does not take explicit parameters).
+
+    Global Variables Used and Modified:
+        - object: The object being thrown; may be reassigned (e.g., to ROD2 or BEAR) or set to 0 in some cases.
+        - verb: The current verb code; may be set to KILL if the axe is thrown at a non-special target.
+        - loc: The player's current location; used for dropping objects.
+        - prop[]: Array of object properties; may be updated for DRAGON, BEAR, AXE, etc.
+        - fixed[]: Array indicating if an object is fixed in place; may be updated for AXE.
+        - dseen[], dloc[], dkill: Dwarf tracking arrays and kill count; may be updated if the axe is thrown at a dwarf.
+        - Other global functions and variables: Calls toting(), at(), here(), drop(), move(), juggle(), vfeed(), vdrop(), itverb(), rspeak(), describe(), and uses constants such as ROD, ROD2, TROLL, TROLL2, CHASM, FOOD, BEAR, AXE, DRAGON, MAXOBJ, KILL.
+
+    Side Effects:
+        - Updates the game state, object locations, and properties based on the outcome of the throw.
+        - May print messages to the player or trigger additional actions (e.g., feeding, attacking, or describing the scene).
 */
 void vthrow(void)
 {
