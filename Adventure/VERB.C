@@ -414,20 +414,37 @@ void vsay(void)
 }
 
 
+/*
+    von
+    ---
+    Handles the ON command, specifically for turning on the lamp in the game. 
+    Checks if the lamp is present, if it has power remaining, and updates the lamp's state and the game environment accordingly.
+    
+    Parameters:
+        None (operates on and updates global game state variables)
+
+    Global Variables Used and Modified:
+        - LAMP: Constant representing the lamp object.
+        - prop[]: Array of object properties; prop[LAMP] is set to 1 to indicate the lamp is on.
+        - limit: Integer tracking the remaining lamp life; checked to ensure the lamp can be turned on.
+        - wzdark: Boolean indicating if the current location is dark; set to false if the lamp is turned on in darkness.
+        - verb: The current verb code, used for default action messages.
+        - Functions called: here(), actspk(), rspeak(), describe().
+*/
 void von(void)
 {
-        if (!here(LAMP))
-                actspk(verb);
-        else if (limit<0)
-                rspeak(184);
-        else {
-                prop[LAMP] = 1;
-                rspeak(39);
-                if (wzdark) {
-                        wzdark = false;
-                        describe();
-                }
+    if (!here(LAMP))
+        actspk(verb);
+    else if (limit<0)
+        rspeak(184);
+    else {
+        prop[LAMP] = 1;
+        rspeak(39);
+        if (wzdark) {
+            wzdark = false;
+            describe();
         }
+    }
 }
 
 /*
