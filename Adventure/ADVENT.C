@@ -79,9 +79,23 @@ int main(int argc, char** argv)
 
 /* ************************************************************ */
 
-/*
-        Initialization of adventure play variables
-*/
+/**
+ * @brief Initializes the game state and resets all adventure play variables to their starting values.
+ *
+ * This function sets up the initial conditions for a new game session by:
+ * - Initializing arrays that track location status (`cond`), object locations (`place`), fixed object locations (`fixed`), default action messages (`actmsg`), and dwarf locations (`dloc`).
+ * - Resetting or zeroing arrays and variables related to visited locations (`visited`), object properties (`prop`), and various game state flags and counters.
+ * - Setting default values for game progress variables such as `turns`, `holding`, `detail`, `limit`, `tally`, `tally2`, `newloc`, `loc`, `oldloc`, `oldloc2`, `knfloc`, `chloc`, `chloc2`, `dkill`, `clock1`, `clock2`, `panic`, `bonus`, `numdie`, `daltloc`, `lmwarn`, `foobar`, `dflag`, `gaveup`, `saveflg`, `hinttaken`, `hintavail`, `testbr`.
+ * - Zeroing or initializing arrays for dwarf old locations (`odloc`), dwarf seen flags (`dseen`), and hint locations (`hintloc`).
+ * - Setting boolean flags such as `wzdark`, `closed`, and `closing` to false.
+ *
+ * @note
+ * This function does not take any parameters.
+ *
+ * @global
+ * The following global variables are modified:
+ * - cond, place, fixed, actmsg, visited, prop, wzdark, closed, closing, holding, detail, limit, tally, tally2, newloc, loc, oldloc, oldloc2, knfloc, chloc, chloc2, dloc, odloc, dkill, dseen, clock1, clock2, panic, bonus, numdie, daltloc, lmwarn, foobar, dflag, gaveup, saveflg, hinttaken, hintavail, hintloc, testbr, turns
+ */
 void initplay(void)
 {
     /*
