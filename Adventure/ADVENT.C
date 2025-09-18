@@ -280,9 +280,30 @@ void saveadv(void)
     printf("OK -- \"C\" you later...\n");
 }
 
-/*
-        restore saved game handler
-*/
+/**
+ * @brief Restores the game state from a previously saved file.
+ *
+ * This function prompts the user for the name of a saved game file, appends the ".adv" extension,
+ * and attempts to open and read the saved game state from the file. If successful, it loads the
+ * saved data into the global game state structure, effectively restoring the game to the point
+ * at which it was saved.
+ *
+ * @details
+ * - Prompts the user for the saved game filename (without extension).
+ * - Ensures the filename does not exceed 8 characters and appends ".adv".
+ * - Opens the file in read mode and loads the saved state into the global variable `saverec`.
+ * - Restores the debug flag (`dbugflg`) to its previous value and resets the player's location.
+ * - Handles errors for file opening, reading, and closing, printing messages and exiting on failure.
+ *
+ * @note
+ * This function does not take any parameters.
+ *
+ * @global
+ * - Uses and modifies the following global variables:
+ *   - `dbugflg`: Temporarily stores and restores the debug flag.
+ *   - `saverec`: Structure holding the entire saved game state, overwritten with loaded data.
+ *   - `loc`: Resets the player's location to 0 after restoring.
+ */
 void restore(void)
 {
     char  username[MAXNAME];
