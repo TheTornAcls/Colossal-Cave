@@ -977,7 +977,7 @@ void dwarves(void)
  *   - If the player is carrying or near a treasure, the pirate may steal it and move the chest/message to a new location.
  *   - If the player meets certain conditions (e.g., has just found the last treasure), the pirate may reveal the chest and message.
  *   - The pirate's location and seen status are updated accordingly.
-*/
+ */
 void dopirate(void)
 {
     int    j, k;
@@ -1030,9 +1030,34 @@ stealit:
     dseen[6] = 0;
 }
 
-/*
-    special time limit stuff...
-*/
+/**
+ * Handles the game's special time limit events, including lamp depletion, cave closing, and endgame transitions.
+ *
+ * Parameters:
+ *   None (operates entirely on global game state).
+ *
+ * Returns:
+ *   bool - true if the cave has just been closed, false otherwise.
+ *
+ * Globals Used/Modified:
+ *   - `foobar` (int): Magic word state. Negated if positive.
+ *   - `testbr` (int): Set to 2 each call.
+ *   - `tally`, `loc`, `clock1`, `clock2` (int): Used to track treasures, player location, and time events.
+ *   - `prop[]` (short int[]): Object properties/status. Used and updated for many objects (GRATE, FISSURE, LAMP, etc.).
+ *   - `fixed[]` (int[]): Secondary object locations. Used for CHAIN, AXE, MIRROR.
+ *   - `dseen[]` (short int[]): Dwarf seen flags. Reset when cave starts closing.
+ *   - `move()`, `juggle()`, `dstroy()`, `put()`, `rspeak()`, `here()`, `toting()`, `drop()`, `normend()` (functions): Used for object and game state manipulation.
+ *   - `closing`, `closed`, `gaveup` (bool/int): Game state flags for cave closing and player quitting.
+ *   - `limit`, `lmwarn` (int): Lamp time limit and warning flag.
+ *   - `oldloc`, `newloc` (int): Player location tracking.
+ *   - `place[]` (int[]): Object locations.
+ *
+ * Description:
+ *   - Decrements and checks timers for cave closing and lamp depletion.
+ *   - Initiates cave closing sequence, moves objects, and updates game state when timers expire.
+ *   - Handles lamp running out of power, battery replacement, and endgame if the player is trapped in the dark.
+ *   - Returns true if the cave has just been closed, otherwise false.
+ */
 bool stimer(void)
 {
     int    i;
