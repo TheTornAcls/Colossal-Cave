@@ -954,8 +954,29 @@ void dwarves(void)
     death();
 }
 
-/*
-    pirate stuff
+/**
+ * Handles the pirate's actions, including stealing treasures and moving the chest/message.
+ *
+ * Parameters:
+ *   None (operates entirely on global game state).
+ *
+ * Globals Used/Modified:
+ *   - `newloc` (int): Current player location. Used to determine if the pirate acts in the current location.
+ *   - `chloc`, `chloc2` (int): Chest and message locations. Used and updated when the pirate moves these items.
+ *   - `prop[]` (short int[]): Object properties/status. Used to check if the chest has already been found.
+ *   - `CHEST`, `MESSAGE`, `PYRAMID`, `EMERALD`, `LAMP` (int): Object indices for special items.
+ *   - `place[]` (int[]): Object locations. Used to check where objects are and to move them.
+ *   - `fixed[]` (int[]): Secondary object locations. Used to check if an object is fixed in place.
+ *   - `tally`, `tally2` (int): Treasure counts. Used to determine if the pirate should act.
+ *   - `MAXTRS` (int): Maximum treasure index.
+ *   - `dloc[]`, `odloc[]`, `dseen[]` (short int[]): Dwarf/pirate locations and seen flags. Updated to move the pirate and reset his seen status.
+ *   - Functions: `toting()`, `here()`, `at()`, `carry()`, `drop()`, `rspeak()`, `move()`, `pct()`.
+ *
+ * Description:
+ *   - If the player is at the chest location or the chest has already been found, the pirate does nothing.
+ *   - If the player is carrying or near a treasure, the pirate may steal it and move the chest/message to a new location.
+ *   - If the player meets certain conditions (e.g., has just found the last treasure), the pirate may reveal the chest and message.
+ *   - The pirate's location and seen status are updated accordingly.
 */
 void dopirate(void)
 {
