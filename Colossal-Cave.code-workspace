@@ -1,0 +1,104 @@
+{
+	"folders": [
+		{
+			"name": "Root",
+			"path": "."
+		},
+		{
+			"name": "Adventure (Main)",
+			"path": "./Adventure"
+		},
+		{
+			"name": "Advent0 (Original)",
+			"path": "./Advent0"
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"*.h": "c",
+			"*.c": "c",
+			"*.cpp": "cpp",
+			"*.txt": "plaintext",
+			"ADVDEC.H": "cpp",
+			"ADVEP.H": "cpp",
+			"ENGLISH.C": "cpp",
+			"ADVENT.H": "cpp",
+			"ADVENT0.C": "cpp",
+			"VERB.C": "cpp",
+			"TURN.C": "cpp"
+		},
+		"files.exclude": {
+			"**/Debug/**": true,
+			"**/x64/**": true,
+			"**/*.vcxproj.user": true,
+			"**/*.opt": true,
+			"**/*.vtg": true,
+			"**/*.vpwhist": true
+		},
+		"search.exclude": {
+			"**/Debug/**": true,
+			"**/x64/**": true
+		},
+		"C_Cpp.default.intelliSenseMode": "windows-msvc-x64",
+		"C_Cpp.default.compilerPath": "",
+		"C_Cpp.default.cStandard": "c11",
+		"C_Cpp.default.cppStandard": "c++17"
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-vscode.cpptools",
+			"ms-vscode.cpptools-extension-pack",
+			"ms-vscode.cmake-tools"
+		]
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			{
+				"label": "Build Adventure (Main)",
+				"type": "shell",
+				"command": "msbuild",
+				"args": [
+					"Adventure.sln",
+					"/p:Configuration=Debug",
+					"/p:Platform=x64"
+				],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "shared"
+				},
+				"problemMatcher": "$msCompile"
+			},
+			{
+				"label": "Clean Adventure",
+				"type": "shell",
+				"command": "msbuild",
+				"args": [
+					"Adventure.sln",
+					"/t:Clean",
+					"/p:Configuration=Debug",
+					"/p:Platform=x64"
+				],
+				"group": "build"
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			{
+				"name": "Debug Adventure",
+				"type": "cppvsdbg",
+				"request": "launch",
+				"program": "${workspaceFolder}/Adventure/Debug/x64/Adventure.exe",
+				"args": [],
+				"stopAtEntry": false,
+				"cwd": "${workspaceFolder}/Adventure",
+				"console": "externalTerminal"
+			}
+		]
+	}
+}
