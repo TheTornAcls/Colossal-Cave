@@ -823,9 +823,31 @@ char* probj(int object)
     analyze(word1, &wtype, &wval);
     return (wtype == 1 ? word1 : word2);
 }
-/*
-    dwarf stuff.
-*/
+/**
+ * Handles the movement, encounters, and attacks of dwarves in the game.
+ *
+ * Parameters:
+ *   None (operates entirely on global game state).
+ *
+ * Globals Used/Modified:
+ *   - `newloc` (int): Current player location. Used to determine if dwarves are allowed and where encounters occur.
+ *   - `cond[]` (short int[]): Location status flags. Used to check for NOPIRAT (no pirate/dwarf) areas.
+ *   - `dflag` (int): Dwarf encounter state. Controls activation and escalation of dwarf encounters; incremented as encounters progress.
+ *   - `dloc[]` (short int[]): Dwarf locations. Updated to move dwarves each turn.
+ *   - `odloc[]` (short int[]): Previous dwarf locations. Updated to track where dwarves were last turn.
+ *   - `dseen[]` (short int[]): Flags indicating if a dwarf has been seen by the player. Updated based on proximity.
+ *   - `daltloc` (int): Alternate location for dwarves. Used when relocating dwarves after first encounter.
+ *   - `knfloc` (int): Knife location. May be set to the player's location if a dwarf attacks.
+ *   - `oldloc2` (int): Previous player location. Set if the player is killed by dwarves.
+ *   - Functions: `forced()`, `pct()`, `rrand()`, `rspeak()`, `drop()`, `dopirate()`, `death()`.
+ *
+ * Description:
+ *   - Checks if dwarves are allowed in the current location and if they are active.
+ *   - Handles the first close encounter by possibly removing some dwarves and dropping the axe.
+ *   - Moves each active dwarf to a new location, updates their seen status, and handles pirate logic.
+ *   - If dwarves are present and have seen the player, may trigger an attack.
+ *   - If the player is attacked and hit, triggers player death and updates relevant state.
+ */
 void dwarves(void)
 {
     int    i, j;
