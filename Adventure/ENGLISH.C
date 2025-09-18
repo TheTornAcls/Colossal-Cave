@@ -51,7 +51,7 @@ bool english(void)
         if (!analyze(word2, &type2, &val2))
             return false;      /* didn't know it       */
 
-/* check his grammar */
+    /* check his grammar */
     if ((type1 == 3) && (type2 == 3) && \
         (val1 == HELP) && (val2 == HELP)) {
         outwords();
@@ -173,7 +173,7 @@ void getwords(void)
     for (wptr = words, wptr2 = word1, j = 0;
         (*wptr != '\n') && (*wptr != ' ') && j <= 18;
         wptr++, wptr2++, j++)
-        * wptr2 = *wptr;
+        *wptr2 = *wptr;
     *wptr2 = '\0';
     if (j > 18)
         while ((*wptr++ != '\n') && *wptr != ' ');
@@ -181,7 +181,7 @@ void getwords(void)
     for (wptr2 = word2, j = 0;
         (*wptr != '\n') && (*wptr != ' ') && j <= 18;
         wptr++, wptr2++, j++)
-        * wptr2 = *wptr;
+        *wptr2 = *wptr;
     *wptr2 = '\0';
 #ifdef DEBUG
     if (dbugflg)

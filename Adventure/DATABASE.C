@@ -74,7 +74,7 @@ void gettrav(int locationIndex)
         - May print to stdout if 'print' is nonzero.
         - May write to the buffer pointed to by 'string' if 'print' is zero.
 */
-bool rdupto(FILE * fdi, char uptoc, char print, char* string, int prespace)
+bool rdupto(FILE* fdi, char uptoc, char print, char* string, int prespace)
 {
     int    c;
 
@@ -93,7 +93,7 @@ bool rdupto(FILE * fdi, char uptoc, char print, char* string, int prespace)
             *string++ = (char)c;
     }
     if (!print)
-        * string = '\0';
+        *string = '\0';
     return true;
 }
 
@@ -112,7 +112,7 @@ bool rdupto(FILE * fdi, char uptoc, char print, char* string, int prespace)
         - Reads from and may reposition the input file stream 'fdi'.
         - May call bug(31) or bug(32) and exit on file errors or EOF.
 */
-void rdskip(FILE * fdi, char skipc, int n, char rewind)
+void rdskip(FILE* fdi, char skipc, int n, char rewind)
 {
     int    c;
 
@@ -154,7 +154,7 @@ bool yes(int msg1, int msg2, int msg3)
         char* i;
         size_t   l;
         putchar('>');
-        fflush(stdout); 
+        fflush(stdout);
         fgets(answer, 80, stdin);
         for (i = answer; *i != '\n'; i++) *i = (char)tolower(*i);
         l = i - answer;
