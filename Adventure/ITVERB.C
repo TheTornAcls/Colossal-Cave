@@ -1,6 +1,5 @@
 /*      program ITVERB.C                                        */
 
-
 #include        <stdio.h>
 #include        <stdbool.h>
 #include        "advent.h"
