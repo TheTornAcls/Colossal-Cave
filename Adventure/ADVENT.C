@@ -233,19 +233,23 @@ void open1(FILE** pfd, char* szName)
     }
 }
 
-/**
-•   @brief Opens the main adventure text data files required for game operation.
-•   •   This function initializes the global file pointers fd1, fd2, fd3, and fd4 by opening the corresponding text files (as defined by FD1, FD2, FD3, and FD4) in read mode. It uses the open1 helper function to construct the full file paths and handle errors if any file cannot be opened. These files contain essential game data such as messages, cave descriptions, and other resources needed during gameplay.
-•   •   @details
-•   •   Calls open1 for each file pointer and file name constant.
-•   •   If any file fails to open, the program prints an error message and exits.
-•   •   The files are expected to be present in the directory specified by szFilePath.
-•   •   @global
-•   •   Modifies the following global variables:
-•   •   fd1, fd2, fd3, fd4: Set to the opened file streams for the respective adventure text files.
-•   •   Uses the following global variables:
-•   •   FD1, FD2, FD3, FD4: Constants containing the file names to open.
-•   •   szFilePath: The base directory path where the files are located.
+
+/*
+    opentxt
+    -------
+    Opens the main adventure text files (advent1.txt, advent2.txt, advent3.txt, advent4.txt) for reading.
+    Uses the open1() helper to construct the full path and open each file, assigning the resulting file pointers
+    to the global variables fd1, fd2, fd3, and fd4.
+
+    Parameters:
+        None.
+
+    Returns:
+        None.
+
+    Side Effects:
+        - Modifies the global FILE* variables fd1, fd2, fd3, and fd4 by opening the corresponding files for reading.
+        - If any file cannot be opened, prints an error message and exits the program.
 */
 void opentxt(void)
 {
