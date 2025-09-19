@@ -25,7 +25,10 @@
 			"ADVENT.H": "cpp",
 			"ADVENT0.C": "cpp",
 			"VERB.C": "cpp",
-			"TURN.C": "cpp"
+			"TURN.C": "cpp",
+			"ITVERB.C": "cpp",
+			"DATABASE.C": "cpp",
+			"ADVENT.C": "cpp"
 		},
 		"files.exclude": {
 			"**/Debug/**": true,
