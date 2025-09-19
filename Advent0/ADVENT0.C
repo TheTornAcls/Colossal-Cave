@@ -42,7 +42,20 @@ void FileError(const char* pszMessage, const char* pszFileName)
     perror(szError);
 }
 
-
+/**
+ * @brief Opens a file with the specified name and mode, handling errors.
+ *
+ * This function attempts to open a file using the given filename and mode. If the file cannot be opened,
+ * it reports the error using `FileError`, sets the global error flag `fError` to 1, and returns NULL.
+ *
+ * @param pszName The name of the file to open.
+ * @param pszMode The mode string to use for opening the file (e.g., "r", "w").
+ * @return Pointer to the opened FILE, or NULL if opening fails.
+ *
+ * @global
+ * - Modifies the global variable `fError` by setting it to 1 if an error occurs during file opening.
+ * - Uses `FileError` for error reporting.
+ */
 FILE* OpenFile(const char* pszName, const char* pszMode)
 {
     FILE* pfil;
