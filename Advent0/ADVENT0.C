@@ -30,8 +30,8 @@ void FileError(const char* pszMessage, const char* pszFileName)
 }
 
 
-FILE* OpenFile(const char* pszName, const char* pszMode) {
-
+FILE* OpenFile(const char* pszName, const char* pszMode)
+{
     FILE* pfil;
     errno_t rc;
 
@@ -44,25 +44,24 @@ FILE* OpenFile(const char* pszName, const char* pszMode) {
     }
 
     return pfil;
-
 }
 
-
-void OutputS(const char* psz) {
-
-    if (fputs(psz, filIndex) < 0) {
+void OutputS(const char* psz)
+{
+    if (fputs(psz, filIndex) < 0)
+    {
         FileError("Error in output file", ISAM);
         exit(EXIT_FAILURE);
     }
-
 }
 
-void OutputF(const char* pszFormat, ...) {
-
+void OutputF(const char* pszFormat, ...)
+{
     va_list         va;
 
     va_start(va, pszFormat);
-    if (vfprintf(filIndex, pszFormat, va) < 0) {
+    if (vfprintf(filIndex, pszFormat, va) < 0)
+    {
         FileError("Error in output file", ISAM);
         exit(EXIT_FAILURE);
     }
@@ -83,8 +82,8 @@ void OutputF(const char* pszFormat, ...) {
         pszMAX     - String used for the array size macro (e.g., "LOC", "OBJ", "MSG")
         pszFileName- Name of the input file (for error reporting)
 */
-void DoFile(FILE* pfil, const char* pszIDX, const char* pszMAX, const char* pszFileName) {
-
+void DoFile(FILE* pfil, const char* pszIDX, const char* pszMAX, const char* pszFileName)
+{
     char            szInput[255];
     char            szOutput[12] = "";
     int             cNumbers = -1;
@@ -107,14 +106,13 @@ void DoFile(FILE* pfil, const char* pszIDX, const char* pszMAX, const char* pszF
             }
         }
     }
-    if (ferror(pfil)) {
+    if (ferror(pfil))
+    {
         FileError("Error in input file", pszFileName);
         exit(EXIT_FAILURE);
     }
     OutputF("%s\n\t};\n\n", szOutput);
-
 }
-
 
 /**
  * @brief Closes an open file and handles errors.
@@ -129,17 +127,17 @@ void DoFile(FILE* pfil, const char* pszIDX, const char* pszMAX, const char* pszF
  * - Modifies the global variable `fError` by setting it to 1 if an error occurs during file closing.
  * - Uses `FileError` for error reporting.
  */
-void CloseFile(FILE* pfil, const char* pszFileName) {
-
-    if (fclose(pfil)) {
+void CloseFile(FILE* pfil, const char* pszFileName)
+{
+    if (fclose(pfil))
+    {
         FileError("Error closing", pszFileName);
         fError = 1;
     }
-
 }
 
-int main(void) {
-
+int main(void)
+{
     filIndex = OpenFile(ISAM, ISAMMODE);
     filTxt1 = OpenFile(FD1, "r");
     filTxt2 = OpenFile(FD2, "r");
