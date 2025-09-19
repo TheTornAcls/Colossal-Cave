@@ -189,6 +189,22 @@ void CloseFile(FILE* pfil, const char* pszFileName)
     }
 }
 
+/**
+ * @brief Main entry point for the ADVENT0 utility.
+ *
+ * This function opens the required adventure text files and the output index file,
+ * processes each input file to generate index arrays, and writes them to the output header file.
+ * It handles file errors, closes all files, and exits with an appropriate status code.
+ *
+ * @param None
+ * @return EXIT_SUCCESS on success, EXIT_FAILURE on error.
+ *
+ * @global
+ * - Uses and modifies the following global variables:
+ *   - `filIndex`, `filTxt1`, `filTxt2`, `filTxt3`, `filTxt4`: FILE pointers for input/output files.
+ *   - `fError`: Error flag, set to 1 if any file operation fails.
+ * - Calls helper functions that may also use or modify these globals.
+ */
 int main(void)
 {
     filIndex = OpenFile(ISAM, ISAMMODE);
