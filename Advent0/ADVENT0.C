@@ -17,6 +17,19 @@ static int      fError = 0;
 static FILE* filIndex, * filTxt1, * filTxt2, * filTxt3, * filTxt4;
 
 
+/**
+ * @brief Prints a formatted error message for file operations.
+ *
+ * This function constructs an error message by concatenating the provided message and file name,
+ * then prints the error using `perror`. It does not exit or modify any global state directly.
+ *
+ * @param pszMessage   The error message to display (e.g., "Error opening").
+ * @param pszFileName  The name of the file associated with the error.
+ *
+ * @global
+ * - Does not modify any global variables directly.
+ * - Uses standard output for error reporting.
+ */
 void FileError(const char* pszMessage, const char* pszFileName)
 {
     char    szError[FILENAME_MAX + 100];
