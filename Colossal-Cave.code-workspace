@@ -28,7 +28,8 @@
 			"TURN.C": "cpp",
 			"ITVERB.C": "cpp",
 			"DATABASE.C": "cpp",
-			"ADVENT.C": "cpp"
+			"ADVENT.C": "cpp",
+			"ADVCAVE.H": "cpp"
 		},
 		"files.exclude": {
 			"**/Debug/**": true,
