@@ -432,7 +432,21 @@ int rrand(int low, int high)
 }
 
 /*
-        Routine true x% of the time.
+    pct
+    ---
+    Returns true with probability x% (i.e., x out of 100 times).
+    Uses the rrand() function to generate a random integer in [0, 99] and checks if it is less than x.
+
+    Parameters:
+        x - The percentage chance (integer between 0 and 100) for which the function should return true.
+
+    Returns:
+        true if a randomly generated number is less than x, false otherwise.
+
+    Side Effects:
+        - Calls the global rrand() function, which in turn calls the standard library rand().
+        - May update the global random seed/state via rand().
+        - Does not modify any other global variables.
 */
 bool pct(int x)
 {
