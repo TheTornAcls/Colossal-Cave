@@ -215,9 +215,23 @@ void initplay(void)
     return;
 }
 
-/*
-        Open advent?.txt files
-*/
+/**
+ * @brief Opens a text file for reading, constructing the full path using the global file path.
+ *
+ * This function constructs the full filename by concatenating the global `szFilePath` with the provided
+ * file name `szName`, then attempts to open the file for reading. If the file cannot be opened, it prints
+ * an error message and exits the program.
+ *
+ * @param pfd    Pointer to a FILE* variable where the opened file handle will be stored.
+ * @param szName Name of the file (relative or base name) to be opened, appended to `szFilePath`.
+ *
+ * @global
+ * - Uses the global variable `szFilePath` to construct the full path to the file.
+ * - Does not modify any global variables directly, but the file pointer pointed to by `pfd` is set.
+ *
+ * @note
+ * Exits the program if the file cannot be opened.
+ */
 void open1(FILE** pfd, char* szName)
 {
     char szFileName[FILENAME_MAX];
