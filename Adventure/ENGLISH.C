@@ -1,6 +1,5 @@
 /*      program ENGLISH.C                                       */
 
-
 #include        <stdio.h>
 #include        <stdlib.h>
 #include        <ctype.h>
@@ -101,7 +100,6 @@ bool english(void)
         bug(36);
     return true;
 }
-
 
 /*
     analyze
