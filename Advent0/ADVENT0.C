@@ -57,8 +57,6 @@ void OutputS(const char* psz) {
 
 }
 
-
-
 void OutputF(const char* pszFormat, ...) {
 
     va_list         va;
@@ -69,7 +67,6 @@ void OutputF(const char* pszFormat, ...) {
         exit(EXIT_FAILURE);
     }
     va_end(va);
-
 }
 
 /*
@@ -119,6 +116,19 @@ void DoFile(FILE* pfil, const char* pszIDX, const char* pszMAX, const char* pszF
 }
 
 
+/**
+ * @brief Closes an open file and handles errors.
+ *
+ * This function attempts to close the specified file pointer. If an error occurs during closing,
+ * it reports the error using `FileError`, sets the global error flag `fError` to 1, and continues.
+ *
+ * @param pfil        Pointer to the FILE to be closed.
+ * @param pszFileName Name of the file (for error reporting purposes).
+ *
+ * @global
+ * - Modifies the global variable `fError` by setting it to 1 if an error occurs during file closing.
+ * - Uses `FileError` for error reporting.
+ */
 void CloseFile(FILE* pfil, const char* pszFileName) {
 
     if (fclose(pfil)) {
@@ -127,7 +137,6 @@ void CloseFile(FILE* pfil, const char* pszFileName) {
     }
 
 }
-
 
 int main(void) {
 
@@ -160,5 +169,4 @@ int main(void) {
         exit(EXIT_FAILURE);
 
     exit(EXIT_SUCCESS);
-
 }
