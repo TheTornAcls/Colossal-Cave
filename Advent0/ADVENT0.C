@@ -72,6 +72,19 @@ FILE* OpenFile(const char* pszName, const char* pszMode)
     return pfil;
 }
 
+/**
+ * @brief Writes a string to the output index file and handles errors.
+ *
+ * This function writes the provided string to the global output file `filIndex`.
+ * If writing fails, it reports the error using `FileError` and exits the program.
+ *
+ * @param psz The null-terminated string to write to the output file.
+ *
+ * @global
+ * - Uses the global variable `filIndex` as the output file.
+ * - Calls `FileError` for error reporting.
+ * - Does not modify any global variables directly.
+ */
 void OutputS(const char* psz)
 {
     if (fputs(psz, filIndex) < 0)
@@ -81,6 +94,20 @@ void OutputS(const char* psz)
     }
 }
 
+/**
+ * @brief Writes a formatted string to the output index file and handles errors.
+ *
+ * This function writes a formatted string (like printf) to the global output file `filIndex`.
+ * If writing fails, it reports the error using `FileError` and exits the program.
+ *
+ * @param pszFormat The format string (as in printf).
+ * @param ...       Additional arguments to be formatted and written.
+ *
+ * @global
+ * - Uses the global variable `filIndex` as the output file.
+ * - Calls `FileError` for error reporting.
+ * - Does not modify any global variables directly.
+ */
 void OutputF(const char* pszFormat, ...)
 {
     va_list         va;
