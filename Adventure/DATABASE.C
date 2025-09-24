@@ -35,7 +35,8 @@ void gettrav(int locationIndex)
     // Bits 3-5:   Verb (tverb)        = (value / 1000) % 1000
     // Bits 6-8:   Destination (tdest) = (value / 1000000) % 1000
     // This section decodes each field for the travel array.
-    for (travelPtr = &travel[0], cavePtr = cave[locationIndex - 1]; *cavePtr != -1; travelPtr++, cavePtr++) {
+    for (travelPtr = &travel[0], cavePtr = cave[locationIndex - 1]; *cavePtr != -1; travelPtr++, cavePtr++)
+    {
         if (travelPtr >= &travel[MAXTRAV]) bug(33);
         long int encodedValue = *cavePtr;
         // Decode travel condition (lowest 3 digits)
@@ -78,8 +79,10 @@ bool rdupto(FILE* fdi, char uptoc, char print, char* string, int prespace)
 {
     int    c;
 
-    while ((c = fgetc(fdi)) != uptoc) {
-        if (prespace) {
+    while ((c = fgetc(fdi)) != uptoc)
+    {
+        if (prespace)
+        {
             putchar('\n');
             prespace = 0;
         }
@@ -150,7 +153,8 @@ bool yes(int msg1, int msg2, int msg3)
 
     if (msg1)
         rspeak(msg1);
-    while (y == -1) {
+    while (y == -1)
+    {
         char* i;
         size_t   l;
         putchar('>');
@@ -160,12 +164,14 @@ bool yes(int msg1, int msg2, int msg3)
         l = i - answer;
         if (l == 0)
             rspeak(89);
-        else if ((l <= 2) && (memcmp(answer, "no", l) == 0)) {
+        else if ((l <= 2) && (memcmp(answer, "no", l) == 0))
+        {
             if (msg3)
                 rspeak(msg3);
             y = 0;
         }
-        else if ((l <= 3) && (memcmp(answer, "yes", l) == 0)) {
+        else if ((l <= 3) && (memcmp(answer, "yes", l) == 0))
+        {
             if (msg2)
                 rspeak(msg2);
             y = 1;
@@ -193,7 +199,8 @@ void rspeak(int msg)
 {
     if (msg == 54)
         printf("ok.\n");
-    else {
+    else
+    {
 #ifdef DEBUG
         if (dbugflg)
             printf("Seek loc msg #%d @ %ld\n", msg, idx4[msg]);
@@ -310,7 +317,8 @@ int binary(char* w, struct wac wctable[], int maxwc)
 
     lo = 0;
     hi = maxwc - 1;
-    while (lo <= hi) {
+    while (lo <= hi)
+    {
         mid = (lo + hi) / 2;
         if ((check = strcmp(w, wctable[mid].aword)) < 0)
             hi = mid - 1;
@@ -321,7 +329,6 @@ int binary(char* w, struct wac wctable[], int maxwc)
     }
     return(-1);
 }
-
 
 /*
         Utility Routines
@@ -528,7 +535,8 @@ void juggle(int iloc)
 */
 void carry(int obj, int where)
 {
-    if (obj < MAXOBJ) {
+    if (obj < MAXOBJ)
+    {
         if (place[obj] == -1)
             return;
         place[obj] = -1;
@@ -551,7 +559,8 @@ void carry(int obj, int where)
 */
 void drop(int obj, int where)
 {
-    if (obj < MAXOBJ) {
+    if (obj < MAXOBJ)
+    {
         if (place[obj] == -1)
             --holding;
         place[obj] = where;
