@@ -22,7 +22,8 @@
 */
 void itverb(void)
 {
-    switch (verb) {
+    switch (verb)
+    {
     case DROP:
     case SAY:
     case WAVE:
@@ -117,16 +118,20 @@ void ivtake(void)
     int    anobj, item;
 
     anobj = 0;
-    for (item = 1; item < MAXOBJ; ++item) {
-        if (place[item] == loc) {
-            if (anobj != 0) {
+    for (item = 1; item < MAXOBJ; ++item)
+    {
+        if (place[item] == loc)
+        {
+            if (anobj != 0)
+            {
                 needobj();
                 return;
             }
             anobj = item;
         }
     }
-    if (anobj == 0 || (dcheck() && dflag >= 2)) {
+    if (anobj == 0 || (dcheck() && dflag >= 2))
+    {
         needobj();
         return;
     }
@@ -158,14 +163,17 @@ void ivopen(void)
         object = DOOR;
     if (at(GRATE))
         object = GRATE;
-    if (here(CHAIN)) {
-        if (object != 0) {
+    if (here(CHAIN))
+    {
+        if (object != 0)
+        {
             needobj();
             return;
         }
         object = CHAIN;
     }
-    if (object == 0) {
+    if (object == 0)
+    {
         rspeak(28);
         return;
     }
@@ -199,11 +207,13 @@ void ivkill(void)
         addobj(TROLL);
     if (here(BEAR) && prop[BEAR] == 0)
         addobj(BEAR);
-    if (object1 != 0) {
+    if (object1 != 0)
+    {
         needobj();
         return;
     }
-    if (object != 0) {
+    if (object != 0)
+    {
         vkill();
         return;
     }
@@ -211,7 +221,8 @@ void ivkill(void)
         object = BIRD;
     if (here(CLAM) || here(OYSTER))
         addobj(CLAM);
-    if (object1 != 0) {
+    if (object1 != 0)
+    {
         needobj();
         return;
     }
@@ -235,7 +246,8 @@ void iveat(void)
 {
     if (!here(FOOD))
         needobj();
-    else {
+    else
+    {
         object = FOOD;
         veat();
     }
@@ -259,7 +271,8 @@ void ivdrink(void)
     if (liqloc(loc) != WATER &&
         (liq() != WATER || !here(BOTTLE)))
         needobj();
-    else {
+    else
+    {
         object = WATER;
         vdrink();
     }
@@ -303,7 +316,8 @@ void ivfill(void)
 {
     if (!here(BOTTLE))
         needobj();
-    else {
+    else
+    {
         object = BOTTLE;
         vfill();
     }
@@ -327,7 +341,8 @@ void ivfoo(void)
     int    k, msg;
     k = verb - FEE + 1;
     msg = 42;
-    if (foobar != 1 - k) {
+    if (foobar != 1 - k)
+    {
         if (foobar != 0)
             msg = 151;
         rspeak(msg);
@@ -338,7 +353,8 @@ void ivfoo(void)
         return;
     foobar = 0;
     if (place[EGGS] == 92 ||
-        (toting(EGGS) && loc == 92)) {
+        (toting(EGGS) && loc == 92))
+    {
         rspeak(msg);
         return;
     }
@@ -377,7 +393,8 @@ void ivread(void)
         object = object * 100 + TABLET;
     if (here(MESSAGE))
         object = object * 100 + MESSAGE;
-    if (object > 100 || object == 0 || dark()) {
+    if (object > 100 || object == 0 || dark())
+    {
         needobj();
         return;
     }
@@ -402,7 +419,8 @@ void invent(void)
     int    msg, i;
 
     msg = 98;
-    for (i = 1; i <= MAXOBJ; ++i) {
+    for (i = 1; i <= MAXOBJ; ++i)
+    {
         if (i == BEAR || !toting(i))
             continue;
         if (msg)
@@ -431,7 +449,8 @@ void addobj(int obj)
 {
     if (object1 != 0)
         return;
-    if (object != 0) {
+    if (object != 0)
+    {
         object1 = -1;
         return;
     }
