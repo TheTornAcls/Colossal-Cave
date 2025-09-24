@@ -40,7 +40,8 @@ bool english(void)
     if (!analyze(word1, &type1, &val1))     /* check word1  */
         return false;              /* didn't know it       */
 
-    if (type1 == 2 && val1 == SAY) {
+    if (type1 == 2 && val1 == SAY)
+    {
         verb = SAY;     /* repeat word & act upon if..  */
         object = 1;
         return true;
@@ -52,20 +53,25 @@ bool english(void)
 
     /* check his grammar */
     if ((type1 == 3) && (type2 == 3) && \
-        (val1 == HELP) && (val2 == HELP)) {
+        (val1 == HELP) && (val2 == HELP))
+    {
         outwords();
         return false;
     }
-    else if (type1 == 3) {
+    else if (type1 == 3)
+    {
         rspeak(val1);
         return false;
     }
-    else if (type2 == 3) {
+    else if (type2 == 3)
+    {
         rspeak(val2);
         return false;
     }
-    else if (type1 == 0) {
-        if (type2 == 0) {
+    else if (type1 == 0)
+    {
+        if (type2 == 0)
+        {
             printf("%s\n", msg);
             return false;
         }
@@ -74,24 +80,29 @@ bool english(void)
     }
     else if (type2 == 0)
         motion = val2;
-    else if (type1 == 1) {
+    else if (type1 == 1)
+    {
         object = val1;
         if (type2 == 2)
             verb = val2;
-        if (type2 == 1) {
+        if (type2 == 1)
+        {
             if ((object == WATER || object == OIL) && at(val2))
                 verb = POUR;
-            else {
+            else
+            {
                 printf("%s\n", msg);
                 return false;
             }
         }
     }
-    else if (type1 == 2) {
+    else if (type1 == 2)
+    {
         verb = val1;
         if (type2 == 1)
             object = val2;
-        if (type2 == 2) {
+        if (type2 == 2)
+        {
             printf("%s\n", msg);
             return false;
         }
@@ -124,8 +135,10 @@ bool analyze(char* word, int* type, int* value)
     int    wordval, msg;
 
     /* make sure I understand */
-    if ((wordval = vocab(word)) == -1) {
-        switch (rrand(0, 2)) {
+    if ((wordval = vocab(word)) == -1)
+    {
+        switch (rrand(0, 2))
+        {
         case 0:
             msg = 60;
             break;
@@ -207,14 +220,18 @@ void outwords(void)
     char            words[80];
 
     j = line = 0;
-    for (i = 0; i < MAXWC; ++i) {
+    for (i = 0; i < MAXWC; ++i)
+    {
         if ((wc[i].acode < 1000) || ((wc[i].acode < 3000) && \
-            (wc[i].acode > 1999))) {
+            (wc[i].acode > 1999)))
+        {
             printf("%-12s", wc[i].aword);
-            if ((++j == 6) || (i == MAXWC - 1)) {
+            if ((++j == 6) || (i == MAXWC - 1))
+            {
                 j = 0;
                 putchar('\n');
-                if (++line == 20) {
+                if (++line == 20)
+                {
                     line = 0;
                     printf("\n\007Enter <RETURN>");
                     printf(" to continue\n\n");
