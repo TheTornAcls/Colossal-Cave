@@ -1,7 +1,6 @@
 /*      header ADVDEC.H                                         *\
 \*      GLOBAL declarations for adventure                       */
 
-
 /*
         Database variables
 */
