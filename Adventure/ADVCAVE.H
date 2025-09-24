@@ -1,6 +1,5 @@
 /*        header ADVCAVE.H                                            */
 
-
 /*        WARNING: the travel array for the cave is stored as MAXLOC
            pointers to arrays of 1..MAXTRAV LONG INTEGERS.
            this requires 32 bit LONG INTEGERS.
