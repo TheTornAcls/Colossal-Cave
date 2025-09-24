@@ -23,7 +23,8 @@
 */
 void trverb(void)
 {
-    switch (verb) {
+    switch (verb)
+    {
     case CALM:
     case WALK:
     case QUIT:
@@ -126,7 +127,8 @@ void vtake(void)
 {
     int    msg, i;
 
-    if (toting(object)) {
+    if (toting(object))
+    {
         actspk(verb);
         return;
     }
@@ -140,17 +142,21 @@ void vtake(void)
         msg = 169;
     if (object == CHAIN && prop[BEAR] != 0)
         msg = 170;
-    if (fixed[object]) {
+    if (fixed[object])
+    {
         rspeak(msg);
         return;
     }
     /*
      special case for liquids
     */
-    if (object == WATER || object == OIL) {
-        if (!here(BOTTLE) || liq() != object) {
+    if (object == WATER || object == OIL)
+    {
+        if (!here(BOTTLE) || liq() != object)
+        {
             object = BOTTLE;
-            if (toting(BOTTLE) && prop[BOTTLE] == 1) {
+            if (toting(BOTTLE) && prop[BOTTLE] == 1)
+            {
                 vfill();
                 return;
             }
@@ -163,19 +169,23 @@ void vtake(void)
         }
         object = BOTTLE;
     }
-    if (holding >= 7) {
+    if (holding >= 7)
+    {
         rspeak(92);
         return;
     }
     /*
      special case for bird.
     */
-    if (object == BIRD && prop[BIRD] == 0) {
-        if (toting(ROD)) {
+    if (object == BIRD && prop[BIRD] == 0)
+    {
+        if (toting(ROD))
+        {
             rspeak(26);
             return;
         }
-        if (!toting(CAGE)) {
+        if (!toting(CAGE))
+        {
             rspeak(27);
             return;
         }
@@ -217,14 +227,16 @@ void vdrop(void)
     */
     if (toting(ROD2) && object == ROD && !toting(ROD))
         object = ROD2;
-    if (!toting(object)) {
+    if (!toting(object))
+    {
         actspk(verb);
         return;
     }
     /*
      snake and bird
     */
-    if (object == BIRD && here(SNAKE)) {
+    if (object == BIRD && here(SNAKE))
+    {
         rspeak(30); msg = 0;
         if (closed)
             dwarfend(136);
@@ -234,7 +246,8 @@ void vdrop(void)
     /*
      coins and vending machine
     */
-    else if (object == COINS && here(VEND)) {
+    else if (object == COINS && here(VEND))
+    {
         dstroy(COINS);
         drop(BATTERIES, loc);
         pspeak(BATTERIES, 0, 0);
@@ -243,7 +256,8 @@ void vdrop(void)
     /*
      bird and dragon (ouch!!)
     */
-    else if (object == BIRD && at(DRAGON) && prop[DRAGON] == 0) {
+    else if (object == BIRD && at(DRAGON) && prop[DRAGON] == 0)
+    {
         rspeak(154); msg = 0;
         dstroy(BIRD);
         prop[BIRD] = 0;
@@ -254,7 +268,8 @@ void vdrop(void)
     /*
      Bear and troll
     */
-    if (object == BEAR && at(TROLL)) {
+    if (object == BEAR && at(TROLL))
+    {
         rspeak(163); msg = 0;
         move(TROLL, 0);
         move((TROLL + MAXOBJ), 0);
@@ -266,10 +281,12 @@ void vdrop(void)
     /*
      vase
     */
-    else if (object == VASE) {
+    else if (object == VASE)
+    {
         if (loc == 96)
             rspeak(54);
-        else {
+        else
+        {
             prop[VASE] = at(PILLOW) ? 0 : 2;
             pspeak(VASE, prop[VASE] + 1, 0);
             if (prop[VASE] != 0)
@@ -314,7 +331,8 @@ void vopen(void)
 {
     int    msg, oyclam;
 
-    switch (object) {
+    switch (object)
+    {
     case CLAM:
     case OYSTER:
         oyclam = (object == OYSTER ? 1 : 0);
@@ -324,7 +342,8 @@ void vopen(void)
             msg = 122 + oyclam;
         else if (toting(object))
             msg = 120 + oyclam;
-        else {
+        else
+        {
             msg = 124 + oyclam;
             dstroy(CLAM);
             drop(OYSTER, loc);
@@ -343,12 +362,14 @@ void vopen(void)
     case CHAIN:
         if (!here(KEYS))
             msg = 31;
-        else if (verb == LOCK) {
+        else if (verb == LOCK)
+        {
             if (prop[CHAIN] != 0)
                 msg = 34;
             else if (loc != 130)
                 msg = 173;
-            else {
+            else
+            {
                 prop[CHAIN] = 2;
                 if (toting(CHAIN))
                     drop(CHAIN, loc);
@@ -356,12 +377,14 @@ void vopen(void)
                 msg = 172;
             }
         }
-        else {
+        else
+        {
             if (prop[BEAR] == 400)
                 msg = 41;
             else if (prop[CHAIN] == 0)
                 msg = 37;
-            else {
+            else
+            {
                 prop[CHAIN] = 0;
                 fixed[CHAIN] = 0;
                 if (prop[BEAR] != 3)
@@ -374,14 +397,17 @@ void vopen(void)
     case GRATE:
         if (!here(KEYS))
             msg = 31;
-        else if (closing) {
-            if (!panic) {
+        else if (closing)
+        {
+            if (!panic)
+            {
                 clock2 = 15;
                 ++panic;
             }
             msg = 130;
         }
-        else {
+        else
+        {
             msg = 34 + prop[GRATE];
             prop[GRATE] = (verb == LOCK ? 0 : 1);
             msg += 2 * prop[GRATE];
@@ -437,10 +463,12 @@ void von(void)
         actspk(verb);
     else if (limit < 0)
         rspeak(184);
-    else {
+    else
+    {
         prop[LAMP] = 1;
         rspeak(39);
-        if (wzdark) {
+        if (wzdark)
+        {
             wzdark = false;
             describe();
         }
@@ -463,7 +491,8 @@ void voff(void)
 {
     if (!here(LAMP))
         actspk(verb);
-    else {
+    else
+    {
         prop[LAMP] = 0;
         rspeak(40);
     }
@@ -489,7 +518,8 @@ void vwave(void)
     else if (object != ROD || !at(FISSURE) ||
         !toting(object) || closing)
         actspk(verb);
-    else {
+    else
+    {
         prop[FISSURE] = 1 - prop[FISSURE];
         pspeak(FISSURE, 2 - prop[FISSURE], 0);
     }
@@ -512,11 +542,13 @@ void vkill(void)
 {
     int    msg, i;
 
-    switch (object) {
+    switch (object)
+    {
     case BIRD:
         if (closed)
             msg = 137;
-        else {
+        else
+        {
             dstroy(BIRD);
             prop[BIRD] = 0;
             if (place[SNAKE] == 19)
@@ -546,7 +578,8 @@ void vkill(void)
         msg = 165 + (prop[BEAR] + 1) / 2;
         break;
     case DRAGON:
-        if (prop[DRAGON] != 0) {
+        if (prop[DRAGON] != 0)
+        {
             msg = 167;
             break;
         }
@@ -588,31 +621,37 @@ void vpour(void)
 {
     if (object == BOTTLE || object == 0)
         object = liq();
-    if (object == 0) {
+    if (object == 0)
+    {
         needobj();
         return;
     }
-    if (!toting(object)) {
+    if (!toting(object))
+    {
         actspk(verb);
         return;
     }
-    if (object != OIL && object != WATER) {
+    if (object != OIL && object != WATER)
+    {
         rspeak(78);
         return;
     }
     prop[BOTTLE] = 1;
     place[object] = 0;
-    if (at(PLANT)) {
+    if (at(PLANT))
+    {
         if (object != WATER)
             rspeak(112);
-        else {
+        else
+        {
             pspeak(PLANT, prop[PLANT] + 1, 0);
             prop[PLANT] = (prop[PLANT] + 2) % 6;
             prop[PLANT2] = prop[PLANT] / 2;
             describe();
         }
     }
-    else if (at(DOOR)) {
+    else if (at(DOOR))
+    {
         prop[DOOR] = (object == OIL ? 1 : 0);
         rspeak(113 + prop[DOOR]);
     }
@@ -637,7 +676,8 @@ void veat(void)
 {
     int    msg;
 
-    switch (object) {
+    switch (object)
+    {
     case FOOD:
         dstroy(FOOD);
         msg = 72;
@@ -672,7 +712,8 @@ void vdrink(void)
         rspeak(110);
     else if (liq() != WATER || !here(BOTTLE))
         actspk(verb);
-    else {
+    else
+    {
         prop[BOTTLE] = 1;
         place[WATER] = 0;
         rspeak(74);
@@ -708,14 +749,16 @@ void vthrow(void)
 
     if (toting(ROD2) && object == ROD && !toting(ROD))
         object = ROD2;
-    if (!toting(object)) {
+    if (!toting(object))
+    {
         actspk(verb);
         return;
     }
     /*
      treasure to troll
     */
-    if (at(TROLL) && object >= 50 && object < MAXOBJ) {
+    if (at(TROLL) && object >= 50 && object < MAXOBJ)
+    {
         rspeak(159);
         drop(object, 0);
         move(TROLL, 0);
@@ -728,7 +771,8 @@ void vthrow(void)
     /*
      feed the bears...
     */
-    if (object == FOOD && here(BEAR)) {
+    if (object == FOOD && here(BEAR))
+    {
         object = BEAR;
         vfeed();
         return;
@@ -736,7 +780,8 @@ void vthrow(void)
     /*
      if not axe, same as drop...
     */
-    if (object != AXE) {
+    if (object != AXE)
+    {
         vdrop();
         return;
     }
@@ -746,9 +791,11 @@ void vthrow(void)
     /*
      at a dwarf...
     */
-    if (i = dcheck()) {
+    if (i = dcheck())
+    {
         msg = 48;
-        if (pct(33)) {
+        if (pct(33))
+        {
             dseen[i] = dloc[i] = 0;
             msg = 47;
             ++dkill;
@@ -769,7 +816,8 @@ void vthrow(void)
     /*
      at the bear...
     */
-    else if (here(BEAR) && prop[BEAR] == 0) {
+    else if (here(BEAR) && prop[BEAR] == 0)
+    {
         rspeak(164);
         drop(AXE, loc);
         fixed[AXE] = -1;
@@ -780,7 +828,8 @@ void vthrow(void)
     /*
      otherwise it is an attack
     */
-    else {
+    else
+    {
         verb = KILL;
         object = 0;
         itverb();
@@ -827,7 +876,8 @@ void vfind(void)
         (liq() == object && here(BOTTLE)) ||
         object == liqloc(loc))
         msg = 94;
-    else {
+    else
+    {
         actspk(verb);
         return;
     }
@@ -855,13 +905,15 @@ void vfill(void)
 {
     int    msg, i;
 
-    switch (object) {
+    switch (object)
+    {
     case BOTTLE:
         if (liq() != 0)
             msg = 105;
         else if (liqloc(loc) == 0)
             msg = 106;
-        else {
+        else
+        {
             prop[BOTTLE] = cond[loc] & WATOIL;
             i = liq();
             if (toting(BOTTLE))
@@ -870,11 +922,13 @@ void vfill(void)
         }
         break;
     case VASE:
-        if (liqloc(loc) == 0) {
+        if (liqloc(loc) == 0)
+        {
             msg = 144;
             break;
         }
-        if (!toting(VASE)) {
+        if (!toting(VASE))
+        {
             msg = 29;
             break;
         }
@@ -910,12 +964,14 @@ void vfeed(void)
 {
     int    msg;
 
-    switch (object) {
+    switch (object)
+    {
     case BIRD:
         msg = 100;
         break;
     case DWARF:
-        if (!here(FOOD)) {
+        if (!here(FOOD))
+        {
             actspk(verb);
             return;
         }
@@ -923,12 +979,14 @@ void vfeed(void)
         msg = 103;
         break;
     case BEAR:
-        if (!here(FOOD)) {
+        if (!here(FOOD))
+        {
             if (prop[BEAR] == 0)
                 msg = 102;
             else if (prop[BEAR] == 3)
                 msg = 110;
-            else {
+            else
+            {
                 actspk(verb);
                 return;
             }
@@ -947,7 +1005,8 @@ void vfeed(void)
         msg = 182;
         break;
     case SNAKE:
-        if (closed || !here(BIRD)) {
+        if (closed || !here(BIRD))
+        {
             msg = 102;
             break;
         }
@@ -986,11 +1045,13 @@ void vread(void)
     int    msg;
 
     msg = 0;
-    if (dark()) {
+    if (dark())
+    {
         printf("I see no %s here.\n", probj(object));
         return;
     }
-    switch (object) {
+    switch (object)
+    {
     case MAGAZINE:
         msg = 190;
         break;
@@ -1004,7 +1065,8 @@ void vread(void)
         if (!toting(OYSTER) || !closed)
             break;
         if (hintavail & HINTO)
-            if (yes(192, 193, 54)) {
+            if (yes(192, 193, 54))
+            {
                 ++hinttaken;
                 hintavail &= ~HINTO;
             }
@@ -1043,7 +1105,8 @@ void vblast(void)
 {
     if (prop[ROD2] < 0 || !closed)
         actspk(verb);
-    else {
+    else
+    {
         bonus = 133;
         if (loc == 115)
             bonus = 134;
@@ -1071,21 +1134,25 @@ void vblast(void)
 void vbreak(void)
 {
     int    msg;
-    if (object == MIRROR) {
+    if (object == MIRROR)
+    {
         msg = 148;
-        if (closed) {
+        if (closed)
+        {
             rspeak(197);
             dwarfend(136);
         }
     }
-    else if (object == VASE && prop[VASE] == 0) {
+    else if (object == VASE && prop[VASE] == 0)
+    {
         msg = 198;
         if (toting(VASE))
             drop(VASE, loc);
         prop[VASE] = 2;
         fixed[VASE] = -1;
     }
-    else {
+    else
+    {
         actspk(verb);
         return;
     }
