@@ -31,7 +31,8 @@ void turn(void)
             if closing, then he can't leave except via
             the main office.
     */
-    if (newloc < 9 && newloc != 0 && closing) {
+    if (newloc < 9 && newloc != 0 && closing)
+    {
         rspeak(130);
         newloc = loc;
         if (!panic)
@@ -44,7 +45,8 @@ void turn(void)
     */
     if (newloc != loc && !forced(loc) && (cond[loc] & NOPIRAT) == 0)
         for (i = 1; i < (DWARFMAX - 1); ++i)
-            if (odloc[i] == newloc && dseen[i]) {
+            if (odloc[i] == newloc && dseen[i])
+            {
                 newloc = loc;
                 rspeak(2);
                 break;
@@ -53,26 +55,30 @@ void turn(void)
     dwarves();      /* & special dwarf(pirate who steals)   */
 
     /* added by BDS C conversion */
-    if (loc != newloc) {
+    if (loc != newloc)
+    {
         if (loc == 0) visited[newloc] = (visited[newloc] + 3) & ~3;
         ++turns;
         loc = newloc;
 
         /* check for death */
-        if (loc == 0) {
+        if (loc == 0)
+        {
             death();
             return;
         }
 
         /* check for forced move */
-        if (forced(loc)) {
+        if (forced(loc))
+        {
             describe();
             domove();
             return;
         }
 
         /* check for wandering in dark */
-        if (wzdark && dark() && pct(35)) {
+        if (wzdark && dark() && pct(35))
+        {
             rspeak(23);
             oldloc2 = loc;
             death();
@@ -85,7 +91,8 @@ void turn(void)
             ++visited[loc];
     }                               /* if (loc != newloc)   */
 
-    if (closed) {
+    if (closed)
+    {
         if (prop[OYSTER] < 0 && toting(OYSTER))
             pspeak(OYSTER, 1, 0);
         for (i = 1; i <= MAXOBJ; ++i)
@@ -101,7 +108,8 @@ void turn(void)
         return;
 
     if (cond[loc] & hintavail)
-        switch (cond[loc] & HINT) {
+        switch (cond[loc] & HINT)
+        {
         case HINTF:
             ++hintloc[HINTAREAF];
             if (hintloc[HINTAREAF] > 20 && visited[8] == 0 /* never in yet */)
@@ -185,7 +193,8 @@ void describe(void)
         rspeak(141);
     if (dark())
         rspeak(16);
-    else {
+    else
+    {
         if ((visited[loc] & 3) || ((detail & testbr) && visited[loc]))
             descsh(loc);
         else
@@ -214,14 +223,18 @@ void descitem(void)
     int    i, init = 0;
     int             state, prespace;
 
-    for (i = 1; i < MAXOBJ; ++i) {
-        if (at(i)) {
+    for (i = 1; i < MAXOBJ; ++i)
+    {
+        if (at(i))
+        {
             if (i == STEPS && toting(NUGGET))
                 continue;
-            if (prop[i] < 0) {
+            if (prop[i] < 0)
+            {
                 if (closed)
                     continue;
-                else {
+                else
+                {
                     prop[i] = 0;
                     if (i == RUG || i == CHAIN)
                         ++prop[i];
@@ -232,7 +245,8 @@ void descitem(void)
                 state = 1;
             else
                 state = prop[i];
-            if (!init && !(detail & 2)) {
+            if (!init && !(detail & 2))
+            {
                 init = 1;
                 prespace = 1;
             }
@@ -259,14 +273,16 @@ void descitem(void)
 void domove(void)
 {
     gettrav(loc);
-    switch (motion) {
+    switch (motion)
+    {
     case NULLX:
         break;
     case BACK:
         goback();
         break;
     case LOOK:
-        if (!detail) {
+        if (!detail)
+        {
             rspeak(15);
             detail |= 1;
         }
@@ -313,21 +329,26 @@ void goback(void)
     oldloc2 = oldloc;
     oldloc = loc;
     k2 = 0;
-    if (want == loc) {
+    if (want == loc)
+    {
         rspeak(91);
         return;
     }
     copytrv(travel, strav);
-    for (kk = 0; travel[kk].tdest != -1; ++kk) {
-        if (!travel[kk].tcond && travel[kk].tdest == want) {
+    for (kk = 0; travel[kk].tdest != -1; ++kk)
+    {
+        if (!travel[kk].tcond && travel[kk].tdest == want)
+        {
             motion = travel[kk].tverb;
             dotrav();
             return;
         }
-        if (!travel[kk].tcond) {
+        if (!travel[kk].tcond)
+        {
             k2 = kk;
             temp = travel[kk].tdest;
-            if (temp <= MAXLOC) {
+            if (temp <= MAXLOC)
+            {
                 gettrav(temp);
                 if (forced(temp) && travel[0].tdest == want)
                     k2 = temp;
@@ -394,7 +415,8 @@ void dotrav(void)
     mvflag = hitflag = 0;
     pctt = rrand(0, 99);
 
-    for (kk = 0; travel[kk].tdest >= 0 && !mvflag; ++kk) {
+    for (kk = 0; travel[kk].tdest >= 0 && !mvflag; ++kk)
+    {
         rdest = travel[kk].tdest;
         rverb = travel[kk].tverb;
         rcond = travel[kk].tcond;
@@ -409,7 +431,8 @@ void dotrav(void)
         if ((rverb != 1) && (rverb != motion) && !hitflag)
             continue;
         ++hitflag;
-        switch (rcond / 100) {
+        switch (rcond / 100)
+        {
         case 0:
             if ((rcond == 0) || (pctt < rcond))
                 ++mvflag;
@@ -446,7 +469,8 @@ void dotrav(void)
         rspeak(rdest - 500);
     else if (rdest > 300)
         spcmove(rdest);
-    else {
+    else
+    {
         newloc = rdest;
 #ifdef DEBUG
         if (dbugflg)
@@ -495,7 +519,8 @@ void badmove(void)
 */
 void spcmove(int rdest)
 {
-    switch (rdest - 300) {
+    switch (rdest - 300)
+    {
     case 1: /* plover movement via alcove */
         if (!holding || (holding == 1 && toting(EMERALD)))
             newloc = (99 + 100) - loc;
@@ -507,7 +532,8 @@ void spcmove(int rdest)
         rspeak(54);
         break;
     case 3: /* troll bridge */
-        if (prop[TROLL] == 1) {
+        if (prop[TROLL] == 1)
+        {
             pspeak(TROLL, 1, 0);
             prop[TROLL] = 0;
             move(TROLL2, 0);
@@ -517,7 +543,8 @@ void spcmove(int rdest)
             juggle(CHASM);
             newloc = loc;
         }
-        else {
+        else
+        {
             newloc = (loc == 117 ? 122 : 117);
             if (prop[TROLL] == 0)
                 ++prop[TROLL];
@@ -607,7 +634,8 @@ int score(void)
     s = t = 0;
     {
         int i, k;
-        for (i = 50; i <= MAXTRS; ++i) {
+        for (i = 50; i <= MAXTRS; ++i)
+        {
             if (i == CHEST)
                 k = 14;
             else if (i > CHEST)
@@ -635,7 +663,8 @@ int score(void)
     if (t)
         printf("%-22s%4d\n", "Masters section:", t);
     s += t;
-    if (closed) {
+    if (closed)
+    {
         if (bonus == 0)
             t = 10;
         else if (bonus == 135)
@@ -650,7 +679,8 @@ int score(void)
     if (place[MAGAZINE] == 108)
         s += 1;
     t = -15 * hinttaken;
-    if (t) {
+    if (t)
+    {
         printf("%-22s%4d\n", "Hints & intructions:", t);
         s += t;
     }
@@ -676,7 +706,8 @@ void death(void)
     int i, j;
     int yea;
 
-    if (!closing) {
+    if (!closing)
+    {
         yea = yes(81 + numdie * 2, 82 + numdie * 2, 54);
         if (++numdie >= MAXDIE || !yea)
             normend();
@@ -684,7 +715,8 @@ void death(void)
         place[OIL] = 0;
         if (toting(LAMP))
             prop[LAMP] = '\0';
-        for (j = 1; j < 101; ++j) {
+        for (j = 1; j < 101; ++j)
+        {
             i = (char)101 - j;
             if (toting(i))
                 drop(i, i == LAMP ? 1 : oldloc2);
@@ -723,12 +755,15 @@ void doobj(void)
     /*
             did he give grate as destination?
     */
-    else if (object == GRATE) {
-        if (loc == 1 || loc == 4 || loc == 7) {
+    else if (object == GRATE)
+    {
+        if (loc == 1 || loc == 4 || loc == 7)
+        {
             motion = DEPRESSION;
             domove();
         }
-        else if (loc > 9 && loc < 15) {
+        else if (loc > 9 && loc < 15)
+        {
             motion = ENTRANCE;
             domove();
         }
@@ -736,7 +771,8 @@ void doobj(void)
     /*
             is it a dwarf he is after?
     */
-    else if (dcheck() && dflag >= 2) {
+    else if (dcheck() && dflag >= 2)
+    {
         object = DWARF;
         trobj();
     }
@@ -747,35 +783,40 @@ void doobj(void)
         liqloc(loc) == object)
         trobj();
     else if (object == PLANT && at(PLANT2) &&
-        prop[PLANT2] == 0) {
+        prop[PLANT2] == 0)
+    {
         object = PLANT2;
         trobj();
     }
     /*
      is he trying to grab a knife?
     */
-    else if (object == KNIFE && knfloc == loc) {
+    else if (object == KNIFE && knfloc == loc)
+    {
         rspeak(116);
         knfloc = -1;
     }
     /*
      is he trying to get at dynamite?
     */
-    else if (object == ROD && here(ROD2)) {
+    else if (object == ROD && here(ROD2))
+    {
         object = ROD2;
         trobj();
     }
     /*
      is he trying to get at shadow troll?
     */
-    else if (object == TROLL && here(TROLL2)) {
+    else if (object == TROLL && here(TROLL2))
+    {
         object = TROLL2;
         trobj();
     }
     /*
      is he trying to get at shadow plant?
     */
-    else if (object == PLANT && here(PLANT2)) {
+    else if (object == PLANT && here(PLANT2))
+    {
         object = PLANT2;
         trobj();
     }
@@ -860,7 +901,8 @@ void dwarves(void)
     /*
             see if dwarves are active.
     */
-    if (!dflag) {
+    if (!dflag)
+    {
         if (newloc > 15)
             ++dflag;
         return;
@@ -869,14 +911,16 @@ void dwarves(void)
             if first close encounter (of 3rd kind)
             kill 0, 1 or 2
     */
-    if (dflag == 1) {
+    if (dflag == 1)
+    {
         if (newloc < 15 || pct(95))
             return;
         ++dflag;
         for (i = 1; i < 3; ++i)
             if (pct(50))
                 dloc[rrand(1, 5)] = 0;
-        for (i = 1; i < (DWARFMAX - 1); ++i) {
+        for (i = 1; i < (DWARFMAX - 1); ++i)
+        {
             if (dloc[i] == newloc)
                 dloc[i] = daltloc;
             odloc[i] = dloc[i];
@@ -886,7 +930,8 @@ void dwarves(void)
         return;
     }
     dtotal = attack = stick = 0;
-    for (i = 1; i < DWARFMAX; ++i) {
+    for (i = 1; i < DWARFMAX; ++i)
+    {
         if (dloc[i] == 0)
             continue;
         /*
@@ -894,7 +939,8 @@ void dwarves(void)
                 have a matrix around to do it
                 as in the original version...
         */
-        for (try = 1; try < 20; ++try) {
+        for (try = 1; try < 20; ++try)
+        {
             j = rrand(15, 120); /* allowed area */
             if (j != odloc[i] && j != dloc[i] &&
                 !(i == (DWARFMAX - 1) && (cond[j] & (NOPIRAT == 1))))
@@ -914,9 +960,11 @@ void dwarves(void)
         dloc[i] = newloc;
         if (i == 6)
             dopirate();
-        else {
+        else
+        {
             ++dtotal;
-            if (odloc[i] == dloc[i]) {
+            if (odloc[i] == dloc[i])
+            {
                 ++attack;
                 if (knfloc >= 0)
                     knfloc = newloc;
@@ -935,15 +983,18 @@ void dwarves(void)
         return;
     if (dflag == 2)
         ++dflag;
-    if (attack > 1) {
+    if (attack > 1)
+    {
         printf("%d of them throw knives at you!!\n", attack);
         k = 6;
     }
-    else {
+    else
+    {
         rspeak(5);
         k = 52;
     }
-    if (stick <= 1) {
+    if (stick <= 1)
+    {
         rspeak(stick + k);
         if (stick == 0)
             return;
@@ -987,14 +1038,16 @@ void dopirate(void)
     for (j = 50; j <= MAXTRS; ++j)
         if (j != PYRAMID ||
             (newloc != place[PYRAMID] &&
-                newloc != place[EMERALD])) {
+                newloc != place[EMERALD]))
+        {
             if (toting(j))
                 goto stealit;
             if (here(j))
                 ++k;
         }
     if (tally == tally2 + 1 && k == 0 && place[CHEST] == 0 &&
-        here(LAMP) && prop[LAMP] == 1) {
+        here(LAMP) && prop[LAMP] == 1)
+    {
         rspeak(186);
         move(CHEST, chloc);
         move(MESSAGE, chloc2);
@@ -1003,7 +1056,8 @@ void dopirate(void)
         dseen[6] = 0;
         return;
     }
-    if (odloc[6] != dloc[6] && pct(20)) {
+    if (odloc[6] != dloc[6] && pct(20))
+    {
         rspeak(127);
         return;
     }
@@ -1015,7 +1069,8 @@ stealit:
     if (place[MESSAGE] == 0)
         move(CHEST, chloc);
     move(MESSAGE, chloc2);
-    for (j = 50; j <= MAXTRS; ++j) {
+    for (j = 50; j <= MAXTRS; ++j)
+    {
         if (j == PYRAMID &&
             (newloc == place[PYRAMID] ||
                 newloc == place[EMERALD]))
@@ -1065,7 +1120,8 @@ bool stimer(void)
     testbr = 2;
     if (tally == 0 && loc >= 15 && loc != 33)
         --clock1;
-    if (clock1 == 0) {
+    if (clock1 == 0)
+    {
         /*
                 start closing the cave
         */
@@ -1091,7 +1147,8 @@ bool stimer(void)
     }
     if (clock1 < 0)
         --clock2;
-    if (clock2 == 0) {
+    if (clock2 == 0)
+    {
         /*
                 set up storage room...
                 and close the cave...
@@ -1125,7 +1182,8 @@ bool stimer(void)
         --limit;
     if (limit <= 30 &&
         here(BATTERIES) && prop[BATTERIES] == 0 &&
-        here(LAMP)) {
+        here(LAMP))
+    {
         rspeak(188);
         prop[BATTERIES] = 1;
         if (toting(BATTERIES))
@@ -1134,19 +1192,22 @@ bool stimer(void)
         lmwarn = 0;
         return false;
     }
-    if (limit == 0) {
+    if (limit == 0)
+    {
         --limit;
         prop[LAMP] = 0;
         if (here(LAMP))
             rspeak(184);
         return false;
     }
-    if (limit < 0 && loc <= 8) {
+    if (limit < 0 && loc <= 8)
+    {
         rspeak(185);
         gaveup = 1;
         normend();
     }
-    if (limit <= 30) {
+    if (limit <= 30)
+    {
         if (lmwarn || !here(LAMP))
             return(0);
         lmwarn = 1;
@@ -1178,7 +1239,8 @@ void tryhint(int imsg, int mask, int i)
 {
     putchar('\n');
     if (yes(imsg, 0, 54))
-        if (yes(87, imsg + 1, 54)) {
+        if (yes(87, imsg + 1, 54))
+        {
             ++hinttaken;
             hintavail &= ~mask;
         }
