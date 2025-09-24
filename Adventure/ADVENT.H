@@ -178,4 +178,3 @@ struct  trav {
 #define FD3      "advent3.txt"
 #define FD4      "advent4.txt"
 #endif
-
