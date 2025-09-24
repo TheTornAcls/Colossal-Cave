@@ -34,11 +34,13 @@ int main(int argc, char** argv)
         szFilePath[i + 1] = '\0';
     }
 #endif
-    while (--argc > 0) {
+    while (--argc > 0)
+    {
         ++argv;
         if (**argv != '-' && **argv != '/')
             break;
-        switch (tolower(argv[0][1])) {
+        switch (tolower(argv[0][1]))
+        {
         case 'r':
             ++rflag;
             continue;
@@ -60,7 +62,8 @@ int main(int argc, char** argv)
     initplay();
     if (rflag)
         restore();
-    else if (yes(65, 1, 0)) {
+    else if (yes(65, 1, 0))
+    {
         limit = 1000;
         ++hinttaken;
     }
@@ -302,7 +305,8 @@ void saveadv(void)
     FILE* savefd;
     char  username[MAXNAME];
 
-    do {
+    do
+    {
         printf("What do you want to name the saved game? ");
         fflush(stdout);
         gets_s(username, MAXNAME);
@@ -322,11 +326,13 @@ void saveadv(void)
         printf("Sorry, I can't create the file...%s\n", username);
         exit(1);
     }
-    if (fwrite(&saverec, sizeof saverec, 1, savefd) != 1) {
+    if (fwrite(&saverec, sizeof saverec, 1, savefd) != 1)
+    {
         printf("Write error on save file...%s\n", username);
         exit(1);
     }
-    if (fclose(savefd) == -1) {
+    if (fclose(savefd) == -1)
+    {
         printf("Sorry, I can't close the file...%s\n", username);
         exit(1);
     }
@@ -364,7 +370,8 @@ void restore(void)
     char* sptr;
     int   savedebug = dbugflg;
 
-    do {
+    do
+    {
         printf("What is the name of the saved game? ");
         fflush(stdout);
         gets_s(username, MAXNAME);
@@ -376,15 +383,18 @@ void restore(void)
         username[8] = '\0'; /* max 8 char filename */
     strcat_s(username, MAXNAME, ".adv");
     fopen_s(&restfd, username, RESTMODE);
-    if (restfd == NULL) {
+    if (restfd == NULL)
+    {
         printf("Sorry, I can't open the file...%s\n", username);
         exit(1);
     }
-    if (fread(&saverec, sizeof saverec, 1, restfd) != 1) {
+    if (fread(&saverec, sizeof saverec, 1, restfd) != 1)
+    {
         printf("Read error on save file...%s\n", username);
         exit(1);
     }
-    if (fclose(restfd) == -1) {
+    if (fclose(restfd) == -1)
+    {
         printf("Warning -- can't close save file...%s\n", username);
     }
     dbugflg |= savedebug; loc = 0; putchar('\n');
