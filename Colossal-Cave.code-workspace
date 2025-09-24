@@ -25,7 +25,9 @@
 			"ITVERB.C": "cpp",
 			"DATABASE.C": "cpp",
 			"ADVENT.C": "cpp",
-			"ADVCAVE.H": "cpp"
+			"ADVCAVE.H": "cpp",
+			"ADVTEXT.H": "cpp",
+			"ADVWORD.H": "cpp"
 		},
 		"files.exclude": {
 			"**/Debug/**": true,
