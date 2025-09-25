@@ -127,11 +127,13 @@ public class AdventureGame
     private readonly AdventureDatabase _db = new();
     private readonly AdventureVerbs _verbs;
     private readonly AdventureScoring _scoring;
+    private readonly AdventureEvents _events;
 
     public AdventureGame()
     {
         this._verbs = new AdventureVerbs(this, this._db);
         this._scoring = new AdventureScoring(this, this._db);
+        this._events = new AdventureEvents(this, this._db);
     }
 
     public void InitPlay()
@@ -429,6 +431,8 @@ public class AdventureGame
         while (!this.SaveFlag)
         {
             this.Turn();
+            this._events.ProcessTurnEvents();
+            this.turns++;
         }
         if (this.SaveFlag)
         {
