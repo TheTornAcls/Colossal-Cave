@@ -113,5 +113,22 @@ public class AdventureDatabase
         }
     }
 
-    public AdventureDatabase() { }
+    public AdventureDatabase()
+    {
+        // Sample rooms
+        this.Rooms.Add(new Room { Id = 1, Name = "Cave Entrance", Description = "You are standing at the entrance of a dark cave.", ShortDescription = "At cave entrance." });
+        this.Rooms.Add(new Room { Id = 2, Name = "Dark Tunnel", Description = "You are in a dark tunnel. The air smells damp.", ShortDescription = "In a dark tunnel." });
+        this.Rooms.Add(new Room { Id = 3, Name = "Underground Lake", Description = "You are at the edge of an underground lake.", ShortDescription = "By an underground lake." });
+        // Sample objects
+        this.Objects.Add(new GameObject { Id = 1, Name = "Lamp", Description = "A brass lantern.", InitialLocation = 1, FixedLocation = 0 });
+        this.Objects.Add(new GameObject { Id = 2, Name = "Book", Description = "An ancient book with faded writing.", InitialLocation = 2, FixedLocation = 0 });
+        this.Objects.Add(new GameObject { Id = 3, Name = "Food", Description = "Some preserved food.", InitialLocation = 3, FixedLocation = 0 });
+        // Sample travel table
+        this.TravelTable.Add(new TravelEntry { FromLocation = 1, ToLocation = 2, Verb = 45, Condition = 0 }); // north
+        this.TravelTable.Add(new TravelEntry { FromLocation = 2, ToLocation = 1, Verb = 46, Condition = 0 }); // south
+        this.TravelTable.Add(new TravelEntry { FromLocation = 2, ToLocation = 3, Verb = 43, Condition = 0 }); // east
+        this.TravelTable.Add(new TravelEntry { FromLocation = 3, ToLocation = 2, Verb = 44, Condition = 0 }); // west
+        // Sample messages
+        this.Messages.Add(new GameMessage { Id = 1, Text = "Welcome to Adventure!" });
+    }
 }
