@@ -1,8 +1,27 @@
 using System;
 using System.IO;
+using System.Text.Json;
 
 namespace AdventureSharp
 {
+    public class GameState
+    {
+        public short[] cond = new short[AdventureConstants.MAXLOC];
+        public short[] place = new short[AdventureConstants.MAXOBJ];
+        public short[] fixedObj = new short[AdventureConstants.MAXOBJ];
+        public short[] actmsg = new short[AdventureConstants.ACTMSG];
+        public short[] visited = new short[AdventureConstants.MAXLOC];
+        public short[] prop = new short[AdventureConstants.MAXOBJ];
+        public short[] dloc = new short[AdventureConstants.DWARFMAX];
+        public short[] odloc = new short[AdventureConstants.DWARFMAX];
+        public short[] dseen = new short[AdventureConstants.DWARFMAX];
+        public short[] hintloc = new short[AdventureConstants.MAXHINT + 1];
+        public int turns, loc, oldloc, oldloc2, newloc;
+        public int tally, tally2, limit, lmwarn, holding, detail, knfloc, clock1, clock2, panic, bonus, numdie, daltloc, dkill, dflag, saveflg, hinttaken, hintavail, testbr;
+        public bool wzdark, closing, closed, gaveup;
+        public int chloc, chloc2, foobar;
+    }
+
     public static class AdventureConstants
     {
         public const int MAXLOC = 141;
@@ -173,16 +192,99 @@ namespace AdventureSharp
             fd4?.Close();
         }
 
-        public void RestoreGame()
+        private GameState GetCurrentState()
         {
-            // Placeholder for restore logic
-            Console.WriteLine("[RestoreGame called - not yet implemented]");
+            return new GameState
+            {
+                cond = (short[])cond.Clone(),
+                place = (short[])place.Clone(),
+                fixedObj = (short[])fixedObj.Clone(),
+                actmsg = (short[])actmsg.Clone(),
+                visited = (short[])visited.Clone(),
+                prop = (short[])prop.Clone(),
+                dloc = (short[])dloc.Clone(),
+                odloc = (short[])odloc.Clone(),
+                dseen = (short[])dseen.Clone(),
+                hintloc = (short[])hintloc.Clone(),
+                turns = turns, loc = loc, oldloc = oldloc, oldloc2 = oldloc2, newloc = newloc,
+                tally = tally, tally2 = tally2, limit = limit, lmwarn = lmwarn, holding = holding, detail = detail, knfloc = knfloc, clock1 = clock1, clock2 = clock2, panic = panic, bonus = bonus, numdie = numdie, daltloc = daltloc, dkill = dkill, dflag = dflag, saveflg = saveflg, hinttaken = hinttaken, hintavail = hintavail, testbr = testbr,
+                wzdark = wzdark, closing = closing, closed = closed, gaveup = gaveup,
+                chloc = chloc, chloc2 = chloc2, foobar = foobar
+            };
+        }
+
+        private void SetCurrentState(GameState state)
+        {
+            Array.Copy(state.cond, cond, cond.Length);
+            Array.Copy(state.place, place, place.Length);
+            Array.Copy(state.fixedObj, fixedObj, fixedObj.Length);
+            Array.Copy(state.actmsg, actmsg, actmsg.Length);
+            Array.Copy(state.visited, visited, visited.Length);
+            Array.Copy(state.prop, prop, prop.Length);
+            Array.Copy(state.dloc, dloc, dloc.Length);
+            Array.Copy(state.odloc, odloc, odloc.Length);
+            Array.Copy(state.dseen, dseen, dseen.Length);
+            Array.Copy(state.hintloc, hintloc, hintloc.Length);
+            turns = state.turns; loc = state.loc; oldloc = state.oldloc; oldloc2 = state.oldloc2; newloc = state.newloc;
+            tally = state.tally; tally2 = state.tally2; limit = state.limit; lmwarn = state.lmwarn; holding = state.holding; detail = state.detail; knfloc = state.knfloc; clock1 = state.clock1; clock2 = state.clock2; panic = state.panic; bonus = state.bonus; numdie = state.numdie; daltloc = state.daltloc; dkill = state.dkill; dflag = state.dflag; saveflg = state.saveflg; hinttaken = state.hinttaken; hintavail = state.hintavail; testbr = state.testbr;
+            wzdark = state.wzdark; closing = state.closing; closed = state.closed; gaveup = state.gaveup;
+            chloc = state.chloc; chloc2 = state.chloc2; foobar = state.foobar;
         }
 
         public void SaveGame()
         {
-            // Placeholder for save logic
-            Console.WriteLine("[SaveGame called - not yet implemented]");
+            Console.Write("What do you want to name the saved game? ");
+            string? filename = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(filename))
+            {
+                Console.WriteLine("Invalid filename.");
+                return;
+            }
+            if (filename.Length > 8)
+                filename = filename.Substring(0, 8);
+            filename += ".json";
+            try
+            {
+                string json = JsonSerializer.Serialize(GetCurrentState());
+                File.WriteAllText(filename, json);
+                Console.WriteLine($"Game saved to {filename}.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving game: {ex.Message}");
+            }
+        }
+
+        public void RestoreGame()
+        {
+            Console.Write("What is the name of the saved game? ");
+            string? filename = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(filename))
+            {
+                Console.WriteLine("Invalid filename.");
+                return;
+            }
+            if (filename.Length > 8)
+                filename = filename.Substring(0, 8);
+            filename += ".json";
+            try
+            {
+                string json = File.ReadAllText(filename);
+                GameState? state = JsonSerializer.Deserialize<GameState>(json);
+                if (state != null)
+                {
+                    SetCurrentState(state);
+                    Console.WriteLine($"Game restored from {filename}.");
+                }
+                else
+                {
+                    Console.WriteLine("Failed to restore game state.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error restoring game: {ex.Message}");
+            }
         }
 
         public bool Yes(int question, int yesResponse, int noResponse)
