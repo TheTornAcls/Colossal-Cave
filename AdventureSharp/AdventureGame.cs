@@ -168,10 +168,10 @@ public class AdventureGame
 
     public void OpenTextFiles(string filePath)
     {
-        fd1 = OpenFile(Path.Combine(filePath, AdventureConstants.FD1));
-        fd2 = OpenFile(Path.Combine(filePath, AdventureConstants.FD2));
-        fd3 = OpenFile(Path.Combine(filePath, AdventureConstants.FD3));
-        fd4 = OpenFile(Path.Combine(filePath, AdventureConstants.FD4));
+        fd1 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD1));
+        fd2 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD2));
+        fd3 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD3));
+        fd4 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD4));
     }
 
     public StreamReader OpenFile(string fullPath)
@@ -245,7 +245,7 @@ public class AdventureGame
         filename += ".json";
         try
         {
-            string json = JsonSerializer.Serialize(GetCurrentState());
+            string json = JsonSerializer.Serialize(this.GetCurrentState());
             File.WriteAllText(filename, json);
             Console.WriteLine($"Game saved to {filename}.");
         }
@@ -273,7 +273,7 @@ public class AdventureGame
             GameState? state = JsonSerializer.Deserialize<GameState>(json);
             if (state != null)
             {
-                SetCurrentState(state);
+                this.SetCurrentState(state);
                 Console.WriteLine($"Game restored from {filename}.");
             }
             else
@@ -301,18 +301,46 @@ public class AdventureGame
 
     public void Turn()
     {
-        // Placeholder for the main turn logic
-        Console.WriteLine("[Turn logic would go here]");
-        SaveFlag = true; // For now, exit after one loop
+        // Basic command loop for demonstration
+        Console.Write("\nWhat do you want to do? ");
+        string? input = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            Console.WriteLine("Please enter a command.");
+            return;
+        }
+        string command = input.Trim().ToLowerInvariant();
+
+        // Simple command parsing (expand as needed)
+        switch (command)
+        {
+            case "quit":
+            case "exit":
+                Console.WriteLine("Thanks for playing!");
+                this.SaveFlag = true;
+                break;
+            case "look":
+                Console.WriteLine("You look around. (Room description would go here.)");
+                break;
+            case "save":
+                this.SaveGame();
+                break;
+            case "restore":
+                this.RestoreGame();
+                break;
+            default:
+                Console.WriteLine($"Unknown command: {command}");
+                break;
+        }
     }
 
     public void MainGameLoop(bool restoreRequested)
     {
         if (restoreRequested)
         {
-            RestoreGame();
+            this.RestoreGame();
         }
-        else if (Yes(65, 1, 0))
+        else if (this.Yes(65, 1, 0))
         {
             limit = 1000;
             hinttaken++;
@@ -321,15 +349,15 @@ public class AdventureGame
         {
             limit = 330;
         }
-        SaveFlag = false;
+        this.SaveFlag = false;
         Random rng = new Random(511); // Seed random
-        while (!SaveFlag)
+        while (!this.SaveFlag)
         {
-            Turn();
+            this.Turn();
         }
-        if (SaveFlag)
+        if (this.SaveFlag)
         {
-            SaveGame();
+            this.SaveGame();
         }
     }
 }
