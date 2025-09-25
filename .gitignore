@@ -13,3 +13,5 @@
 *.ipch
 *.user
 **/Debug
+/AdventureSharp/obj
+/AdventureSharp/bin
