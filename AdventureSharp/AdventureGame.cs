@@ -122,56 +122,59 @@ public class AdventureGame
 
     public bool SaveFlag { get { return saveflg != 0; } set { saveflg = value ? 1 : 0; } }
 
+    // AdventureParser instance
+    private readonly AdventureParser _parser = new();
+
     public void InitPlay()
     {
-        turns = 0;
-        Array.Copy(icond, cond, AdventureConstants.MAXLOC);
-        Array.Copy(iplace, place, AdventureConstants.MAXOBJ);
-        Array.Copy(ifixed, fixedObj, AdventureConstants.MAXOBJ);
-        Array.Copy(iactmsg, actmsg, AdventureConstants.ACTMSG);
-        Array.Clear(visited, 0, AdventureConstants.MAXLOC);
-        Array.Clear(prop, 0, AdventureConstants.MAXOBJ);
+        this.turns = 0;
+        Array.Copy(icond, this.cond, AdventureConstants.MAXLOC);
+        Array.Copy(iplace, this.place, AdventureConstants.MAXOBJ);
+        Array.Copy(ifixed, this.fixedObj, AdventureConstants.MAXOBJ);
+        Array.Copy(iactmsg, this.actmsg, AdventureConstants.ACTMSG);
+        Array.Clear(this.visited, 0, AdventureConstants.MAXLOC);
+        Array.Clear(this.prop, 0, AdventureConstants.MAXOBJ);
         for (int i = 50; i < AdventureConstants.MAXOBJ; i++)
-            prop[i] = -1;
-        wzdark = false;
-        closed = false;
-        closing = false;
-        holding = detail = 0;
-        limit = 100;
-        tally = 15;
-        tally2 = 0;
-        newloc = 1;
-        loc = oldloc = oldloc2 = 2;
-        knfloc = 0;
-        chloc = 114;
-        chloc2 = 140;
-        Array.Copy(idloc, dloc, AdventureConstants.DWARFMAX);
-        Array.Clear(odloc, 0, AdventureConstants.DWARFMAX);
-        dkill = 0;
-        Array.Clear(dseen, 0, AdventureConstants.DWARFMAX);
-        clock1 = 30;
-        clock2 = 50;
-        panic = 0;
-        bonus = 0;
-        numdie = 0;
-        daltloc = 18;
-        lmwarn = 0;
-        foobar = 0;
-        dflag = 0;
-        gaveup = false;
-        saveflg = 0;
-        hinttaken = 0;
-        hintavail = 0; // HINT constant to be defined if needed
-        Array.Clear(hintloc, 0, AdventureConstants.MAXHINT + 1);
-        testbr = 2;
+            this.prop[i] = -1;
+        this.wzdark = false;
+        this.closed = false;
+        this.closing = false;
+        this.holding = this.detail = 0;
+        this.limit = 100;
+        this.tally = 15;
+        this.tally2 = 0;
+        this.newloc = 1;
+        this.loc = this.oldloc = this.oldloc2 = 2;
+        this.knfloc = 0;
+        this.chloc = 114;
+        this.chloc2 = 140;
+        Array.Copy(idloc, this.dloc, AdventureConstants.DWARFMAX);
+        Array.Clear(this.odloc, 0, AdventureConstants.DWARFMAX);
+        this.dkill = 0;
+        Array.Clear(this.dseen, 0, AdventureConstants.DWARFMAX);
+        this.clock1 = 30;
+        this.clock2 = 50;
+        this.panic = 0;
+        this.bonus = 0;
+        this.numdie = 0;
+        this.daltloc = 18;
+        this.lmwarn = 0;
+        this.foobar = 0;
+        this.dflag = 0;
+        this.gaveup = false;
+        this.saveflg = 0;
+        this.hinttaken = 0;
+        this.hintavail = 0; // HINT constant to be defined if needed
+        Array.Clear(this.hintloc, 0, AdventureConstants.MAXHINT + 1);
+        this.testbr = 2;
     }
 
     public void OpenTextFiles(string filePath)
     {
-        fd1 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD1));
-        fd2 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD2));
-        fd3 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD3));
-        fd4 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD4));
+        this.fd1 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD1));
+        this.fd2 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD2));
+        this.fd3 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD3));
+        this.fd4 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD4));
     }
 
     public StreamReader OpenFile(string fullPath)
@@ -186,49 +189,49 @@ public class AdventureGame
 
     public void CloseTextFiles()
     {
-        fd1?.Close();
-        fd2?.Close();
-        fd3?.Close();
-        fd4?.Close();
+        this.fd1?.Close();
+        this.fd2?.Close();
+        this.fd3?.Close();
+        this.fd4?.Close();
     }
 
     private GameState GetCurrentState()
     {
         return new GameState
         {
-            cond = (short[])cond.Clone(),
-            place = (short[])place.Clone(),
-            fixedObj = (short[])fixedObj.Clone(),
-            actmsg = (short[])actmsg.Clone(),
-            visited = (short[])visited.Clone(),
-            prop = (short[])prop.Clone(),
-            dloc = (short[])dloc.Clone(),
-            odloc = (short[])odloc.Clone(),
-            dseen = (short[])dseen.Clone(),
-            hintloc = (short[])hintloc.Clone(),
-            turns = turns, loc = loc, oldloc = oldloc, oldloc2 = oldloc2, newloc = newloc,
-            tally = tally, tally2 = tally2, limit = limit, lmwarn = lmwarn, holding = holding, detail = detail, knfloc = knfloc, clock1 = clock1, clock2 = clock2, panic = panic, bonus = bonus, numdie = numdie, daltloc = daltloc, dkill = dkill, dflag = dflag, saveflg = saveflg, hinttaken = hinttaken, hintavail = hintavail, testbr = testbr,
-            wzdark = wzdark, closing = closing, closed = closed, gaveup = gaveup,
-            chloc = chloc, chloc2 = chloc2, foobar = foobar
+            cond = (short[])this.cond.Clone(),
+            place = (short[])this.place.Clone(),
+            fixedObj = (short[])this.fixedObj.Clone(),
+            actmsg = (short[])this.actmsg.Clone(),
+            visited = (short[])this.visited.Clone(),
+            prop = (short[])this.prop.Clone(),
+            dloc = (short[])this.dloc.Clone(),
+            odloc = (short[])this.odloc.Clone(),
+            dseen = (short[])this.dseen.Clone(),
+            hintloc = (short[])this.hintloc.Clone(),
+            turns = this.turns, loc = this.loc, oldloc = this.oldloc, oldloc2 = this.oldloc2, newloc = this.newloc,
+            tally = this.tally, tally2 = this.tally2, limit = this.limit, lmwarn = this.lmwarn, holding = this.holding, detail = this.detail, knfloc = this.knfloc, clock1 = this.clock1, clock2 = this.clock2, panic = this.panic, bonus = this.bonus, numdie = this.numdie, daltloc = this.daltloc, dkill = this.dkill, dflag = this.dflag, saveflg = this.saveflg, hinttaken = this.hinttaken, hintavail = this.hintavail, testbr = this.testbr,
+            wzdark = this.wzdark, closing = this.closing, closed = this.closed, gaveup = this.gaveup,
+            chloc = this.chloc, chloc2 = this.chloc2, foobar = this.foobar
         };
     }
 
     private void SetCurrentState(GameState state)
     {
-        Array.Copy(state.cond, cond, cond.Length);
-        Array.Copy(state.place, place, place.Length);
-        Array.Copy(state.fixedObj, fixedObj, fixedObj.Length);
-        Array.Copy(state.actmsg, actmsg, actmsg.Length);
-        Array.Copy(state.visited, visited, visited.Length);
-        Array.Copy(state.prop, prop, prop.Length);
-        Array.Copy(state.dloc, dloc, dloc.Length);
-        Array.Copy(state.odloc, odloc, odloc.Length);
-        Array.Copy(state.dseen, dseen, dseen.Length);
-        Array.Copy(state.hintloc, hintloc, hintloc.Length);
-        turns = state.turns; loc = state.loc; oldloc = state.oldloc; oldloc2 = state.oldloc2; newloc = state.newloc;
-        tally = state.tally; tally2 = state.tally2; limit = state.limit; lmwarn = state.lmwarn; holding = state.holding; detail = state.detail; knfloc = state.knfloc; clock1 = state.clock1; clock2 = state.clock2; panic = state.panic; bonus = state.bonus; numdie = state.numdie; daltloc = state.daltloc; dkill = state.dkill; dflag = state.dflag; saveflg = state.saveflg; hinttaken = state.hinttaken; hintavail = state.hintavail; testbr = state.testbr;
-        wzdark = state.wzdark; closing = state.closing; closed = state.closed; gaveup = state.gaveup;
-        chloc = state.chloc; chloc2 = state.chloc2; foobar = state.foobar;
+        Array.Copy(state.cond, this.cond, this.cond.Length);
+        Array.Copy(state.place, this.place, this.place.Length);
+        Array.Copy(state.fixedObj, this.fixedObj, this.fixedObj.Length);
+        Array.Copy(state.actmsg, this.actmsg, this.actmsg.Length);
+        Array.Copy(state.visited, this.visited, this.visited.Length);
+        Array.Copy(state.prop, this.prop, this.prop.Length);
+        Array.Copy(state.dloc, this.dloc, this.dloc.Length);
+        Array.Copy(state.odloc, this.odloc, this.odloc.Length);
+        Array.Copy(state.dseen, this.dseen, this.dseen.Length);
+        Array.Copy(state.hintloc, this.hintloc, this.hintloc.Length);
+        this.turns = state.turns; this.loc = state.loc; this.oldloc = state.oldloc; this.oldloc2 = state.oldloc2; this.newloc = state.newloc;
+        this.tally = state.tally; this.tally2 = state.tally2; this.limit = state.limit; this.lmwarn = state.lmwarn; this.holding = state.holding; this.detail = state.detail; this.knfloc = state.knfloc; this.clock1 = state.clock1; this.clock2 = state.clock2; this.panic = state.panic; this.bonus = state.bonus; this.numdie = state.numdie; this.daltloc = state.daltloc; this.dkill = state.dkill; this.dflag = state.dflag; this.saveflg = state.saveflg; this.hinttaken = state.hinttaken; this.hintavail = state.hintavail; this.testbr = state.testbr;
+        this.wzdark = state.wzdark; this.closing = state.closing; this.closed = state.closed; this.gaveup = state.gaveup;
+        this.chloc = state.chloc; this.chloc2 = state.chloc2; this.foobar = state.foobar;
     }
 
     public void SaveGame()
@@ -301,73 +304,77 @@ public class AdventureGame
 
     public void Turn()
     {
-        // Basic command loop for demonstration
-        Console.Write("\nWhat do you want to do? ");
-        string? input = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(input))
+        int verb, obj, motion;
+        if (!this._parser.English(out verb, out obj, out motion))
         {
-            Console.WriteLine("Please enter a command.");
+            Console.WriteLine("I don't understand that.");
             return;
         }
-        string command = input.Trim().ToLowerInvariant();
-
-        // Expanded command parsing
-        switch (command)
+        // Dispatch based on parser output
+        if (verb != 0)
         {
-            case "quit":
-            case "exit":
-                Console.WriteLine("Thanks for playing!");
-                this.SaveFlag = true;
-                break;
-            case "look":
-                Console.WriteLine("You look around. (Room description would go here.)");
-                break;
-            case "save":
-                this.SaveGame();
-                break;
-            case "restore":
-                this.RestoreGame();
-                break;
-            case "inventory":
-            case "i":
-                Console.WriteLine("You are carrying: (Inventory list would go here.)");
-                break;
-            case "help":
-                Console.WriteLine("Available commands: look, inventory (i), save, restore, quit (exit), help, north, south, east, west, up, down, take, drop");
-                break;
-            case "north":
-            case "n":
-                Console.WriteLine("You go north. (Movement logic would go here.)");
-                break;
-            case "south":
-            case "s":
-                Console.WriteLine("You go south. (Movement logic would go here.)");
-                break;
-            case "east":
-            case "e":
-                Console.WriteLine("You go east. (Movement logic would go here.)");
-                break;
-            case "west":
-            case "w":
-                Console.WriteLine("You go west. (Movement logic would go here.)");
-                break;
-            case "up":
-            case "u":
-                Console.WriteLine("You go up. (Movement logic would go here.)");
-                break;
-            case "down":
-            case "d":
-                Console.WriteLine("You go down. (Movement logic would go here.)");
-                break;
-            case "take":
-                Console.WriteLine("Take what? (Item handling logic would go here.)");
-                break;
-            case "drop":
-                Console.WriteLine("Drop what? (Item handling logic would go here.)");
-                break;
-            default:
-                Console.WriteLine($"Unknown command: {command}");
-                break;
+            switch (verb)
+            {
+                case 18: // quit
+                    Console.WriteLine("Thanks for playing!");
+                    this.SaveFlag = true;
+                    break;
+                case 57: // look
+                    Console.WriteLine("You look around. (Room description would go here.)");
+                    break;
+                case 2020: // inventory
+                    Console.WriteLine("You are carrying: (Inventory list would go here.)");
+                    break;
+                case 2030: // save/restore
+                    if (obj == 0)
+                        this.SaveGame();
+                    else
+                        this.RestoreGame();
+                    break;
+                case 3051: // help
+                    Console.WriteLine("Available commands: look, inventory (i), save, restore, quit (exit), help, north, south, east, west, up, down, take, drop");
+                    break;
+                case 2001: // take
+                    Console.WriteLine("Take what? (Item handling logic would go here.)");
+                    break;
+                case 2002: // drop
+                    Console.WriteLine("Drop what? (Item handling logic would go here.)");
+                    break;
+                default:
+                    Console.WriteLine($"That verb is not implemented yet. (verb={verb}, obj={obj}, motion={motion})");
+                    break;
+            }
+        }
+        else if (motion != 0)
+        {
+            switch (motion)
+            {
+                case 45: // north
+                    Console.WriteLine("You go north. (Movement logic would go here.)");
+                    break;
+                case 46: // south
+                    Console.WriteLine("You go south. (Movement logic would go here.)");
+                    break;
+                case 43: // east
+                    Console.WriteLine("You go east. (Movement logic would go here.)");
+                    break;
+                case 44: // west
+                    Console.WriteLine("You go west. (Movement logic would go here.)");
+                    break;
+                case 29: // up
+                    Console.WriteLine("You go up. (Movement logic would go here.)");
+                    break;
+                case 30: // down
+                    Console.WriteLine("You go down. (Movement logic would go here.)");
+                    break;
+                default:
+                    Console.WriteLine($"That movement is not implemented yet. (motion={motion})");
+                    break;
+            }
+        }
+        else
+        {
+            Console.WriteLine("I don't understand that.");
         }
     }
 
@@ -379,12 +386,12 @@ public class AdventureGame
         }
         else if (this.Yes(65, 1, 0))
         {
-            limit = 1000;
-            hinttaken++;
+            this.limit = 1000;
+            this.hinttaken++;
         }
         else
         {
-            limit = 330;
+            this.limit = 330;
         }
         this.SaveFlag = false;
         Random rng = new Random(511); // Seed random
