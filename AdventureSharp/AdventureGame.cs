@@ -339,7 +339,7 @@ public class AdventureGame
                         this.RestoreGame();
                     break;
                 case 3051: // help
-                    Console.WriteLine("Available commands: look, inventory (i), save, restore, quit (exit), help, north, south, east, west, up, down, take, drop, examine, light, eat, read");
+                    Console.WriteLine("Available commands: look, inventory (i), save, restore, quit (exit), help, north, south, east, west, up, down, take, drop, examine, light, eat, read, wave, kill");
                     break;
                 case 2001: // take
                     if (obj != 0)
@@ -377,6 +377,18 @@ public class AdventureGame
                     else
                         Console.WriteLine("Read what?");
                     break;
+                case 2005: // wave
+                    if (obj != 0)
+                        this._verbs.Wave(obj);
+                    else
+                        Console.WriteLine("Wave what?");
+                    break;
+                case 2006: // kill
+                    if (obj != 0)
+                        this._verbs.Kill(obj);
+                    else
+                        Console.WriteLine("Kill what?");
+                    break;
                 default:
                     Console.WriteLine($"That verb is not implemented yet. (verb={verb}, obj={obj}, motion={motion})");
                     break;
@@ -384,7 +396,6 @@ public class AdventureGame
         }
         else if (motion != 0)
         {
-            // Movement logic
             this._verbs.Move(motion);
         }
         else
