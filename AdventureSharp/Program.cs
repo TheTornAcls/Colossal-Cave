@@ -42,8 +42,8 @@ namespace AdventureSharp
             AdventureGame game = new AdventureGame();
             game.InitPlay();
             game.OpenTextFiles(szFilePath);
-            Console.WriteLine("AdventureSharp: Game initialized and files opened. (Game loop to be ported next.)");
-            // Placeholder for main game loop
+            Console.WriteLine("AdventureSharp: Game initialized and files opened. Starting main game loop...");
+            game.MainGameLoop(rflag > 0);
             game.CloseTextFiles();
         }
     }
