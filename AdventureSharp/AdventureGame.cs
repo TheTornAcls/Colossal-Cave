@@ -339,7 +339,7 @@ public class AdventureGame
                         this.RestoreGame();
                     break;
                 case 3051: // help
-                    Console.WriteLine("Available commands: look, inventory (i), save, restore, quit (exit), help, north, south, east, west, up, down, take, drop");
+                    Console.WriteLine("Available commands: look, inventory (i), save, restore, quit (exit), help, north, south, east, west, up, down, take, drop, examine, light, eat, read");
                     break;
                 case 2001: // take
                     if (obj != 0)
@@ -353,6 +353,30 @@ public class AdventureGame
                     else
                         Console.WriteLine("Drop what?");
                     break;
+                case 2003: // examine
+                    if (obj != 0)
+                        this._verbs.Examine(obj);
+                    else
+                        Console.WriteLine("Examine what?");
+                    break;
+                case 2004: // light
+                    if (obj != 0)
+                        this._verbs.Light(obj);
+                    else
+                        Console.WriteLine("Light what?");
+                    break;
+                case 2014: // eat
+                    if (obj != 0)
+                        this._verbs.Eat(obj);
+                    else
+                        Console.WriteLine("Eat what?");
+                    break;
+                case 2027: // read
+                    if (obj != 0)
+                        this._verbs.Read(obj);
+                    else
+                        Console.WriteLine("Read what?");
+                    break;
                 default:
                     Console.WriteLine($"That verb is not implemented yet. (verb={verb}, obj={obj}, motion={motion})");
                     break;
@@ -360,30 +384,8 @@ public class AdventureGame
         }
         else if (motion != 0)
         {
-            switch (motion)
-            {
-                case 45: // north
-                    Console.WriteLine("You go north. (Movement logic would go here.)");
-                    break;
-                case 46: // south
-                    Console.WriteLine("You go south. (Movement logic would go here.)");
-                    break;
-                case 43: // east
-                    Console.WriteLine("You go east. (Movement logic would go here.)");
-                    break;
-                case 44: // west
-                    Console.WriteLine("You go west. (Movement logic would go here.)");
-                    break;
-                case 29: // up
-                    Console.WriteLine("You go up. (Movement logic would go here.)");
-                    break;
-                case 30: // down
-                    Console.WriteLine("You go down. (Movement logic would go here.)");
-                    break;
-                default:
-                    Console.WriteLine($"That movement is not implemented yet. (motion={motion})");
-                    break;
-            }
+            // Movement logic
+            this._verbs.Move(motion);
         }
         else
         {
