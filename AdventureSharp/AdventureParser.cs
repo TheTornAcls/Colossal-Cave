@@ -3,7 +3,7 @@ namespace AdventureSharp;
 using System;
 using System.Collections.Generic;
 
-file class AdventureParser
+public class AdventureParser
 {
     private readonly struct WordAction
     {
