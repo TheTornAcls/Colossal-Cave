@@ -16,7 +16,7 @@ public class AdventureScoring
     public int CalculateScore()
     {
         int score = 0;
-        // Example: 10 points per treasure in treasure room
+        // 10 points per treasure in treasure room
         foreach (AdventureDatabase.GameObject obj in this._db.Objects)
         {
             if (obj.Name.ToLower().Contains("treasure") || obj.Name.ToLower().Contains("chest") || obj.Name.ToLower().Contains("crystal"))
@@ -27,7 +27,7 @@ public class AdventureScoring
                 }
             }
         }
-        // Example: 2 points per unique room visited
+        // 2 points per unique room visited
         for (int i = 0; i < AdventureConstants.MAXLOC; i++)
         {
             if (this._game.visited[i] != 0)
@@ -35,7 +35,7 @@ public class AdventureScoring
                 score += 2;
             }
         }
-        // Example: 1 point per object carried at end
+        // 1 point per object carried at end
         for (int i = 0; i < AdventureConstants.MAXOBJ; i++)
         {
             if (this._game.place[i] == -1)
@@ -43,12 +43,42 @@ public class AdventureScoring
                 score += 1;
             }
         }
+        // Bonus for winning (closed=true)
+        if (this._game.closed)
+        {
+            score += 25;
+        }
+        // Penalty for giving up
+        if (this._game.gaveup)
+        {
+            score -= 10;
+        }
+        // Penalty for dying
+        score -= this._game.numdie * 5;
         return score;
     }
 
     public void ShowScore()
     {
         int score = this.CalculateScore();
+        int maxScore = 10 * 3 + 2 * 6 + 9 + 25; // Example: treasures + rooms + objects + win bonus
         Console.WriteLine($"Your score is: {score}");
+        Console.WriteLine($"Maximum possible score: {maxScore}");
+        if (score == maxScore)
+        {
+            Console.WriteLine("Congratulations! You have achieved the maximum score!");
+        }
+        else if (score > maxScore * 0.7)
+        {
+            Console.WriteLine("Great job! You're a master adventurer.");
+        }
+        else if (score > maxScore * 0.4)
+        {
+            Console.WriteLine("Not bad! Keep exploring for a higher score.");
+        }
+        else
+        {
+            Console.WriteLine("You have much more to discover!");
+        }
     }
 }
