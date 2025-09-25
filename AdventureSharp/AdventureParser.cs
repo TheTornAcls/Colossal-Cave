@@ -45,18 +45,18 @@ public class AdventureParser
 
     private static readonly AdventureParser.WordAction[] extraVerbs = new AdventureParser.WordAction[]
     {
-        new AdventureParser.WordAction("examine", 2003),
-        new AdventureParser.WordAction("light", 2004),
-        new AdventureParser.WordAction("wave", 2005),
-        new AdventureParser.WordAction("kill", 2006),
-        new AdventureParser.WordAction("score", 2019),
-        new AdventureParser.WordAction("eat", 2014),
-        new AdventureParser.WordAction("read", 2027)
+        new ("examine", 2003),
+        new ("light", 2004),
+        new ("wave", 2005),
+        new ("kill", 2006),
+        new ("score", 2019),
+        new ("eat", 2014),
+        new ("read", 2027)
     };
 
     public AdventureParser()
     {
-        foreach (AdventureParser.WordAction wa in extraVerbs)
+        foreach (WordAction wa in extraVerbs)
         {
             this._vocabulary.Add(wa);
         }
