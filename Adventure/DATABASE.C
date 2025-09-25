@@ -10,37 +10,79 @@
 #include        "advdec.h"
 
 /*
-        Routine to fill travel array for a given location
+    gettrav
+    -------
+    Fills the global 'travel' array with possible travel options for a given location.
+    For the specified location index (iloc), this function reads the encoded travel data
+    from the 'cave' array and decodes each entry into destination, verb, and condition fields
+    in the 'travel' array. The function stops when it encounters a -1 sentinel value.
+    The last entry in 'travel' is set to indicate the end of the array.
+
+    Parameters:
+        iloc - The location index (1-based) for which to fill the travel array.
+
+    Side Effects:
+        - Modifies the global 'travel' array with the decoded travel options for the given location.
+        - May print debug information if compiled with DEBUG and dbugflg is set.
+        - Calls bug(33) if the travel array overflows.
 */
-void gettrav(int iloc)
+void gettrav(int locationIndex)
 {
-    struct trav* i;
-    long int* j;
-    for (i = &travel[0], j = cave[iloc - 1]; *j != -1; i++, j++) {
-        if (i >= &travel[MAXTRAV]) bug(33);
-        i->tcond = (int)(*j % 1000);
-        i->tverb = (int)((*j / 1000) % 1000);
-        i->tdest = (int)((*j / 1000000) % 1000);
+    struct trav* travelPtr;
+    long int* cavePtr;
+    // Each entry in cave[locationIndex - 1] encodes travel information as a single integer:
+    // Bits 0-2:   Condition (tcond)   = value % 1000
+    // Bits 3-5:   Verb (tverb)        = (value / 1000) % 1000
+    // Bits 6-8:   Destination (tdest) = (value / 1000000) % 1000
+    // This section decodes each field for the travel array.
+    for (travelPtr = &travel[0], cavePtr = cave[locationIndex - 1]; *cavePtr != -1; travelPtr++, cavePtr++)
+    {
+        if (travelPtr >= &travel[MAXTRAV]) bug(33);
+        long int encodedValue = *cavePtr;
+        // Decode travel condition (lowest 3 digits)
+        travelPtr->tcond = (int)(encodedValue % 1000);
+        // Decode verb (next 3 digits)
+        travelPtr->tverb = (int)((encodedValue / 1000) % 1000);
+        // Decode destination (next 3 digits)
+        travelPtr->tdest = (int)((encodedValue / 1000000) % 1000);
     }
-    i->tdest = -1; /* end of array */
+    travelPtr->tdest = -1; /* end of array */
 #ifdef DEBUG
     if (dbugflg)
-        for (i = &travel[0]; i->tdest != -1; ++i)
+        for (travelPtr = &travel[0]; travelPtr->tdest != -1; ++travelPtr)
             printf("cave[%d] = %d %d %d\n",
-                iloc, i->tdest, i->tverb, i->tcond);
+                locationIndex, travelPtr->tdest, travelPtr->tverb, travelPtr->tcond);
 #endif
 }
 
 /*
-        Function to scan a file up to a specified
-        point and either print or return a string.
+    rdupto
+    ------
+    Reads characters from a file up to a specified delimiter character. Optionally prints the characters or stores them in a string. Handles newlines and carriage returns, and can insert a leading newline if prespace is set.
+
+    Parameters:
+        fdi      - Pointer to the input FILE to read from.
+        uptoc    - Character to read up to (delimiter, not included in output).
+        print    - If nonzero, prints the characters to stdout; otherwise, stores them in 'string'.
+        string   - Pointer to a buffer to store the string (if print is zero); ignored if print is nonzero.
+        prespace - If nonzero, prints a newline before the output (only on the first character).
+
+    Returns:
+        true if the delimiter was found, false if EOF was reached first.
+
+    Side Effects:
+        - Reads from the input file stream 'fdi'.
+        - May print to stdout if 'print' is nonzero.
+        - May write to the buffer pointed to by 'string' if 'print' is zero.
 */
-bool rdupto(FILE * fdi, char uptoc, char print, char* string, int prespace)
+bool rdupto(FILE* fdi, char uptoc, char print, char* string, int prespace)
 {
     int    c;
 
-    while ((c = fgetc(fdi)) != uptoc) {
-        if (prespace) {
+    while ((c = fgetc(fdi)) != uptoc)
+    {
+        if (prespace)
+        {
             putchar('\n');
             prespace = 0;
         }
@@ -54,17 +96,26 @@ bool rdupto(FILE * fdi, char uptoc, char print, char* string, int prespace)
             *string++ = (char)c;
     }
     if (!print)
-        * string = '\0';
+        *string = '\0';
     return true;
 }
 
 /*
-        Function to read a file skipping
-        a given character a specified number
-        of times, with or without repositioning
-        the file.
+    rdskip
+    ------
+    Reads and skips over a specified character in a file a given number of times. Optionally rewinds the file before skipping. Used to position the file pointer for reading specific data.
+
+    Parameters:
+        fdi    - Pointer to the input FILE to read from.
+        skipc  - Character to skip over.
+        n      - Number of times to skip the character.
+        rewind - If nonzero, rewinds the file to the beginning before skipping.
+
+    Side Effects:
+        - Reads from and may reposition the input file stream 'fdi'.
+        - May call bug(31) or bug(32) and exit on file errors or EOF.
 */
-void rdskip(FILE * fdi, char skipc, int n, char rewind)
+void rdskip(FILE* fdi, char skipc, int n, char rewind)
 {
     int    c;
 
@@ -78,7 +129,22 @@ void rdskip(FILE * fdi, char skipc, int n, char rewind)
 }
 
 /*
-        Routine to request a yes or no answer to a question.
+    yes
+    ---
+    Prompts the player for a yes or no answer, processes the response, and prints appropriate messages. Handles input, converts it to lowercase, and checks for 'yes' or 'no'.
+
+    Parameters:
+        msg1 - Message number to print before prompting (0 for none).
+        msg2 - Message number to print if the answer is 'yes' (0 for none).
+        msg3 - Message number to print if the answer is 'no' (0 for none).
+
+    Returns:
+        true if the player answers 'yes', false if 'no'.
+
+    Side Effects:
+        - Prints messages to the player using rspeak().
+        - Reads input from stdin.
+        - May update the game state depending on how the result is used by the caller.
 */
 bool yes(int msg1, int msg2, int msg3)
 {
@@ -87,22 +153,25 @@ bool yes(int msg1, int msg2, int msg3)
 
     if (msg1)
         rspeak(msg1);
-    while (y == -1) {
+    while (y == -1)
+    {
         char* i;
         size_t   l;
         putchar('>');
-        fflush(stdout); 
+        fflush(stdout);
         fgets(answer, 80, stdin);
         for (i = answer; *i != '\n'; i++) *i = (char)tolower(*i);
         l = i - answer;
         if (l == 0)
             rspeak(89);
-        else if ((l <= 2) && (memcmp(answer, "no", l) == 0)) {
+        else if ((l <= 2) && (memcmp(answer, "no", l) == 0))
+        {
             if (msg3)
                 rspeak(msg3);
             y = 0;
         }
-        else if ((l <= 3) && (memcmp(answer, "yes", l) == 0)) {
+        else if ((l <= 3) && (memcmp(answer, "yes", l) == 0))
+        {
             if (msg2)
                 rspeak(msg2);
             y = 1;
@@ -114,13 +183,24 @@ bool yes(int msg1, int msg2, int msg3)
 }
 
 /*
-        Print a location description from "advent4.txt"
+    rspeak
+    ------
+    Prints a location or general message to the player, using a message number to look up the text in the message file. Handles special case for message 54 (prints "ok.").
+
+    Parameters:
+        msg - The message number to print.
+
+    Side Effects:
+        - Prints the message to stdout.
+        - Seeks and reads from the message file (fd4) using the global index array 'idx4'.
+        - May print debug information if DEBUG and dbugflg are set.
 */
 void rspeak(int msg)
 {
     if (msg == 54)
         printf("ok.\n");
-    else {
+    else
+    {
 #ifdef DEBUG
         if (dbugflg)
             printf("Seek loc msg #%d @ %ld\n", msg, idx4[msg]);
@@ -132,7 +212,19 @@ void rspeak(int msg)
 }
 
 /*
-        Print an item message for a given state from "advent3.txt"
+    pspeak
+    ------
+    Prints an item-specific message for a given state from the item message file ("advent3.txt"). Seeks to the correct message for the item and state, and prints it to the player. Optionally prints a leading newline if prespace is set.
+
+    Parameters:
+        item     - The item number for which to print the message.
+        state    - The state index for the message (which variant to print).
+        prespace - If nonzero, prints a newline before the message.
+
+    Side Effects:
+        - Seeks and reads from the item message file (fd3) using the global index array 'idx3'.
+        - Calls rdskip() and rdupto() to position and print the message.
+        - Prints the message to stdout.
 */
 void pspeak(int item, int state, int prespace)
 {
@@ -142,7 +234,16 @@ void pspeak(int item, int state, int prespace)
 }
 
 /*
-        Print a long location description from "advent1.txt"
+    desclg
+    ------
+    Prints a long location description from the location description file ("advent1.txt") for the given location index. Seeks to the correct offset and prints the description up to the next '#' character.
+
+    Parameters:
+        iloc - The location index for which to print the long description.
+
+    Side Effects:
+        - Seeks and reads from the location description file (fd1) using the global index array 'idx1'.
+        - Calls rdupto() to print the description to stdout.
 */
 void desclg(int iloc)
 {
@@ -151,7 +252,16 @@ void desclg(int iloc)
 }
 
 /*
-        Print a short location description from "advent2.txt"
+    descsh
+    ------
+    Prints a short location description from the short description file ("advent2.txt") for the given location index. Seeks to the correct offset and prints the description up to the next '#' character.
+
+    Parameters:
+        iloc - The location index for which to print the short description.
+
+    Side Effects:
+        - Seeks and reads from the short description file (fd2) using the global index array 'idx2'.
+        - Calls rdupto() to print the description to stdout.
 */
 void descsh(int iloc)
 {
@@ -160,8 +270,19 @@ void descsh(int iloc)
 }
 
 /*
-        look-up vocabulary word in lex-ordered table.
-        word is the word to look up.
+    vocab
+    -----
+    Looks up a word in the adventure's vocabulary table and returns its associated code if found, or -1 if not found.
+
+    Parameters:
+        word - Pointer to the word (string) to look up.
+
+    Returns:
+        The code associated with the word if found, or -1 if not found.
+
+    Side Effects:
+        - Calls binary() to perform the lookup.
+        - Reads the global vocabulary array 'wc'.
 */
 int vocab(char* word)
 {
@@ -173,6 +294,22 @@ int vocab(char* word)
         return(-1);
 }
 
+/*
+    binary
+    ------
+    Performs a binary search for a word in a sorted vocabulary table and returns its index if found, or -1 if not found.
+
+    Parameters:
+        w        - Pointer to the word (string) to search for.
+        wctable  - Array of vocabulary entries to search (struct wac[]).
+        maxwc    - Number of entries in the vocabulary array.
+
+    Returns:
+        The index of the word in the array if found, or -1 if not found.
+
+    Side Effects:
+        - None (does not modify global variables or state).
+*/
 int binary(char* w, struct wac wctable[], int maxwc)
 {
     int             check;
@@ -180,7 +317,8 @@ int binary(char* w, struct wac wctable[], int maxwc)
 
     lo = 0;
     hi = maxwc - 1;
-    while (lo <= hi) {
+    while (lo <= hi)
+    {
         mid = (lo + hi) / 2;
         if ((check = strcmp(w, wctable[mid].aword)) < 0)
             hi = mid - 1;
@@ -192,13 +330,22 @@ int binary(char* w, struct wac wctable[], int maxwc)
     return(-1);
 }
 
-
 /*
         Utility Routines
 */
 
 /*
-        Routine to test for darkness
+    Determines if the current location is dark (i.e., not lit and the lamp is not present or not on).
+
+    Parameters:
+        None (uses global state for location, lamp, and conditions)
+
+    Returns:
+        true if the location is dark, false otherwise.
+
+    Side Effects:
+        - Reads the global variables 'cond', 'loc', 'prop', and 'LAMP' to determine darkness.
+
 */
 bool dark(void)
 {
@@ -208,7 +355,19 @@ bool dark(void)
 }
 
 /*
-        Routine to tell if an item is present.
+    here
+    ----
+    Determines if a specified item is present at the current location or is being carried by the player.
+
+    Parameters:
+        item - The item number to check for presence.
+
+    Returns:
+        true if the item is at the current location or being carried, false otherwise.
+
+    Side Effects:
+        - Reads the global variables 'place' and 'loc' to check item location.
+        - Calls toting() to check if the item is being carried.
 */
 bool here(int item)
 {
@@ -216,7 +375,18 @@ bool here(int item)
 }
 
 /*
-        Routine to tell if an item is being carried.
+    toting
+    ----
+    Determines if a specified item is currently being carried by the player.
+
+    Parameters:
+        item - The item number to check.
+
+    Returns:
+        true if the item is being carried (i.e., its place is -1), false otherwise.
+
+    Side Effects:
+        - Reads the global variable 'place' to check the item's status.
 */
 bool toting(int item)
 {
@@ -224,8 +394,16 @@ bool toting(int item)
 }
 
 /*
-        Routine to tell if a location causes
-        a forced move.
+    Determines if a specified location causes a forced move (i.e., the player must move upon entering).
+
+    Parameters:
+        atloc - The location index to check.
+
+    Returns:
+        true if the location is a forced-move location, false otherwise.
+
+    Side Effects:
+        - Reads the global variable 'cond' to check the forced move flag for the location.
 */
 bool forced(int atloc)
 {
@@ -233,7 +411,17 @@ bool forced(int atloc)
 }
 
 /*
-        Routine to supply a random number in a selected range
+    Generates a random integer in the specified inclusive range [low, high]. Uses the standard C library rand() function and ensures uniform distribution.
+
+    Parameters:
+        low  - The lower bound of the range (inclusive).
+        high - The upper bound of the range (inclusive).
+
+    Returns:
+        A random integer between low and high, inclusive.
+
+    Side Effects:
+        - Calls the standard library rand() function, which may update the global random seed/state.
 */
 int rrand(int low, int high)
 {
@@ -251,7 +439,21 @@ int rrand(int low, int high)
 }
 
 /*
-        Routine true x% of the time.
+    pct
+    ---
+    Returns true with probability x% (i.e., x out of 100 times).
+    Uses the rrand() function to generate a random integer in [0, 99] and checks if it is less than x.
+
+    Parameters:
+        x - The percentage chance (integer between 0 and 100) for which the function should return true.
+
+    Returns:
+        true if a randomly generated number is less than x, false otherwise.
+
+    Side Effects:
+        - Calls the global rrand() function, which in turn calls the standard library rand().
+        - May update the global random seed/state via rand().
+        - Does not modify any other global variables.
 */
 bool pct(int x)
 {
@@ -259,8 +461,18 @@ bool pct(int x)
 }
 
 /*
-        Routine to tell if player is on
-        either side of a two sided object.
+    at
+    --
+    Determines if a specified item is present at the current location or is fixed at the current location (for two-sided objects).
+
+    Parameters:
+        item - The item number to check.
+
+    Returns:
+        true if the item is at the current location or fixed at the current location, false otherwise.
+
+    Side Effects:
+        - Reads the global variables 'place', 'fixed', and 'loc' to check item location and fixed status.
 */
 bool at(int item)
 {
@@ -276,7 +488,18 @@ void dstroy(int obj)
 }
 
 /*
-        Routine to move an object
+    move
+    ----
+    Moves an object to a specified location. If the object is being carried or is at a valid location, it is first removed from its current location and then placed at the new location.
+
+    Parameters:
+        obj   - The object number to move.
+        where - The destination location number.
+
+    Side Effects:
+        - Updates the global arrays 'place' and 'fixed' to reflect the object's new location.
+        - May call carry() and drop() to update inventory and object state.
+        - May affect the global variable 'holding' if the object is picked up or dropped.
 */
 void move(int obj, int where)
 {
@@ -297,11 +520,23 @@ void juggle(int iloc)
 }
 
 /*
-        Routine to carry an object
+    carry
+    -----
+    Picks up an object and adds it to the player's inventory. Updates the object's location to indicate it is being carried.
+
+    Parameters:
+        obj   - The object number to carry.
+        where - The location from which the object is being picked up.
+
+    Side Effects:
+        - Updates the global array 'place' to set the object's location to -1 (carried).
+        - Increments the global variable 'holding' to reflect the number of items carried.
+        - Does nothing if the object is already being carried.
 */
 void carry(int obj, int where)
 {
-    if (obj < MAXOBJ) {
+    if (obj < MAXOBJ)
+    {
         if (place[obj] == -1)
             return;
         place[obj] = -1;
@@ -310,11 +545,22 @@ void carry(int obj, int where)
 }
 
 /*
-        Routine to drop an object
+    drop
+    ----
+    Drops an object at a specified location. Updates the object's location and removes it from the player's inventory if necessary.
+
+    Parameters:
+        obj   - The object number to drop.
+        where - The location number where the object will be dropped.
+
+    Side Effects:
+        - Updates the global array 'place' to set the object's new location, or 'fixed' for fixed objects.
+        - Decrements the global variable 'holding' if the object was being carried.
 */
 void drop(int obj, int where)
 {
-    if (obj < MAXOBJ) {
+    if (obj < MAXOBJ)
+    {
         if (place[obj] == -1)
             --holding;
         place[obj] = where;
@@ -324,18 +570,42 @@ void drop(int obj, int where)
 }
 
 /*
-        routine to move an object and return a
-        value used to set the negated prop values
-        for the repository.
+    put
+    ---
+    Moves an object to a specified location and returns a value used to set the negated property values for the repository.
+
+    Parameters:
+        obj   - The object number to move.
+        where - The destination location number.
+        pval  - The property value to be negated and returned.
+
+    Returns:
+        The negated property value (as -1 - pval).
+
+    Side Effects:
+        - Calls move() to update the object's location.
+        - Updates the global arrays 'place' and 'fixed' to reflect the object's new location.
+        - May affect the global variable 'holding' if the object is picked up or dropped.
 */
 int put(int obj, int where, int pval)
 {
     move(obj, where);
     return((-1) - pval);
 }
+
 /*
-        Routine to check for presence
-        of dwarves..
+    dcheck
+    ------
+    Checks for the presence of dwarves at the player's current location. Returns the index of the first dwarf found at the current location, or 0 if no dwarves are present.
+
+    Parameters:
+        None (uses global state for dwarf locations and player location)
+
+    Returns:
+        The index (integer) of the first dwarf present at the current location, or 0 if none are present.
+
+    Side Effects:
+        - Reads the global arrays 'dloc' (dwarf locations) and the variable 'loc' (player location).
 */
 int dcheck(void)
 {
@@ -348,7 +618,19 @@ int dcheck(void)
 }
 
 /*
-        Determine liquid in the bottle
+    liq
+    ---
+    Determines the type of liquid currently in the bottle by examining its property value. Returns a constant representing the liquid type (WATER, OIL, or nothing).
+
+    Parameters:
+        None (uses global state for bottle property)
+
+    Returns:
+        The constant representing the liquid type in the bottle (WATER, OIL, or nothing).
+
+    Side Effects:
+        - Reads the global array 'prop' for the bottle property and uses the constant 'BOTTLE'.
+        - Calls liq2() to convert the property value to a liquid type.
 */
 int liq(void)
 {
@@ -359,7 +641,19 @@ int liq(void)
 }
 
 /*
-        Determine liquid at a location
+    liqloc
+    ------
+    Determines the type of liquid present at a given location based on the location's condition flags.
+
+    Parameters:
+        iloc - The location index to check for liquid (integer).
+
+    Returns:
+        The constant representing the liquid type at the location (WATER, OIL, or nothing).
+
+    Side Effects:
+        - Reads the global variable 'cond' to check the location's condition flags.
+        - Calls liq2() to convert the condition to a liquid type.
 */
 int liqloc(int iloc)
 {
@@ -370,9 +664,18 @@ int liqloc(int iloc)
 }
 
 /*
-        Convert 0 to WATER
-                 1 to nothing
-                 2 to OIL
+    liq2
+    ----
+    Converts a bottle property value or condition code to a liquid type constant (WATER, nothing, or OIL).
+
+    Parameters:
+        pbottle - The property value or condition code to convert (integer).
+
+    Returns:
+        The constant representing the liquid type (WATER, OIL, or nothing).
+
+    Side Effects:
+        - None (does not modify global variables or state).
 */
 int liq2(int pbottle)
 {
@@ -387,4 +690,3 @@ void bug(int n)
     printf("Fatal error number %d\n", n);
     exit(1);
 }
-

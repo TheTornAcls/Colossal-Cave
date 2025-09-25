@@ -17,6 +17,19 @@ static int      fError = 0;
 static FILE* filIndex, * filTxt1, * filTxt2, * filTxt3, * filTxt4;
 
 
+/**
+ * @brief Prints a formatted error message for file operations.
+ *
+ * This function constructs an error message by concatenating the provided message and file name,
+ * then prints the error using `perror`. It does not exit or modify any global state directly.
+ *
+ * @param pszMessage   The error message to display (e.g., "Error opening").
+ * @param pszFileName  The name of the file associated with the error.
+ *
+ * @global
+ * - Does not modify any global variables directly.
+ * - Uses standard output for error reporting.
+ */
 void FileError(const char* pszMessage, const char* pszFileName)
 {
     char    szError[FILENAME_MAX + 100];
@@ -29,9 +42,22 @@ void FileError(const char* pszMessage, const char* pszFileName)
     perror(szError);
 }
 
-
-FILE* OpenFile(const char* pszName, const char* pszMode) {
-
+/**
+ * @brief Opens a file with the specified name and mode, handling errors.
+ *
+ * This function attempts to open a file using the given filename and mode. If the file cannot be opened,
+ * it reports the error using `FileError`, sets the global error flag `fError` to 1, and returns NULL.
+ *
+ * @param pszName The name of the file to open.
+ * @param pszMode The mode string to use for opening the file (e.g., "r", "w").
+ * @return Pointer to the opened FILE, or NULL if opening fails.
+ *
+ * @global
+ * - Modifies the global variable `fError` by setting it to 1 if an error occurs during file opening.
+ * - Uses `FileError` for error reporting.
+ */
+FILE* OpenFile(const char* pszName, const char* pszMode)
+{
     FILE* pfil;
     errno_t rc;
 
@@ -44,37 +70,73 @@ FILE* OpenFile(const char* pszName, const char* pszMode) {
     }
 
     return pfil;
-
 }
 
-
-void OutputS(const char* psz) {
-
-    if (fputs(psz, filIndex) < 0) {
+/**
+ * @brief Writes a string to the output index file and handles errors.
+ *
+ * This function writes the provided string to the global output file `filIndex`.
+ * If writing fails, it reports the error using `FileError` and exits the program.
+ *
+ * @param psz The null-terminated string to write to the output file.
+ *
+ * @global
+ * - Uses the global variable `filIndex` as the output file.
+ * - Calls `FileError` for error reporting.
+ * - Does not modify any global variables directly.
+ */
+void OutputS(const char* psz)
+{
+    if (fputs(psz, filIndex) < 0)
+    {
         FileError("Error in output file", ISAM);
         exit(EXIT_FAILURE);
     }
-
 }
 
-
-
-void OutputF(const char* pszFormat, ...) {
-
+/**
+ * @brief Writes a formatted string to the output index file and handles errors.
+ *
+ * This function writes a formatted string (like printf) to the global output file `filIndex`.
+ * If writing fails, it reports the error using `FileError` and exits the program.
+ *
+ * @param pszFormat The format string (as in printf).
+ * @param ...       Additional arguments to be formatted and written.
+ *
+ * @global
+ * - Uses the global variable `filIndex` as the output file.
+ * - Calls `FileError` for error reporting.
+ * - Does not modify any global variables directly.
+ */
+void OutputF(const char* pszFormat, ...)
+{
     va_list         va;
 
     va_start(va, pszFormat);
-    if (vfprintf(filIndex, pszFormat, va) < 0) {
+    if (vfprintf(filIndex, pszFormat, va) < 0)
+    {
         FileError("Error in output file", ISAM);
         exit(EXIT_FAILURE);
     }
     va_end(va);
-
 }
 
+/*
+    DoFile
+    -------
+    Processes an adventure text file and writes an index array to the output header file.
+    For each line in the input file that starts with '#', it records the file offset (using ftell)
+    into an index array. This array is written as a C array definition to the output file.
+    The function is used to generate index arrays for locations, objects, and messages in the game.
 
-void DoFile(FILE* pfil, const char* pszIDX, const char* pszMAX, const char* pszFileName) {
-
+    Parameters:
+        pfil       - Pointer to the input FILE to process (advent1.txt, etc.)
+        pszIDX     - String used in the index array name (e.g., "1", "2", "3", "4")
+        pszMAX     - String used for the array size macro (e.g., "LOC", "OBJ", "MSG")
+        pszFileName- Name of the input file (for error reporting)
+*/
+void DoFile(FILE* pfil, const char* pszIDX, const char* pszMAX, const char* pszFileName)
+{
     char            szInput[255];
     char            szOutput[12] = "";
     int             cNumbers = -1;
@@ -97,27 +159,54 @@ void DoFile(FILE* pfil, const char* pszIDX, const char* pszMAX, const char* pszF
             }
         }
     }
-    if (ferror(pfil)) {
+    if (ferror(pfil))
+    {
         FileError("Error in input file", pszFileName);
         exit(EXIT_FAILURE);
     }
     OutputF("%s\n\t};\n\n", szOutput);
-
 }
 
-
-void CloseFile(FILE* pfil, const char* pszFileName) {
-
-    if (fclose(pfil)) {
+/**
+ * @brief Closes an open file and handles errors.
+ *
+ * This function attempts to close the specified file pointer. If an error occurs during closing,
+ * it reports the error using `FileError`, sets the global error flag `fError` to 1, and continues.
+ *
+ * @param pfil        Pointer to the FILE to be closed.
+ * @param pszFileName Name of the file (for error reporting purposes).
+ *
+ * @global
+ * - Modifies the global variable `fError` by setting it to 1 if an error occurs during file closing.
+ * - Uses `FileError` for error reporting.
+ */
+void CloseFile(FILE* pfil, const char* pszFileName)
+{
+    if (fclose(pfil))
+    {
         FileError("Error closing", pszFileName);
         fError = 1;
     }
-
 }
 
-
-int main(void) {
-
+/**
+ * @brief Main entry point for the ADVENT0 utility.
+ *
+ * This function opens the required adventure text files and the output index file,
+ * processes each input file to generate index arrays, and writes them to the output header file.
+ * It handles file errors, closes all files, and exits with an appropriate status code.
+ *
+ * @param None
+ * @return EXIT_SUCCESS on success, EXIT_FAILURE on error.
+ *
+ * @global
+ * - Uses and modifies the following global variables:
+ *   - `filIndex`, `filTxt1`, `filTxt2`, `filTxt3`, `filTxt4`: FILE pointers for input/output files.
+ *   - `fError`: Error flag, set to 1 if any file operation fails.
+ * - Calls helper functions that may also use or modify these globals.
+ */
+int main(void)
+{
     filIndex = OpenFile(ISAM, ISAMMODE);
     filTxt1 = OpenFile(FD1, "r");
     filTxt2 = OpenFile(FD2, "r");
@@ -147,6 +236,4 @@ int main(void) {
         exit(EXIT_FAILURE);
 
     exit(EXIT_SUCCESS);
-
 }
-

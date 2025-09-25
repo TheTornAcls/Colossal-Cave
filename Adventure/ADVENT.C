@@ -20,7 +20,7 @@ typedef int INT_PTR;
 
 int main(int argc, char** argv)
 {
-    int	rflag;		/* user restore request option	*/
+    int rflag;      /* user restore request option   */
 
     rflag = 0;
     dbugflg = 0;
@@ -34,11 +34,13 @@ int main(int argc, char** argv)
         szFilePath[i + 1] = '\0';
     }
 #endif
-    while (--argc > 0) {
+    while (--argc > 0)
+    {
         ++argv;
         if (**argv != '-' && **argv != '/')
             break;
-        switch (tolower(argv[0][1])) {
+        switch (tolower(argv[0][1]))
+        {
         case 'r':
             ++rflag;
             continue;
@@ -60,7 +62,8 @@ int main(int argc, char** argv)
     initplay();
     if (rflag)
         restore();
-    else if (yes(65, 1, 0)) {
+    else if (yes(65, 1, 0))
+    {
         limit = 1000;
         ++hinttaken;
     }
@@ -79,11 +82,41 @@ int main(int argc, char** argv)
 
 /* ************************************************************ */
 
-/*
-        Initialization of adventure play variables
-*/
+/**
+ * @brief Initializes the game state and resets all adventure play variables to their starting values.
+ *
+ * This function sets up the initial conditions for a new game session by:
+ * - Initializing arrays that track location status (`cond`), object locations (`place`), fixed object locations (`fixed`), default action messages (`actmsg`), and dwarf locations (`dloc`).
+ * - Resetting or zeroing arrays and variables related to visited locations (`visited`), object properties (`prop`), and various game state flags and counters.
+ * - Setting default values for game progress variables such as `turns`, `holding`, `detail`, `limit`, `tally`, `tally2`, `newloc`, `loc`, `oldloc`, `oldloc2`, `knfloc`, `chloc`, `chloc2`, `dkill`, `clock1`, `clock2`, `panic`, `bonus`, `numdie`, `daltloc`, `lmwarn`, `foobar`, `dflag`, `gaveup`, `saveflg`, `hinttaken`, `hintavail`, `testbr`.
+ * - Zeroing or initializing arrays for dwarf old locations (`odloc`), dwarf seen flags (`dseen`), and hint locations (`hintloc`).
+ * - Setting boolean flags such as `wzdark`, `closed`, and `closing` to false.
+ *
+ * @note
+ * This function does not take any parameters.
+ *
+ * @global
+ * The following global variables are modified:
+ * - cond, place, fixed, actmsg, visited, prop, wzdark, closed, closing, holding, detail, limit, tally, tally2, newloc, loc, oldloc, oldloc2, knfloc, chloc, chloc2, dloc, odloc, dkill, dseen, clock1, clock2, panic, bonus, numdie, daltloc, lmwarn, foobar, dflag, gaveup, saveflg, hinttaken, hintavail, hintloc, testbr, turns
+ */
 void initplay(void)
 {
+    /*
+        icond[MAXLOC]:
+            Initial status flags for each location in the game. Used to initialize the 'cond' array, which tracks conditions such as darkness, visited status, and other special properties for each location.
+
+        iplace[MAXOBJ]:
+            Initial locations for each object in the game. Used to initialize the 'place' array, which determines where each object starts in the game world.
+
+        ifixed[MAXOBJ]:
+            Secondary (fixed) locations for certain objects. Used to initialize the 'fixed' array, indicating objects that are immovable or have a special fixed position.
+
+        iactmsg[33]:
+            Default message numbers for actions/verbs. Used to initialize the 'actmsg' array, which determines what message to display for specific player actions.
+
+        idloc[DWARFMAX]:
+            Initial locations for the dwarves (NPCs). Used to initialize the 'dloc' array, setting the starting positions of the dwarves in the game.
+    */
     static const short int icond[MAXLOC] =
         /*   0 */{ 0, 2053, 2049, 2053, 2053, 2049, 2049, 2053,   33,    1,
         /*  10 */      1,    0,    0,   64,    0,    0,   16,    0,    0,  128,
@@ -123,7 +156,6 @@ void initplay(void)
         /*  70 */      0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         /*  80 */      0,    0,    0,    0,    0,    0,    0,    0,    0,    0,
         /*  90 */      0,    0,    0,    0,    0,    0,    0,    0,    0,    0 };
-
 
     static const short int iactmsg[33] =
         /*   0 */{ 0,   24,   29,    0,   33,    0,   33,   38,   38,   42,
@@ -186,10 +218,24 @@ void initplay(void)
     return;
 }
 
-/*
-        Open advent?.txt files
-*/
-void open1(FILE * *pfd, char* szName)
+/**
+ * @brief Opens a text file for reading, constructing the full path using the global file path.
+ *
+ * This function constructs the full filename by concatenating the global `szFilePath` with the provided
+ * file name `szName`, then attempts to open the file for reading. If the file cannot be opened, it prints
+ * an error message and exits the program.
+ *
+ * @param pfd    Pointer to a FILE* variable where the opened file handle will be stored.
+ * @param szName Name of the file (relative or base name) to be opened, appended to `szFilePath`.
+ *
+ * @global
+ * - Uses the global variable `szFilePath` to construct the full path to the file.
+ * - Does not modify any global variables directly, but the file pointer pointed to by `pfd` is set.
+ *
+ * @note
+ * Exits the program if the file cannot be opened.
+ */
+void open1(FILE** pfd, char* szName)
 {
     char szFileName[FILENAME_MAX];
     errno_t rc;
@@ -203,6 +249,25 @@ void open1(FILE * *pfd, char* szName)
         exit(1);
     }
 }
+
+
+/*
+    opentxt
+    -------
+    Opens the main adventure text files (advent1.txt, advent2.txt, advent3.txt, advent4.txt) for reading.
+    Uses the open1() helper to construct the full path and open each file, assigning the resulting file pointers
+    to the global variables fd1, fd2, fd3, and fd4.
+
+    Parameters:
+        None.
+
+    Returns:
+        None.
+
+    Side Effects:
+        - Modifies the global FILE* variables fd1, fd2, fd3, and fd4 by opening the corresponding files for reading.
+        - If any file cannot be opened, prints an error message and exits the program.
+*/
 void opentxt(void)
 {
     open1(&fd1, FD1);
@@ -211,16 +276,37 @@ void opentxt(void)
     open1(&fd4, FD4);
 }
 
-/*
-                save adventure game
-*/
+/**
+ * @brief Saves the current game state to a user-specified file.
+ *
+ * This function prompts the user for a filename, appends the ".adv" extension,
+ * and writes the current game state (contained in the global variable `saverec`)
+ * to the specified file. It ensures the filename is valid, handles file creation,
+ * and reports errors if the file cannot be created or written to.
+ *
+ * @details
+ * - Prompts the user for a save game filename (without extension).
+ * - Ensures the filename does not exceed 8 characters and appends ".adv".
+ * - Opens the file in write mode and saves the current game state.
+ * - Handles errors for file creation, writing, and closing, printing messages and exiting on failure.
+ *
+ * @param None
+ *
+ * @global
+ * - Uses and modifies the following global variables:
+ *   - `saverec`: The structure containing the entire current game state, which is written to the save file.
+ *
+ * @note
+ * No parameters are passed to this function. All required data is accessed via global variables.
+ */
 void saveadv(void)
 {
     char* sptr;
     FILE* savefd;
     char  username[MAXNAME];
 
-    do {
+    do
+    {
         printf("What do you want to name the saved game? ");
         fflush(stdout);
         gets_s(username, MAXNAME);
@@ -240,20 +326,43 @@ void saveadv(void)
         printf("Sorry, I can't create the file...%s\n", username);
         exit(1);
     }
-    if (fwrite(&saverec, sizeof saverec, 1, savefd) != 1) {
+    if (fwrite(&saverec, sizeof saverec, 1, savefd) != 1)
+    {
         printf("Write error on save file...%s\n", username);
         exit(1);
     }
-    if (fclose(savefd) == -1) {
+    if (fclose(savefd) == -1)
+    {
         printf("Sorry, I can't close the file...%s\n", username);
         exit(1);
     }
     printf("OK -- \"C\" you later...\n");
 }
 
-/*
-        restore saved game handler
-*/
+/**
+ * @brief Restores the game state from a previously saved file.
+ *
+ * This function prompts the user for the name of a saved game file, appends the ".adv" extension,
+ * and attempts to open and read the saved game state from the file. If successful, it loads the
+ * saved data into the global game state structure, effectively restoring the game to the point
+ * at which it was saved.
+ *
+ * @details
+ * - Prompts the user for the saved game filename (without extension).
+ * - Ensures the filename does not exceed 8 characters and appends ".adv".
+ * - Opens the file in read mode and loads the saved state into the global variable `saverec`.
+ * - Restores the debug flag (`dbugflg`) to its previous value and resets the player's location.
+ * - Handles errors for file opening, reading, and closing, printing messages and exiting on failure.
+ *
+ * @note
+ * This function does not take any parameters.
+ *
+ * @global
+ * - Uses and modifies the following global variables:
+ *   - `dbugflg`: Temporarily stores and restores the debug flag.
+ *   - `saverec`: Structure holding the entire saved game state, overwritten with loaded data.
+ *   - `loc`: Resets the player's location to 0 after restoring.
+ */
 void restore(void)
 {
     char  username[MAXNAME];
@@ -261,27 +370,31 @@ void restore(void)
     char* sptr;
     int   savedebug = dbugflg;
 
-    do {
+    do
+    {
         printf("What is the name of the saved game? ");
         fflush(stdout);
         gets_s(username, MAXNAME);
     } while (*username == '\0');
 
     if (sptr = strchr(username, '.'))
-        * sptr = '\0';           /* kill extension       */
+        *sptr = '\0';           /* kill extension       */
     if (strlen(username) > 8)
         username[8] = '\0'; /* max 8 char filename */
     strcat_s(username, MAXNAME, ".adv");
     fopen_s(&restfd, username, RESTMODE);
-    if (restfd == NULL) {
+    if (restfd == NULL)
+    {
         printf("Sorry, I can't open the file...%s\n", username);
         exit(1);
     }
-    if (fread(&saverec, sizeof saverec, 1, restfd) != 1) {
+    if (fread(&saverec, sizeof saverec, 1, restfd) != 1)
+    {
         printf("Read error on save file...%s\n", username);
         exit(1);
     }
-    if (fclose(restfd) == -1) {
+    if (fclose(restfd) == -1)
+    {
         printf("Warning -- can't close save file...%s\n", username);
     }
     dbugflg |= savedebug; loc = 0; putchar('\n');

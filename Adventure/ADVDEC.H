@@ -1,7 +1,6 @@
 /*      header ADVDEC.H                                         *\
 \*      GLOBAL declarations for adventure                       */
 
-
 /*
         Database variables
 */
@@ -39,10 +38,13 @@ char       word1[WORDSIZE],word2[WORDSIZE];
 int        testbr;
 struct {
     int       turns;
-    int       loc,oldloc,oldloc2,newloc;      /* location variables */
+    int       loc;                  /* location variables */
+    int       oldloc;               /* location variables */
+    int       oldloc2;              /* location variables */
+    int       newloc;               /* location variables */
     short int cond[MAXLOC];         /* location status      */
-    int place[MAXOBJ];        /* object location      */
-    int fixed[MAXOBJ];        /* second object loc    */
+    int place[MAXOBJ];              /* object location      */
+    int fixed[MAXOBJ];              /* second object loc    */
     short int visited[MAXLOC];      /* >0 if has been here  */
     short int prop[MAXOBJ];         /* status of object     */
     int       tally,tally2;         /* item counts          */
@@ -71,17 +73,17 @@ struct {
     int       dbugflg;              /* if game is in debug  */
     int       hinttaken;            /* minus 1 for each hint */
     int       hintavail;            /* masks of hints still available */
-    int       hintloc[MAXHINT+1]; /* moves expended hanging around hint area */
+    int       hintloc[MAXHINT+1];   /* moves expended hanging around hint area */
     } saverec;
 #define turns     saverec.turns
 #define loc       saverec.loc
 #define oldloc    saverec.oldloc
-#define oldloc2 saverec.oldloc2
+#define oldloc2   saverec.oldloc2
 #define newloc    saverec.newloc
 #define cond      saverec.cond
 #define place     saverec.place
 #define fixed     saverec.fixed
-#define visited saverec.visited
+#define visited   saverec.visited
 #define prop      saverec.prop
 #define tally     saverec.tally
 #define tally2    saverec.tally2
@@ -100,17 +102,17 @@ struct {
 #define dflag     saverec.dflag
 #define dseen     saverec.dseen
 #define odloc     saverec.odloc
-#define daltloc saverec.daltloc
+#define daltloc   saverec.daltloc
 #define dkill     saverec.dkill
 #define chloc     saverec.chloc
 #define chloc2    saverec.chloc2
 #define bonus     saverec.bonus
 #define numdie    saverec.numdie
-#define object1 saverec.object1
+#define object1   saverec.object1
 #define gaveup    saverec.gaveup
 #define foobar    saverec.foobar
-#define saveflg saverec.saveflg
-#define dbugflg saverec.dbugflg
+#define saveflg   saverec.saveflg
+#define dbugflg   saverec.dbugflg
 #define hinttaken saverec.hinttaken
 #define hintavail saverec.hintavail
-#define hintloc saverec.hintloc
+#define hintloc   saverec.hintloc

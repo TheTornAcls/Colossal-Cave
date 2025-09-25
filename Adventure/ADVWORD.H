@@ -1,6 +1,5 @@
 /*      header ADVWORD.H                                        */
 
-
 /*
         Adventure vocabulary & encryption
 */
