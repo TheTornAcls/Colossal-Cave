@@ -311,7 +311,7 @@ public class AdventureGame
         }
         string command = input.Trim().ToLowerInvariant();
 
-        // Simple command parsing (expand as needed)
+        // Expanded command parsing
         switch (command)
         {
             case "quit":
@@ -327,6 +327,43 @@ public class AdventureGame
                 break;
             case "restore":
                 this.RestoreGame();
+                break;
+            case "inventory":
+            case "i":
+                Console.WriteLine("You are carrying: (Inventory list would go here.)");
+                break;
+            case "help":
+                Console.WriteLine("Available commands: look, inventory (i), save, restore, quit (exit), help, north, south, east, west, up, down, take, drop");
+                break;
+            case "north":
+            case "n":
+                Console.WriteLine("You go north. (Movement logic would go here.)");
+                break;
+            case "south":
+            case "s":
+                Console.WriteLine("You go south. (Movement logic would go here.)");
+                break;
+            case "east":
+            case "e":
+                Console.WriteLine("You go east. (Movement logic would go here.)");
+                break;
+            case "west":
+            case "w":
+                Console.WriteLine("You go west. (Movement logic would go here.)");
+                break;
+            case "up":
+            case "u":
+                Console.WriteLine("You go up. (Movement logic would go here.)");
+                break;
+            case "down":
+            case "d":
+                Console.WriteLine("You go down. (Movement logic would go here.)");
+                break;
+            case "take":
+                Console.WriteLine("Take what? (Item handling logic would go here.)");
+                break;
+            case "drop":
+                Console.WriteLine("Drop what? (Item handling logic would go here.)");
                 break;
             default:
                 Console.WriteLine($"Unknown command: {command}");
