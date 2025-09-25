@@ -126,10 +126,12 @@ public class AdventureGame
     private readonly AdventureParser _parser = new();
     private readonly AdventureDatabase _db = new();
     private readonly AdventureVerbs _verbs;
+    private readonly AdventureScoring _scoring;
 
     public AdventureGame()
     {
         this._verbs = new AdventureVerbs(this, this._db);
+        this._scoring = new AdventureScoring(this, this._db);
     }
 
     public void InitPlay()
@@ -388,6 +390,9 @@ public class AdventureGame
                         this._verbs.Kill(obj);
                     else
                         Console.WriteLine("Kill what?");
+                    break;
+                case 2019: // score
+                    this._scoring.ShowScore();
                     break;
                 default:
                     Console.WriteLine($"That verb is not implemented yet. (verb={verb}, obj={obj}, motion={motion})");
