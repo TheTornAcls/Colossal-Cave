@@ -37,7 +37,8 @@ namespace AdventureSharp
             513, 0, 0, 0, 0, 0, 0, 0, 1024, 0,
             0, 0, 0, 4, 0, 1, 1, 0, 0, 0,
             0, 0, 8, 8, 8, 8, 8, 8, 8, 8,
-            8, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            8, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0
         };
         private static readonly short[] iplace = new short[AdventureConstants.MAXOBJ]
         {
