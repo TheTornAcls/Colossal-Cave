@@ -124,6 +124,7 @@ public class AdventureGame
 
     // AdventureParser instance
     private readonly AdventureParser _parser = new();
+    private readonly AdventureDatabase _db = new();
 
     public void InitPlay()
     {
@@ -403,5 +404,19 @@ public class AdventureGame
         {
             this.SaveGame();
         }
+    }
+
+    public void LoadGameData(string dataDir)
+    {
+        this._db.LoadRooms(Path.Combine(dataDir, "rooms.txt"));
+        this._db.LoadObjects(Path.Combine(dataDir, "objects.txt"));
+        this._db.LoadMessages(Path.Combine(dataDir, "messages.txt"));
+        this._db.LoadTravelTable(Path.Combine(dataDir, "travel.txt"));
+    }
+
+    public string GetCurrentRoomDescription()
+    {
+        var room = this._db.Rooms.Find(r => r.Id == this.loc);
+        return room != null ? room.Description : "You are nowhere.";
     }
 }
