@@ -8,7 +8,6 @@ namespace AdventureSharp
         static void Main(string[] args)
         {
             int rflag = 0;
-            int dbugflg = 0;
             string szFilePath = string.Empty;
 
             if (args.Length > 0)
