@@ -184,26 +184,45 @@ namespace AdventureSharp
             Console.WriteLine("[SaveGame called - not yet implemented]");
         }
 
+        public bool Yes(int question, int yesResponse, int noResponse)
+        {
+            // Placeholder: ask the user a yes/no question
+            Console.Write($"Question {question}: (y/n)? ");
+            string? input = Console.ReadLine();
+            if (!string.IsNullOrEmpty(input) && (input.StartsWith("y", StringComparison.OrdinalIgnoreCase)))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public void Turn()
+        {
+            // Placeholder for the main turn logic
+            Console.WriteLine("[Turn logic would go here]");
+            SaveFlag = true; // For now, exit after one loop
+        }
+
         public void MainGameLoop(bool restoreRequested)
         {
-            // Placeholder for yes() and turn() logic
             if (restoreRequested)
             {
                 RestoreGame();
             }
+            else if (Yes(65, 1, 0))
+            {
+                limit = 1000;
+                hinttaken++;
+            }
             else
             {
-                // Placeholder for yes() logic
-                Console.WriteLine("[yes() logic would go here]");
-                limit = 330; // Default value if not yes(65, 1, 0)
+                limit = 330;
             }
             SaveFlag = false;
             Random rng = new Random(511); // Seed random
             while (!SaveFlag)
             {
-                // Placeholder for turn() logic
-                Console.WriteLine("[turn() logic would go here]");
-                SaveFlag = true; // For now, exit after one loop
+                Turn();
             }
             if (SaveFlag)
             {
