@@ -376,7 +376,7 @@ bool here(int item)
 
 /*
     toting
-    ----__
+    ----
     Determines if a specified item is currently being carried by the player.
 
     Parameters:
