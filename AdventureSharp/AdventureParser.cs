@@ -43,6 +43,22 @@ public class AdventureParser
         // ... add more as needed ...
     };
 
+    private static readonly AdventureParser.WordAction[] extraVerbs = new AdventureParser.WordAction[]
+    {
+        new AdventureParser.WordAction("examine", 2003),
+        new AdventureParser.WordAction("light", 2004),
+        new AdventureParser.WordAction("eat", 2014),
+        new AdventureParser.WordAction("read", 2027)
+    };
+
+    public AdventureParser()
+    {
+        foreach (AdventureParser.WordAction wa in extraVerbs)
+        {
+            this._vocabulary.Add(wa);
+        }
+    }
+
     public bool Analyze(string word, out int type, out int value)
     {
         foreach (WordAction wa in this._vocabulary)
