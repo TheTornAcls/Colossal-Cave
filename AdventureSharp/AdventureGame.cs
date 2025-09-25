@@ -125,6 +125,12 @@ public class AdventureGame
     // AdventureParser instance
     private readonly AdventureParser _parser = new();
     private readonly AdventureDatabase _db = new();
+    private readonly AdventureVerbs _verbs;
+
+    public AdventureGame()
+    {
+        this._verbs = new AdventureVerbs(this, this._db);
+    }
 
     public void InitPlay()
     {
@@ -321,10 +327,10 @@ public class AdventureGame
                     this.SaveFlag = true;
                     break;
                 case 57: // look
-                    Console.WriteLine("You look around. (Room description would go here.)");
+                    this._verbs.Look();
                     break;
                 case 2020: // inventory
-                    Console.WriteLine("You are carrying: (Inventory list would go here.)");
+                    this._verbs.Inventory();
                     break;
                 case 2030: // save/restore
                     if (obj == 0)
@@ -336,10 +342,16 @@ public class AdventureGame
                     Console.WriteLine("Available commands: look, inventory (i), save, restore, quit (exit), help, north, south, east, west, up, down, take, drop");
                     break;
                 case 2001: // take
-                    Console.WriteLine("Take what? (Item handling logic would go here.)");
+                    if (obj != 0)
+                        this._verbs.Take(obj);
+                    else
+                        Console.WriteLine("Take what?");
                     break;
                 case 2002: // drop
-                    Console.WriteLine("Drop what? (Item handling logic would go here.)");
+                    if (obj != 0)
+                        this._verbs.Drop(obj);
+                    else
+                        Console.WriteLine("Drop what?");
                     break;
                 default:
                     Console.WriteLine($"That verb is not implemented yet. (verb={verb}, obj={obj}, motion={motion})");
@@ -416,7 +428,7 @@ public class AdventureGame
 
     public string GetCurrentRoomDescription()
     {
-        var room = this._db.Rooms.Find(r => r.Id == this.loc);
+        AdventureDatabase.Room? room = this._db.Rooms.Find(r => r.Id == this.loc);
         return room != null ? room.Description : "You are nowhere.";
     }
 }
