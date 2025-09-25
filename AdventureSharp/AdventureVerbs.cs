@@ -85,4 +85,82 @@ public class AdventureVerbs
             Console.WriteLine($"You are not carrying the {obj.Name}.");
         }
     }
+
+    public void Examine(int objId)
+    {
+        // Examine an object more closely
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
+        if (obj != null)
+        {
+            Console.WriteLine(obj.Description);
+        }
+        else
+        {
+            Console.WriteLine("You see nothing special.");
+        }
+    }
+
+    public void Light(int objId)
+    {
+        // Light a lamp or similar object
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
+        if (obj != null && obj.Name.ToLower().Contains("lamp"))
+        {
+            Console.WriteLine("You turn on the lamp. (Lamp logic would go here.)");
+        }
+        else
+        {
+            Console.WriteLine("You can't light that.");
+        }
+    }
+
+    public void Move(int directionVerb)
+    {
+        // Move in a direction
+        int currentLoc = this._game.loc;
+        bool moved = false;
+        foreach (AdventureDatabase.TravelEntry entry in this._db.TravelTable)
+        {
+            if (entry.FromLocation == currentLoc && entry.Verb == directionVerb)
+            {
+                this._game.loc = entry.ToLocation;
+                Console.WriteLine(this._game.GetCurrentRoomDescription());
+                moved = true;
+                break;
+            }
+        }
+        if (!moved)
+        {
+            Console.WriteLine("You can't go that way.");
+        }
+    }
+
+    public void Eat(int objId)
+    {
+        // Eat food
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
+        if (obj != null && obj.Name.ToLower().Contains("food"))
+        {
+            Console.WriteLine("You eat the food. (Eating logic would go here.)");
+            this._game.place[objId] = 0; // Remove from inventory
+        }
+        else
+        {
+            Console.WriteLine("You can't eat that.");
+        }
+    }
+
+    public void Read(int objId)
+    {
+        // Read a book or similar object
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
+        if (obj != null && obj.Name.ToLower().Contains("book"))
+        {
+            Console.WriteLine("You read the book. (Book text would go here.)");
+        }
+        else
+        {
+            Console.WriteLine("You can't read that.");
+        }
+    }
 }
