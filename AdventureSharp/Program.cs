@@ -7,18 +7,19 @@ namespace AdventureSharp
     {
         static void Main(string[] args)
         {
-            // Placeholder for ported variables and logic
             int rflag = 0;
             int dbugflg = 0;
             string szFilePath = string.Empty;
 
-            // Simulate file path logic (platform-specific handling omitted for brevity)
             if (args.Length > 0)
             {
                 szFilePath = Path.GetDirectoryName(args[0]) + Path.DirectorySeparatorChar;
             }
+            else
+            {
+                szFilePath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar;
+            }
 
-            // Command-line argument parsing (flags)
             int argIndex = 0;
             while (argIndex < args.Length)
             {
@@ -31,7 +32,6 @@ namespace AdventureSharp
                     case 'r':
                         rflag++;
                         break;
-                    // Add debug flag handling if needed
                     default:
                         Console.WriteLine($"unknown flag: {flag}");
                         break;
@@ -39,9 +39,12 @@ namespace AdventureSharp
                 argIndex++;
             }
 
-            // TODO: Port opentxt(), initplay(), restore(), yes(), turn(), saveadv() and related logic
-            Console.WriteLine("AdventureSharp: Game initialization would occur here.");
+            AdventureGame game = new AdventureGame();
+            game.InitPlay();
+            game.OpenTextFiles(szFilePath);
+            Console.WriteLine("AdventureSharp: Game initialized and files opened. (Game loop to be ported next.)");
             // Placeholder for main game loop
+            game.CloseTextFiles();
         }
     }
 }
