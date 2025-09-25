@@ -1,10 +1,10 @@
 namespace AdventureSharp;
 
 using System.Collections.Generic;
+using System.IO;
 
 public class AdventureDatabase
 {
-    // Room/Location structure
     public class Room
     {
         public int Id { get; set; }
@@ -14,7 +14,6 @@ public class AdventureDatabase
         public List<int> Exits { get; set; } = new();
     }
 
-    // Object structure
     public class GameObject
     {
         public int Id { get; set; }
@@ -24,14 +23,12 @@ public class AdventureDatabase
         public int FixedLocation { get; set; }
     }
 
-    // Message structure
     public class GameMessage
     {
         public int Id { get; set; }
         public string Text { get; set; } = string.Empty;
     }
 
-    // Travel table entry
     public class TravelEntry
     {
         public int FromLocation { get; set; }
@@ -45,13 +42,76 @@ public class AdventureDatabase
     public List<GameMessage> Messages { get; } = new();
     public List<TravelEntry> TravelTable { get; } = new();
 
-    // TODO: Implement loading from text files or embedded resources
-    // For now, add a few sample entries for demonstration
-    public AdventureDatabase()
+    public void LoadRooms(string filePath)
     {
-        this.Rooms.Add(new Room { Id = 1, Name = "Cave Entrance", Description = "You are standing at the entrance of a dark cave.", ShortDescription = "At cave entrance." });
-        this.Objects.Add(new GameObject { Id = 1, Name = "Lamp", Description = "A brass lantern.", InitialLocation = 1, FixedLocation = 0 });
-        this.Messages.Add(new GameMessage { Id = 1, Text = "Welcome to Adventure!" });
-        this.TravelTable.Add(new TravelEntry { FromLocation = 1, ToLocation = 2, Verb = 45, Condition = 0 }); // Example: north
+        // Example: Each line in file: id|name|desc|shortdesc
+        foreach (string line in File.ReadLines(filePath))
+        {
+            if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+            string[] parts = line.Split('|');
+            if (parts.Length < 4) continue;
+            this.Rooms.Add(new Room
+            {
+                Id = int.Parse(parts[0]),
+                Name = parts[1],
+                Description = parts[2],
+                ShortDescription = parts[3]
+            });
+        }
     }
+
+    public void LoadObjects(string filePath)
+    {
+        // Example: Each line in file: id|name|desc|initloc|fixedloc
+        foreach (string line in File.ReadLines(filePath))
+        {
+            if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+            string[] parts = line.Split('|');
+            if (parts.Length < 5) continue;
+            this.Objects.Add(new GameObject
+            {
+                Id = int.Parse(parts[0]),
+                Name = parts[1],
+                Description = parts[2],
+                InitialLocation = int.Parse(parts[3]),
+                FixedLocation = int.Parse(parts[4])
+            });
+        }
+    }
+
+    public void LoadMessages(string filePath)
+    {
+        // Example: Each line in file: id|text
+        foreach (string line in File.ReadLines(filePath))
+        {
+            if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+            string[] parts = line.Split('|');
+            if (parts.Length < 2) continue;
+            this.Messages.Add(new GameMessage
+            {
+                Id = int.Parse(parts[0]),
+                Text = parts[1]
+            });
+        }
+    }
+
+    public void LoadTravelTable(string filePath)
+    {
+        // Example: Each line in file: from|to|verb|cond
+        foreach (string line in File.ReadLines(filePath))
+        {
+            if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+            string[] parts = line.Split('|');
+            if (parts.Length < 4) continue;
+            this.TravelTable.Add(new TravelEntry
+            {
+                FromLocation = int.Parse(parts[0]),
+                ToLocation = int.Parse(parts[1]),
+                Verb = int.Parse(parts[2]),
+                Condition = int.Parse(parts[3])
+            });
+        }
+    }
+
+    public AdventureDatabase() { }
 }
