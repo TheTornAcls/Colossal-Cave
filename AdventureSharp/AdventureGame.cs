@@ -1,9 +1,9 @@
+namespace AdventureSharp
+{
 using System;
 using System.IO;
 using System.Text.Json;
 
-namespace AdventureSharp
-{
     public class GameState
     {
         public short[] cond = new short[AdventureConstants.MAXLOC];
