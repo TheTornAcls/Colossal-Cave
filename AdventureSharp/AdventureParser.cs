@@ -49,6 +49,7 @@ public class AdventureParser
         new AdventureParser.WordAction("light", 2004),
         new AdventureParser.WordAction("wave", 2005),
         new AdventureParser.WordAction("kill", 2006),
+        new AdventureParser.WordAction("score", 2019),
         new AdventureParser.WordAction("eat", 2014),
         new AdventureParser.WordAction("read", 2027)
     };
