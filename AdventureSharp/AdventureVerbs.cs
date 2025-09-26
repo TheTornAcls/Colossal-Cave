@@ -207,4 +207,22 @@ public class AdventureVerbs
             Console.WriteLine("There's nothing to attack.");
         }
     }
+
+    public void Open(int objId) { Console.WriteLine("You try to open it, but nothing happens (stub)."); }
+    public void Close(int objId) { Console.WriteLine("You try to close it, but nothing happens (stub)."); }
+    public void Lock(int objId) { Console.WriteLine("You try to lock it, but nothing happens (stub)."); }
+    public void Unlock(int objId) { Console.WriteLine("You try to unlock it, but nothing happens (stub)."); }
+    public void Pour(int objId) { Console.WriteLine("You try to pour it, but nothing happens (stub)."); }
+    public void Fill(int objId) { Console.WriteLine("You try to fill it, but nothing happens (stub)."); }
+    public void Throw(int objId) { Console.WriteLine("You try to throw it, but nothing happens (stub)."); }
+    public void Feed(int objId) { Console.WriteLine("You try to feed it, but nothing happens (stub)."); }
+    public void Find(int objId) { Console.WriteLine("You try to find it, but nothing happens (stub)."); }
+    public void Blast(int objId) { Console.WriteLine("You try to blast it, but nothing happens (stub)."); }
+    public void Break(int objId) { Console.WriteLine("You try to break it, but nothing happens (stub)."); }
+    public void Wake(int objId) { Console.WriteLine("You try to wake it, but nothing happens (stub)."); }
+    public void Say(int objId) { Console.WriteLine("You say some words, but nothing happens (stub)."); }
+    public void On(int objId) { Console.WriteLine("You try to turn it on, but nothing happens (stub)."); }
+    public void Off(int objId) { Console.WriteLine("You try to turn it off, but nothing happens (stub)."); }
+    public void Rub(int objId) { Console.WriteLine("You try to rub it, but nothing happens (stub)."); }
+    public void Drink(int objId) { Console.WriteLine("You try to drink it, but nothing happens (stub)."); }
 }
