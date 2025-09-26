@@ -182,32 +182,6 @@ public class AdventureGame
         this.testbr = 2;
     }
 
-    public void OpenTextFiles(string filePath)
-    {
-        this.fd1 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD1));
-        this.fd2 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD2));
-        this.fd3 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD3));
-        this.fd4 = this.OpenFile(Path.Combine(filePath, AdventureConstants.FD4));
-    }
-
-    public StreamReader OpenFile(string fullPath)
-    {
-        if (!File.Exists(fullPath))
-        {
-            Console.WriteLine($"Sorry, I can't open {fullPath}");
-            Environment.Exit(1);
-        }
-        return new StreamReader(fullPath);
-    }
-
-    public void CloseTextFiles()
-    {
-        this.fd1?.Close();
-        this.fd2?.Close();
-        this.fd3?.Close();
-        this.fd4?.Close();
-    }
-
     private GameState GetCurrentState()
     {
         return new GameState
