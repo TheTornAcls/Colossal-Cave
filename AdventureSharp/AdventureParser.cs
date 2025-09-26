@@ -51,7 +51,24 @@ public class AdventureParser
         new ("kill", 2006),
         new ("score", 2019),
         new ("eat", 2014),
-        new ("read", 2027)
+        new ("read", 2027),
+        new ("open", 2007),
+        new ("close", 2008),
+        new ("lock", 2009),
+        new ("unlock", 2010),
+        new ("pour", 2011),
+        new ("fill", 2012),
+        new ("throw", 2013),
+        new ("feed", 2015),
+        new ("find", 2016),
+        new ("blast", 2017),
+        new ("break", 2018),
+        new ("wake", 2021),
+        new ("say", 2022),
+        new ("on", 2023),
+        new ("off", 2024),
+        new ("rub", 2025),
+        new ("drink", 2026)
     };
 
     public AdventureParser()
