@@ -112,41 +112,98 @@ public class AdventureParser
         verb = 0;
         obj = 0;
         motion = 0;
-        int type1, type2, val1, val2;
+        int type1 = -1, type2 = -1, val1 = -1, val2 = -1;
+        string msg = "bad grammar...";
         (string word1, string word2) = this.GetWords();
         if (string.IsNullOrEmpty(word1))
-            return false;
+            return false; // ignore whitespace
         if (!this.Analyze(word1, out type1, out val1))
-            return false;
+            return false; // didn't know it
+
+        // Special case: SAY
+        if (type1 == 2 && val1 == 22) // 22 = SAY
+        {
+            verb = 22;
+            obj = 1;
+            return true;
+        }
+
         if (!string.IsNullOrEmpty(word2))
         {
             if (!this.Analyze(word2, out type2, out val2))
-                return false;
+                return false; // didn't know it
         }
         else
         {
             type2 = val2 = -1;
         }
-        // Simple grammar: verb-object or motion
-        if (type1 == 2)
+
+        // Grammar checks and special cases
+        if ((type1 == 3) && (type2 == 3) && (val1 == 51) && (val2 == 51)) // HELP HELP
         {
-            verb = val1;
-            if (type2 == 1)
-                obj = val2;
+            Console.WriteLine("Word list: " + string.Join(", ", this._vocabulary));
+            return false;
+        }
+        else if (type1 == 3)
+        {
+            Console.WriteLine($"Special: {val1}");
+            return false;
+        }
+        else if (type2 == 3)
+        {
+            Console.WriteLine($"Special: {val2}");
+            return false;
         }
         else if (type1 == 0)
         {
-            motion = val1;
+            if (type2 == 0)
+            {
+                Console.WriteLine(msg);
+                return false;
+            }
+            else
+            {
+                motion = val1;
+                return true;
+            }
         }
-        else if (type1 == 1 && type2 == 2)
+        else if (type2 == 0)
         {
-            obj = val1;
-            verb = val2;
+            motion = val2;
+            return true;
+        }
+        else if (type1 == 1)
+        {
+            if (type2 == 1)
+            {
+                Console.WriteLine(msg);
+                return false;
+            }
+            else if (type2 == 2)
+            {
+                obj = val1;
+                verb = val2;
+                return true;
+            }
+            else
+            {
+                Console.WriteLine(msg);
+                return false;
+            }
+        }
+        else if (type1 == 2)
+        {
+            verb = val1;
+            if (type2 == 1)
+            {
+                obj = val2;
+            }
+            return true;
         }
         else
         {
+            Console.WriteLine(msg);
             return false;
         }
-        return true;
     }
 }
