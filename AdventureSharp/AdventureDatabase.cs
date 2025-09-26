@@ -118,7 +118,7 @@ public class AdventureDatabase
     {
         this.Rooms.Clear();
         int currentId = 0;
-        List<string> descLines = new List<string>();
+        List<string> descLines = [];
         foreach (string line in Advent1Data.Lines)
         {
             if (line.StartsWith("#"))
@@ -133,8 +133,7 @@ public class AdventureDatabase
                         ShortDescription = descLines[0]
                     });
                 }
-                int id;
-                if (int.TryParse(line.TrimStart('#'), out id))
+                if (int.TryParse(line.TrimStart('#'), out int id))
                 {
                     currentId = id;
                     descLines.Clear();
@@ -164,7 +163,7 @@ public class AdventureDatabase
         this.Objects.Clear();
         int currentId = 0;
         string name = "";
-        List<string> descLines = new List<string>();
+        List<string> descLines = [];
         foreach (string line in Advent3Data.Lines)
         {
             if (line.StartsWith("#"))
@@ -233,8 +232,7 @@ public class AdventureDatabase
                         Text = string.Join("\n", msgLines)
                     });
                 }
-                int id;
-                if (int.TryParse(line.TrimStart('#'), out id))
+                if (int.TryParse(line.TrimStart('#'), out int id))
                 {
                     currentId = id;
                     msgLines.Clear();
