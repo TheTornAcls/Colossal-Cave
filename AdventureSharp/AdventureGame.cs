@@ -345,59 +345,34 @@ public class AdventureGame
                         this.RestoreGame();
                     break;
                 case 3051: // help
-                    Console.WriteLine("Available commands: look, inventory (i), save, restore, quit (exit), help, north, south, east, west, up, down, take, drop, examine, light, eat, read, wave, kill");
+                    Console.WriteLine("Available commands: look, inventory (i), save, restore, quit (exit), help, north, south, east, west, up, down, take, drop, examine, light, eat, read, wave, kill, open, close, lock, unlock, pour, fill, throw, feed, find, blast, break, wake, say, on, off, rub, drink");
                     break;
-                case 2001: // take
-                    if (obj != 0)
-                        this._verbs.Take(obj);
-                    else
-                        Console.WriteLine("Take what?");
-                    break;
-                case 2002: // drop
-                    if (obj != 0)
-                        this._verbs.Drop(obj);
-                    else
-                        Console.WriteLine("Drop what?");
-                    break;
-                case 2003: // examine
-                    if (obj != 0)
-                        this._verbs.Examine(obj);
-                    else
-                        Console.WriteLine("Examine what?");
-                    break;
-                case 2004: // light
-                    if (obj != 0)
-                        this._verbs.Light(obj);
-                    else
-                        Console.WriteLine("Light what?");
-                    break;
-                case 2014: // eat
-                    if (obj != 0)
-                        this._verbs.Eat(obj);
-                    else
-                        Console.WriteLine("Eat what?");
-                    break;
-                case 2027: // read
-                    if (obj != 0)
-                        this._verbs.Read(obj);
-                    else
-                        Console.WriteLine("Read what?");
-                    break;
-                case 2005: // wave
-                    if (obj != 0)
-                        this._verbs.Wave(obj);
-                    else
-                        Console.WriteLine("Wave what?");
-                    break;
-                case 2006: // kill
-                    if (obj != 0)
-                        this._verbs.Kill(obj);
-                    else
-                        Console.WriteLine("Kill what?");
-                    break;
-                case 2019: // score
-                    this._scoring.ShowScore();
-                    break;
+                case 2001: this._verbs.Take(obj); break;
+                case 2002: this._verbs.Drop(obj); break;
+                case 2003: this._verbs.Examine(obj); break;
+                case 2004: this._verbs.Light(obj); break;
+                case 2005: this._verbs.Wave(obj); break;
+                case 2006: this._verbs.Kill(obj); break;
+                case 2007: this._verbs.Open(obj); break;
+                case 2008: this._verbs.Close(obj); break;
+                case 2009: this._verbs.Lock(obj); break;
+                case 2010: this._verbs.Unlock(obj); break;
+                case 2011: this._verbs.Pour(obj); break;
+                case 2012: this._verbs.Fill(obj); break;
+                case 2013: this._verbs.Throw(obj); break;
+                case 2014: this._verbs.Eat(obj); break;
+                case 2015: this._verbs.Feed(obj); break;
+                case 2016: this._verbs.Find(obj); break;
+                case 2017: this._verbs.Blast(obj); break;
+                case 2018: this._verbs.Break(obj); break;
+                case 2019: this._scoring.ShowScore(); break;
+                case 2021: this._verbs.Wake(obj); break;
+                case 2022: this._verbs.Say(obj); break;
+                case 2023: this._verbs.On(obj); break;
+                case 2024: this._verbs.Off(obj); break;
+                case 2025: this._verbs.Rub(obj); break;
+                case 2026: this._verbs.Drink(obj); break;
+                case 2027: this._verbs.Read(obj); break;
                 default:
                     Console.WriteLine($"That verb is not implemented yet. (verb={verb}, obj={obj}, motion={motion})");
                     break;
