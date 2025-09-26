@@ -2,8 +2,8 @@ namespace AdventureSharp;
 
 public static class Advent1Data
 {
-    public static readonly string[] Lines = new string[]
-    {
+    public static readonly string[] Lines =
+    [
         "#1",
         "You are standing at the end of a road before a small brick building.  Around",
         "you is a forest.  A small stream flows out of the building and down a gully.",
@@ -433,5 +433,5 @@ public static class Advent1Data
         "You are in a maze of little twisty passages, all different.",
         "#140",
         "Dead end."
-    };
+    ];
 }
