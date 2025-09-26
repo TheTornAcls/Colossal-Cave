@@ -404,7 +404,7 @@ public class AdventureGame
             this.limit = 330;
         }
         this.SaveFlag = false;
-        Random rng = new Random(511); // Seed random
+        Random rng = new(511); // Seed random
         while (!this.SaveFlag)
         {
             this.Turn();
