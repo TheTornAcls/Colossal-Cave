@@ -418,14 +418,6 @@ public class AdventureGame
         }
     }
 
-    public void LoadGameData(string dataDir)
-    {
-        this._db.LoadRooms(Path.Combine(dataDir, "rooms.txt"));
-        this._db.LoadObjects(Path.Combine(dataDir, "objects.txt"));
-        this._db.LoadMessages(Path.Combine(dataDir, "messages.txt"));
-        this._db.LoadTravelTable(Path.Combine(dataDir, "travel.txt"));
-    }
-
     public void LoadGameDataFromEmbedded()
     {
         this._db.LoadGameDataFromEmbedded();
