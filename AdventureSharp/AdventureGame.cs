@@ -426,6 +426,11 @@ public class AdventureGame
         this._db.LoadTravelTable(Path.Combine(dataDir, "travel.txt"));
     }
 
+    public void LoadGameDataFromEmbedded()
+    {
+        this._db.LoadGameDataFromEmbedded();
+    }
+
     public string GetCurrentRoomDescription()
     {
         AdventureDatabase.Room? room = this._db.Rooms.Find(r => r.Id == this.loc);
