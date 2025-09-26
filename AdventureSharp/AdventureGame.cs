@@ -1,7 +1,6 @@
 namespace AdventureSharp;
 
 using System;
-using System.IO;
 using System.Text.Json;
 
 public class GameState
@@ -114,12 +113,6 @@ public class AdventureGame
     public bool wzdark, closing, closed, gaveup;
     public int chloc, chloc2, foobar;
 
-    // File handles for the main text files
-    public StreamReader? fd1;
-    public StreamReader? fd2;
-    public StreamReader? fd3;
-    public StreamReader? fd4;
-
     public bool SaveFlag { get { return saveflg != 0; } set { saveflg = value ? 1 : 0; } }
 
     // AdventureParser instance
@@ -136,6 +129,8 @@ public class AdventureGame
         this._scoring = new AdventureScoring(this, this._db);
         this._events = new AdventureEvents(this, this._db);
         this._puzzles = new AdventurePuzzles(this, this._db);
+        this.LoadGameDataFromEmbedded();
+        this.InitPlay();
     }
 
     public void InitPlay()
