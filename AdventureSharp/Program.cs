@@ -39,10 +39,6 @@ class Program
         }
 
         AdventureGame game = new();
-        game.InitPlay();
-        game.OpenTextFiles(szFilePath);
-        Console.WriteLine("AdventureSharp: Game initialized and files opened. Starting main game loop...");
         game.MainGameLoop(rflag > 0);
-        game.CloseTextFiles();
     }
 }
