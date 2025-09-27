@@ -139,9 +139,10 @@ public class AdventureVerbs
     {
         int currentLoc = this._game.loc;
         bool moved = false;
-        foreach (AdventureDatabase.TravelEntry entry in this._db.TravelTable)
+        for (int i = 0; i < this._db.TravelTable.Count; i++)
         {
-            if (entry.FromLocation == currentLoc && entry.Verb == directionVerb)
+            AdventureDatabase.TravelEntry entry = this._db.TravelTable[i];
+            if (entry.FromLocation == currentLoc && (entry.Verb == directionVerb || entry.Verb == 0))
             {
                 this._game.loc = entry.ToLocation;
                 this.Look();
