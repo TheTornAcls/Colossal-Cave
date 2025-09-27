@@ -255,12 +255,38 @@ public class AdventureDatabase
         }
     }
 
-    // Loads travel entries from embedded Advent2Data (stub, as format is not clear)
+    // Loads travel entries from embedded Advent2Data
     public void LoadTravelTableFromEmbedded()
     {
         this.TravelTable.Clear();
-        // You may need to implement parsing logic here if Advent2Data contains travel info
-        // For now, this is a stub
+        // Example: #from to verb cond
+        int currentFrom = 0;
+        foreach (string line in Advent2Data.Lines)
+        {
+            if (line.StartsWith("#"))
+            {
+                int id;
+                if (int.TryParse(line.TrimStart('#'), out id))
+                {
+                    currentFrom = id;
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(line))
+            {
+                // For demo: treat each non-empty line after # as a possible exit to next room
+                // In real game, this would be parsed from a more complex format
+                int toLocation = currentFrom + 1;
+                int verb = 0; // 0 = any motion
+                int cond = 0; // 0 = no condition
+                this.TravelTable.Add(new TravelEntry
+                {
+                    FromLocation = currentFrom,
+                    ToLocation = toLocation,
+                    Verb = verb,
+                    Condition = cond
+                });
+            }
+        }
     }
 
     public AdventureDatabase()
