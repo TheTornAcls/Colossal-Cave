@@ -380,6 +380,23 @@ public class AdventureGame
             this._events.ProcessTurnEvents();
             this._puzzles.ProcessPuzzles();
             this.turns++;
+            // Endgame scenarios
+            if (this.closed && this.loc == 1)
+            {
+                this._scoring.EndGame("win");
+            }
+            if (this.closed && this.loc == 6)
+            {
+                this._scoring.EndGame("lose");
+            }
+            if (this.gaveup)
+            {
+                this._scoring.EndGame("quit");
+            }
+            if (this.numdie > 0)
+            {
+                this._scoring.EndGame("death");
+            }
         }
         if (this.SaveFlag)
         {
