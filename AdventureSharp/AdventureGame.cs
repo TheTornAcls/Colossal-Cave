@@ -430,12 +430,20 @@ public class AdventureGame
         string? input = Console.ReadLine();
         if (!string.IsNullOrEmpty(input) && input.Trim().ToLower().StartsWith("y"))
         {
-            ShowInstructions();
+            this.ShowInstructions();
         }
     }
 
     private void ShowInstructions()
     {
-        Console.WriteLine("\nSomewhere nearby is Colossal Cave, where others have found fortunes in treasure and gold, though it is rumored that some who enter are never seen again. Magic is said to work in the cave. I will be your eyes and hands. Direct me with commands of 1 or 2 words. (Should you get stuck, type 'help' for some general hints. For information on how to end your adventure, etc., type 'info'.)\n");
+        AdventureDatabase.GameMessage? msg = this._db.Messages.Find(m => m.Id == 65);
+        if (msg != null)
+        {
+            Console.WriteLine("\n" + msg.Text + "\n");
+        }
+        else
+        {
+            Console.WriteLine("Instructions not found.");
+        }
     }
 }
