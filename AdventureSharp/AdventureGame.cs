@@ -377,6 +377,7 @@ public class AdventureGame
         }
         this.SaveFlag = false;
         Random rng = new(AdventureConstants.RANDOM_SEED); // Seed random
+        this.ShowWelcomeScreen();
         while (!this.SaveFlag)
         {
             this.Turn();
@@ -417,5 +418,24 @@ public class AdventureGame
     {
         AdventureDatabase.Room? room = this._db.Rooms.Find(r => r.Id == this.loc);
         return room != null ? room.Description : "You are nowhere.";
+    }
+
+    public void ShowWelcomeScreen()
+    {
+        Console.WriteLine("\n\t\tWelcome to ADVENTURE!\n");
+        Console.WriteLine("\nOriginal development by Willie Crowther.");
+        Console.WriteLine("Major features added by Don Woods.");
+        Console.WriteLine("Conversion to C# by AdventureSharp Team.\n");
+        Console.WriteLine("Would you like instructions? (y/n)");
+        string? input = Console.ReadLine();
+        if (!string.IsNullOrEmpty(input) && input.Trim().ToLower().StartsWith("y"))
+        {
+            ShowInstructions();
+        }
+    }
+
+    private void ShowInstructions()
+    {
+        Console.WriteLine("\nSomewhere nearby is Colossal Cave, where others have found fortunes in treasure and gold, though it is rumored that some who enter are never seen again. Magic is said to work in the cave. I will be your eyes and hands. Direct me with commands of 1 or 2 words. (Should you get stuck, type 'help' for some general hints. For information on how to end your adventure, etc., type 'info'.)\n");
     }
 }
