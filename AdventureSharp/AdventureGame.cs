@@ -123,6 +123,7 @@ public class AdventureGame
     private readonly AdventureScoring _scoring;
     private readonly AdventureEvents _events;
     private readonly AdventurePuzzles _puzzles;
+    private readonly AdventurePirate _pirate;
 
     public AdventureGame()
     {
@@ -130,6 +131,7 @@ public class AdventureGame
         this._scoring = new AdventureScoring(this, this._db);
         this._events = new AdventureEvents(this, this._db);
         this._puzzles = new AdventurePuzzles(this, this._db);
+        this._pirate = new AdventurePirate(this, this._db);
         this.LoadGameDataFromEmbedded();
         this.InitPlay();
     }
@@ -379,6 +381,7 @@ public class AdventureGame
         {
             this.Turn();
             this._events.ProcessTurnEvents();
+            this._pirate.ProcessPirateEvents();
             this._puzzles.ProcessPuzzles();
             this.turns++;
             // Endgame scenarios
