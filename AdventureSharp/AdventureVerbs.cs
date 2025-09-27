@@ -60,7 +60,7 @@ public class AdventureVerbs
 
     public void Take(int objId)
     {
-        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj == null)
         {
             Console.WriteLine("You don't see that here.");
@@ -76,6 +76,12 @@ public class AdventureVerbs
             Console.WriteLine($"You can't take the {obj.Name}.");
             return;
         }
+        // Special case: fixed objects
+        if (this._game.fixedObj[objId] == this._game.loc)
+        {
+            Console.WriteLine($"The {obj.Name} is fixed in place and cannot be taken.");
+            return;
+        }
         // Inventory limit
         int count = 0;
         for (int i = 0; i < AdventureConstants.MAXOBJ; i++)
@@ -89,12 +95,13 @@ public class AdventureVerbs
             return;
         }
         this._game.place[objId] = (short)(-1);
+        this._game.holding++;
         Console.WriteLine($"You take the {obj.Name}.");
     }
 
     public void Drop(int objId)
     {
-        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj == null)
         {
             Console.WriteLine("You don't have that.");
@@ -106,7 +113,65 @@ public class AdventureVerbs
             return;
         }
         this._game.place[objId] = (short)this._game.loc;
+        this._game.holding--;
         Console.WriteLine($"You drop the {obj.Name}.");
+        // Special case: dropping bird with snake present
+        if (obj.Name.ToLower().Contains("bird") && this._db.Objects.Exists(o => o.Name.ToLower().Contains("snake") && this._game.place[o.Id] == this._game.loc))
+        {
+            Console.WriteLine("The bird attacks the snake and both disappear!");
+            this._game.place[objId] = 0;
+            AdventureDatabase.GameObject snakeObj = this._db.Objects.Find(o => o.Name.ToLower().Contains("snake"));
+            if (snakeObj != null)
+            {
+                this._game.place[snakeObj.Id] = 0;
+            }
+        }
+    }
+
+    public void Combine(int objId1, int objId2)
+    {
+        AdventureDatabase.GameObject obj1 = this._db.Objects.Find(o => o.Id == objId1);
+        AdventureDatabase.GameObject obj2 = this._db.Objects.Find(o => o.Id == objId2);
+        if (obj1 == null || obj2 == null)
+        {
+            Console.WriteLine("You can't combine those.");
+            return;
+        }
+        // Example: combine key and chest
+        if (obj1.Name.ToLower().Contains("key") && obj2.Name.ToLower().Contains("chest") && this._game.place[objId1] == -1 && this._game.place[objId2] == this._game.loc)
+        {
+            Console.WriteLine("You unlock the chest with the key!");
+            this._game.prop[objId2] = 1;
+        }
+        else
+        {
+            Console.WriteLine("Nothing happens.");
+        }
+    }
+
+    public void Use(int objId)
+    {
+        AdventureDatabase.GameObject obj = this._db.Objects.Find(o => o.Id == objId);
+        if (obj == null)
+        {
+            Console.WriteLine("You can't use that.");
+            return;
+        }
+        if (this._game.place[objId] != -1)
+        {
+            Console.WriteLine($"You need to be carrying the {obj.Name} to use it.");
+            return;
+        }
+        // Example: use lamp
+        if (obj.Name.ToLower().Contains("lamp"))
+        {
+            Console.WriteLine("You turn on the lamp. The cave is illuminated.");
+            this._game.wzdark = false;
+        }
+        else
+        {
+            Console.WriteLine("You can't use that here.");
+        }
     }
 
     public void Examine(int objId)
