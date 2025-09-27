@@ -35,6 +35,7 @@ public static class AdventureConstants
     public const string FD2 = "advent2.txt";
     public const string FD3 = "advent3.txt";
     public const string FD4 = "advent4.txt";
+    public const int RANDOM_SEED = 511;
 }
 
 public class AdventureGame
@@ -373,7 +374,7 @@ public class AdventureGame
             this.limit = 330;
         }
         this.SaveFlag = false;
-        Random rng = new(511); // Seed random
+        Random rng = new(AdventureConstants.RANDOM_SEED); // Seed random
         while (!this.SaveFlag)
         {
             this.Turn();
