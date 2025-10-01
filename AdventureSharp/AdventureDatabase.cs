@@ -240,8 +240,8 @@ public class AdventureDatabase
             }
             else
             {
-                if (!string.IsNullOrWhiteSpace(line))
-                    msgLines.Add(line.Trim());
+                // Preserve blank lines and tabs
+                msgLines.Add(line);
             }
         }
         // Add last message
