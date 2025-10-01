@@ -422,11 +422,16 @@ public class AdventureGame
 
     public void ShowWelcomeScreen()
     {
-        Console.WriteLine("\n\t\tWelcome to ADVENTURE!\n");
-        Console.WriteLine("\nOriginal development by Willie Crowther.");
-        Console.WriteLine("Major features added by Don Woods.");
-        Console.WriteLine("Conversion to C# by AdventureSharp Team.\n");
-        Console.WriteLine("Would you like instructions? (y/n)");
+        AdventureDatabase.GameMessage? msg = this._db.Messages.Find(m => m.Id == 65);
+        if (msg != null)
+        {
+            Console.WriteLine(msg.Text);
+        }
+        else
+        {
+            Console.WriteLine("Welcome to Adventure!");
+        }
+
         string? input = Console.ReadLine();
         if (!string.IsNullOrEmpty(input) && input.Trim().ToLower().StartsWith("y"))
         {
