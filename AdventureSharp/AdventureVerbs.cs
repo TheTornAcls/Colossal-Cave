@@ -410,17 +410,19 @@ public class AdventureVerbs
         }
     }
 
+    // Food object ID for bear feeding operations
+    private const int FOOD_OBJECT_ID = 3; // The object ID for the food used to feed the bear
+
     public void Feed(int objId)
     {
         AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null && obj.Name.ToLower().Contains("bear"))
         {
-            int foodId = 3;
-            if (this._game.place[foodId] == -1)
+            if (this._game.place[FOOD_OBJECT_ID] == -1)
             {
                 Console.WriteLine("You feed the food to the bear. The bear seems happy!");
                 this._game.prop[objId] = 1;
-                this._game.place[foodId] = 0;
+                this._game.place[FOOD_OBJECT_ID] = 0;
             }
             else
             {
