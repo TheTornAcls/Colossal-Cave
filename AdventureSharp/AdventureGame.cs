@@ -388,7 +388,7 @@ public class AdventureGame
         }
         this.SaveFlag = false;
         Random rng = new(AdventureConstants.RANDOM_SEED); // Seed random
-        this.ShowWelcomeScreen();
+
         while (!this.SaveFlag)
         {
             this.Turn();
