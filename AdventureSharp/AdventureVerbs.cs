@@ -340,6 +340,9 @@ public class AdventureVerbs
         }
     }
 
+    // Key object ID for chest operations
+    private const int KEY_OBJECT_ID = 5; // The object ID for the key used to unlock/lock the chest
+
     public void Unlock(int objId)
     {
         AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
@@ -348,10 +351,9 @@ public class AdventureVerbs
             Console.WriteLine("You don't see that here.");
             return;
         }
-        int keyId = 5;
         if (obj.Name.ToLower().Contains("chest") && this._game.place[objId] == this._game.loc)
         {
-            if (this._game.place[keyId] == -1)
+            if (this._game.place[KEY_OBJECT_ID] == -1)
             {
                 this._game.prop[objId] = 1;
                 Console.WriteLine("You unlock and open the chest with the key!");
