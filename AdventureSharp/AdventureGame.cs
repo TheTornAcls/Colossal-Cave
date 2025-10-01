@@ -436,7 +436,7 @@ public class AdventureGame
 
     private void ShowInstructions()
     {
-        AdventureDatabase.GameMessage? msg = this._db.Messages.Find(m => m.Id == 65);
+        AdventureDatabase.GameMessage? msg = this._db.Messages.Find(m => m.Id == 1);
         if (msg != null)
         {
             Console.WriteLine("\n" + msg.Text + "\n");
