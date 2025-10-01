@@ -276,7 +276,7 @@ public class AdventureVerbs
 
     public void Open(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj == null)
         {
             Console.WriteLine("You don't see that here.");
@@ -297,7 +297,7 @@ public class AdventureVerbs
 
     public void Close(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj == null)
         {
             Console.WriteLine("You don't see that here.");
@@ -321,7 +321,7 @@ public class AdventureVerbs
 
     public void Lock(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj == null)
         {
             Console.WriteLine("You don't see that here.");
@@ -342,7 +342,7 @@ public class AdventureVerbs
 
     public void Unlock(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj == null)
         {
             Console.WriteLine("You don't see that here.");
@@ -369,7 +369,7 @@ public class AdventureVerbs
 
     public void Pour(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null && obj.Name.ToLower().Contains("food"))
         {
             Console.WriteLine("You pour out the food. Ants appear and quickly carry it away.");
@@ -383,7 +383,7 @@ public class AdventureVerbs
 
     public void Fill(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null && obj.Name.ToLower().Contains("chest"))
         {
             Console.WriteLine("You try to fill the chest, but with what?");
@@ -396,7 +396,7 @@ public class AdventureVerbs
 
     public void Throw(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null && this._game.place[objId] == -1)
         {
             Console.WriteLine($"You throw the {obj.Name}. It lands nearby.");
@@ -410,7 +410,7 @@ public class AdventureVerbs
 
     public void Feed(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null && obj.Name.ToLower().Contains("bear"))
         {
             int foodId = 3;
@@ -433,7 +433,7 @@ public class AdventureVerbs
 
     public void Find(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null)
         {
             if (this._game.place[objId] == -1)
@@ -456,7 +456,7 @@ public class AdventureVerbs
 
     public void Break(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null && obj.Name.ToLower().Contains("chest") && this._game.place[objId] == this._game.loc)
         {
             Console.WriteLine("You smash the chest, but it's too sturdy to break.");
@@ -469,7 +469,7 @@ public class AdventureVerbs
 
     public void Wake(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null && obj.Name.ToLower().Contains("bear"))
         {
             Console.WriteLine("You try to wake the bear. It grumbles and rolls over.");
@@ -487,7 +487,7 @@ public class AdventureVerbs
 
     public void On(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null && obj.Name.ToLower().Contains("lamp"))
         {
             Console.WriteLine("You turn on the lamp. The cave is illuminated.");
@@ -501,7 +501,7 @@ public class AdventureVerbs
 
     public void Off(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null && obj.Name.ToLower().Contains("lamp"))
         {
             Console.WriteLine("You turn off the lamp. The cave grows dark.");
@@ -515,7 +515,7 @@ public class AdventureVerbs
 
     public void Rub(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null && obj.Name.ToLower().Contains("lamp"))
         {
             Console.WriteLine("You rub the lamp, but no genie appears.");
@@ -528,7 +528,7 @@ public class AdventureVerbs
 
     public void Drink(int objId)
     {
-        var obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj != null && obj.Name.ToLower().Contains("water"))
         {
             Console.WriteLine("You drink the water. Refreshing!");
