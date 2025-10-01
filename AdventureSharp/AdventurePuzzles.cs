@@ -7,6 +7,11 @@ public class AdventurePuzzles
     private readonly AdventureGame _game;
     private readonly AdventureDatabase _db;
 
+    // Key object ID for treasure room puzzle
+    private const int PUZZLE_KEY_OBJECT_ID = 5; // The object ID for the key used to unlock the treasure chest in the treasure room
+    // Chest object ID for treasure room puzzle
+    private const int PUZZLE_CHEST_OBJECT_ID = 6; // The object ID for the treasure chest in the treasure room
+
     public AdventurePuzzles(AdventureGame game, AdventureDatabase db)
     {
         this._game = game;
@@ -19,16 +24,14 @@ public class AdventurePuzzles
         // Puzzle 1: Unlock treasure room with key
         if (this._game.loc == 6)
         {
-            int keyId = 5; // Key object
-            int chestId = 6; // Treasure Chest object
-            if (this._game.place[keyId] == -1 && this._game.place[chestId] == 6 && this._game.prop[chestId] == 0)
+            if (this._game.place[PUZZLE_KEY_OBJECT_ID] == -1 && this._game.place[PUZZLE_CHEST_OBJECT_ID] == 6 && this._game.prop[PUZZLE_CHEST_OBJECT_ID] == 0)
             {
                 Console.WriteLine("You use the rusty key to unlock the treasure chest!");
                 Console.WriteLine("The chest opens, revealing a pile of gold coins!");
-                this._game.prop[chestId] = 1; // Mark chest as opened
+                this._game.prop[PUZZLE_CHEST_OBJECT_ID] = 1; // Mark chest as opened
                 this._game.tally += 1; // Award progress
             }
-            else if (this._game.place[chestId] == 6 && this._game.prop[chestId] == 0)
+            else if (this._game.place[PUZZLE_CHEST_OBJECT_ID] == 6 && this._game.prop[PUZZLE_CHEST_OBJECT_ID] == 0)
             {
                 Console.WriteLine("A locked treasure chest sits here. You need a key to open it.");
             }
