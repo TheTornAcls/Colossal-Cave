@@ -8,16 +8,6 @@ class Program
     static void Main(string[] args)
     {
         int rflag = 0;
-        string szFilePath = string.Empty;
-
-        if (args.Length > 0)
-        {
-            szFilePath = Path.GetDirectoryName(args[0]) + Path.DirectorySeparatorChar;
-        }
-        else
-        {
-            szFilePath = Directory.GetCurrentDirectory() + Path.DirectorySeparatorChar;
-        }
 
         int argIndex = 0;
         while (argIndex < args.Length)
