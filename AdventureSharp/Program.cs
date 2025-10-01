@@ -6,7 +6,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        int rflag = 0;
+        bool restoreRequested = false;
 
         int argIndex = 0;
         while (argIndex < args.Length)
@@ -18,7 +18,7 @@ class Program
             switch (flag)
             {
                 case 'r':
-                    rflag++;
+                    restoreRequested = true;
                     break;
                 default:
                     Console.WriteLine($"unknown flag: {flag}");
@@ -28,6 +28,6 @@ class Program
         }
 
         AdventureGame game = new();
-        game.MainGameLoop(rflag > 0);
+        game.MainGameLoop(restoreRequested);
     }
 }
