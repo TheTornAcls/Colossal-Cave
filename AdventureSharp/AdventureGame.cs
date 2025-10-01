@@ -277,14 +277,25 @@ public class AdventureGame
 
     public bool Yes(int question, int yesResponse, int noResponse)
     {
-        // Placeholder: ask the user a yes/no question
-        Console.Write($"Question {question}: (y/n)? ");
+        // Show the question message
+        AdventureDatabase.GameMessage? msg = this._db.Messages.Find(m => m.Id == question);
+        if (msg != null)
+            Console.Write($"{msg.Text} ");
+        else
+            Console.Write($"Question {question}: ");
+
+        Console.Write("(y/n)? ");
         string? input = Console.ReadLine();
-        if (!string.IsNullOrEmpty(input) && (input.StartsWith("y", StringComparison.OrdinalIgnoreCase)))
-        {
-            return true;
-        }
-        return false;
+
+        bool isYes = !string.IsNullOrEmpty(input) && input.Trim().StartsWith("y", StringComparison.OrdinalIgnoreCase);
+
+        // Show yes/no response message if available
+        int responseId = isYes ? yesResponse : noResponse;
+        AdventureDatabase.GameMessage? respMsg = this._db.Messages.Find(m => m.Id == responseId);
+        if (respMsg != null)
+            Console.WriteLine(respMsg.Text);
+
+        return isYes;
     }
 
     public void Turn()
