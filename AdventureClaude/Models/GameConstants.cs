@@ -1,10 +1,10 @@
-namespace AdventureClaude.Models
-{
-    /// <summary>
-    /// Represents the travel options from a location.
-    /// Converted from the C struct trav.
-    /// </summary>
-    public class TravelOption
+namespace AdventureClaude.Models;
+
+/// <summary>
+/// Represents the travel options from a location.
+/// Converted from the C struct trav.
+/// </summary>
+public class TravelOption
     {
         public int Destination { get; set; } = -1;  // tdest
         public int Verb { get; set; } = 0;          // tverb
@@ -70,4 +70,3 @@ namespace AdventureClaude.Models
         public const int Look = 57;
         public const int Inventory = 20;
     }
-}

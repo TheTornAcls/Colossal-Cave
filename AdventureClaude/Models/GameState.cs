@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 
-namespace AdventureClaude.Models
-{
-    /// <summary>
-    /// Represents the complete game state for the adventure.
-    /// Converted from the C global variables and structs in ADVDEC.H.
-    /// </summary>
-    public class GameState
+namespace AdventureClaude.Models;
+
+/// <summary>
+/// Represents the complete game state for the adventure.
+/// Converted from the C global variables and structs in ADVDEC.H.
+/// </summary>
+public class GameState
     {
         // Location-related variables
         public int Turns { get; set; } = 0;
@@ -189,7 +189,7 @@ namespace AdventureClaude.Models
         /// <returns>List of object IDs being carried</returns>
         public List<int> GetCarriedObjects()
         {
-            List<int> carriedObjects = new List<int>();
+            List<int> carriedObjects = new ();
             for (int i = 1; i < GameConstants.MaxObjects; i++)
             {
                 if (IsCarrying(i))
@@ -206,7 +206,7 @@ namespace AdventureClaude.Models
         /// <returns>List of object IDs at the current location</returns>
         public List<int> GetObjectsHere()
         {
-            List<int> objectsHere = new List<int>();
+            List<int> objectsHere = new ();
             for (int i = 1; i < GameConstants.MaxObjects; i++)
             {
                 if (IsObjectHere(i))
@@ -217,4 +217,3 @@ namespace AdventureClaude.Models
             return objectsHere;
         }
     }
-}

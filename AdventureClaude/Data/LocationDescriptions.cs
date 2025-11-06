@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 
-namespace AdventureClaude.Data
-{
-    /// <summary>
-    /// Contains all location descriptions for the adventure game.
-    /// Converted from ADVENT1.txt (long descriptions) and ADVENT2.txt (short descriptions).
-    /// </summary>
-    public static class LocationDescriptions
+namespace AdventureClaude.Data;
+
+/// <summary>
+/// Contains all location descriptions for the adventure game.
+/// Converted from ADVENT1.txt (long descriptions) and ADVENT2.txt (short descriptions).
+/// </summary>
+public static class LocationDescriptions
     {
         /// <summary>
         /// Long detailed location descriptions, shown on first visit or when explicitly requested.
@@ -304,4 +304,3 @@ namespace AdventureClaude.Data
             {140, "Dead end."}
         };
     }
-}

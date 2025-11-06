@@ -2,13 +2,13 @@ using System;
 using AdventureClaude.Data;
 using AdventureClaude.Models;
 
-namespace AdventureClaude.Game
-{
-    /// <summary>
-    /// Handles parsing and analysis of player input.
-    /// Converted from ENGLISH.C functions.
-    /// </summary>
-    public class InputParser
+namespace AdventureClaude.Game;
+
+/// <summary>
+/// Handles parsing and analysis of player input.
+/// Converted from ENGLISH.C functions.
+/// </summary>
+public class InputParser
     {
         public InputParser()
         {
@@ -202,4 +202,3 @@ namespace AdventureClaude.Game
             return false;
         }
     }
-}

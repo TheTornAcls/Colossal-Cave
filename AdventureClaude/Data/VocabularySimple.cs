@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 
-namespace AdventureClaude.Data
-{
-    /// <summary>
-    /// Contains the adventure game vocabulary.
-    /// Converted from ADVWORD.H file.
-    /// </summary>
-    public static class VocabularySimple
+namespace AdventureClaude.Data;
+
+/// <summary>
+/// Contains the adventure game vocabulary.
+/// Converted from ADVWORD.H file.
+/// </summary>
+public static class VocabularySimple
     {
         /// <summary>
         /// Dictionary of all known words mapped to their types and values.
@@ -112,4 +112,3 @@ namespace AdventureClaude.Data
             return false;
         }
     }
-}

@@ -1,12 +1,12 @@
 ﻿using AdventureClaude.Game;
 
-namespace AdventureClaude
-{
-    /// <summary>
-    /// Main program entry point for the Adventure game.
-    /// This is the C# port of the classic Colossal Cave Adventure.
-    /// </summary>
-    internal class Program
+namespace AdventureClaude;
+
+/// <summary>
+/// Main program entry point for the Adventure game.
+/// This is the C# port of the classic Colossal Cave Adventure.
+/// </summary>
+internal class Program
     {
         /// <summary>
         /// Main entry point for the adventure game.
@@ -24,7 +24,7 @@ namespace AdventureClaude
 
             try
             {
-                AdventureGame game = new AdventureGame();
+                AdventureGame game = new ();
                 game.StartNewGame();
             }
             catch (Exception ex)
@@ -41,4 +41,3 @@ namespace AdventureClaude
             Console.ReadKey();
         }
     }
-}

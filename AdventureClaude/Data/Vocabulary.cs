@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 
-namespace AdventureClaude.Data
-{
-    /// <summary>
-    /// Represents a word entry in the adventure vocabulary.
-    /// </summary>
-    public class WordEntry
+namespace AdventureClaude.Data;
+
+/// <summary>
+/// Represents a word entry in the adventure vocabulary.
+/// </summary>
+public class WordEntry
     {
         public string Word { get; set; } = string.Empty;
         public int Type { get; set; }  // 1=motion, 2=verb, 3=object, etc.
@@ -212,4 +212,3 @@ namespace AdventureClaude.Data
             return false;
         }
     }
-}

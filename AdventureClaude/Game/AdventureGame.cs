@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using AdventureClaude.Data;
 using AdventureClaude.Models;
 
-namespace AdventureClaude.Game
-{
-    /// <summary>
-    /// Core adventure game engine.
-    /// Converted from the main game logic in ADVENT.C and related files.
-    /// </summary>
-    public class AdventureGame
+namespace AdventureClaude.Game;
+
+/// <summary>
+/// Core adventure game engine.
+/// Converted from the main game logic in ADVENT.C and related files.
+/// </summary>
+public class AdventureGame
     {
         private readonly GameState gameState;
         private readonly InputParser inputParser;
@@ -489,4 +489,3 @@ namespace AdventureClaude.Game
             return normalized.StartsWith("y") || normalized == "yes";
         }
     }
-}

@@ -1,17 +1,17 @@
 using System.Collections.Generic;
 
-namespace AdventureClaude.Data
-{
-    /// <summary>
-    /// Contains all game messages and responses.
-    /// Converted from ADVENT4.txt file.
-    /// </summary>
-    public static class GameMessages
+namespace AdventureClaude.Data;
+
+/// <summary>
+/// Contains all game messages and responses.
+/// Converted from ADVENT4.txt file.
+/// </summary>
+public static class GameMessages
     {
         /// <summary>
         /// Dictionary of all game messages indexed by their ID.
         /// </summary>
-        public static readonly Dictionary<int, string> Messages = new Dictionary<int, string>
+        public static readonly Dictionary<int, string> Messages = new()
         {
             {1, "\n\nSomewhere nearby is Colossal Cave, where others have found fortunes in\ntreasure and gold, though it is rumored that some who enter are never seen\nagain.\tMagic is said to work in the cave.  I will be your eyes and hands.\nDirect me with commands of 1 or 2 words.  (Should you get stuck, type \"help\"\nfor some general hints.  For information on how to end your adventure, etc.,\ntype \"info\".)"},
             {2, "A little dwarf with a big knife blocks your way."},
@@ -238,4 +238,3 @@ namespace AdventureClaude.Data
             return $"Unknown message ID: {messageId}";
         }
     }
-}
