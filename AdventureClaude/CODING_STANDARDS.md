@@ -22,10 +22,10 @@ This document outlines the coding standards and conventions used in the Adventur
 
 #### File-Scoped Namespace Example:
 ```csharp
+namespace AdventureClaude.Models;
+
 using System;
 using System.Collections.Generic;
-
-namespace AdventureClaude.Models;
 
 /// <summary>
 /// Class documentation here
@@ -38,6 +38,9 @@ public class GameState
 
 **NOT:**
 ```csharp
+using System;
+using System.Collections.Generic;
+
 namespace AdventureClaude.Models
 {
     public class GameState
@@ -113,11 +116,11 @@ public class GameState
 When creating new classes, use this template:
 
 ```csharp
+namespace AdventureClaude.[FolderName];
+
 using System;
 using System.Collections.Generic;
 // Additional using statements as needed
-
-namespace AdventureClaude.[FolderName];
 
 /// <summary>
 /// Brief description of the class purpose.
@@ -163,9 +166,10 @@ When porting from the original C code:
 
 ## Dependencies and Imports
 
-- **Minimal using statements**: Only include necessary using directives
+- **Using statements after namespace**: Place using directives after the namespace declaration
 - **System namespaces first**: Order System namespaces before project namespaces
 - **Alphabetical ordering**: Sort using statements alphabetically within each group
+- **Minimal using statements**: Only include necessary using directives
 
 ## Example File Structure
 
