@@ -1,6 +1,6 @@
-using System.Collections.Generic;
-
 namespace AdventureClaude.Data;
+
+using System.Collections.Generic;
 
 /// <summary>
 /// Contains all game messages and responses.

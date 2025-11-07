@@ -1,6 +1,6 @@
-using System.Collections.Generic;
-
 namespace AdventureClaude.Models;
+
+using System.Collections.Generic;
 
 /// <summary>
 /// Represents the complete game state for the adventure.

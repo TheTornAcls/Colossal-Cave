@@ -1,9 +1,9 @@
+namespace AdventureClaude.Game;
+
 using System;
 using System.Collections.Generic;
 using AdventureClaude.Data;
 using AdventureClaude.Models;
-
-namespace AdventureClaude.Game;
 
 /// <summary>
 /// Core adventure game engine.

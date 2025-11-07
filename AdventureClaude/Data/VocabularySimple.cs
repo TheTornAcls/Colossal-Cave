@@ -1,6 +1,6 @@
-using System.Collections.Generic;
-
 namespace AdventureClaude.Data;
+
+using System.Collections.Generic;
 
 /// <summary>
 /// Contains the adventure game vocabulary.

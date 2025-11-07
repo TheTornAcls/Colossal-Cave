@@ -1,6 +1,6 @@
-using System.Collections.Generic;
-
 namespace AdventureClaude.Data;
+
+using System.Collections.Generic;
 
 /// <summary>
 /// Represents a word entry in the adventure vocabulary.

@@ -1,6 +1,6 @@
-﻿using AdventureClaude.Game;
+﻿namespace AdventureClaude;
 
-namespace AdventureClaude;
+using AdventureClaude.Game;
 
 /// <summary>
 /// Main program entry point for the Adventure game.

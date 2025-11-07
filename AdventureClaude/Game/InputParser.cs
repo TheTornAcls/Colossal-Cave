@@ -1,8 +1,8 @@
+namespace AdventureClaude.Game;
+
 using System;
 using AdventureClaude.Data;
 using AdventureClaude.Models;
-
-namespace AdventureClaude.Game;
 
 /// <summary>
 /// Handles parsing and analysis of player input.
