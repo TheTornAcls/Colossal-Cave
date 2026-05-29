@@ -60,7 +60,7 @@ public class AdventureVerbs
 
     public void Take(int objId)
     {
-        AdventureDatabase.GameObject obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj == null)
         {
             Console.WriteLine("You don't see that here.");
@@ -101,7 +101,7 @@ public class AdventureVerbs
 
     public void Drop(int objId)
     {
-        AdventureDatabase.GameObject obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj == null)
         {
             Console.WriteLine("You don't have that.");
