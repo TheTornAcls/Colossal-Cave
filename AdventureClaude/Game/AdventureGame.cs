@@ -106,167 +106,49 @@ public class AdventureGame
         }
 
         /// <summary>
-        /// Handles movement commands.
+        /// Handles movement commands using the travel table system.
         /// </summary>
         private void HandleMotion(int motion)
         {
-            // Simple movement implementation
-            // In the full version, this would check travel tables
-            
-            switch (motion)
-            {
-                case 1: // North
-                    AttemptMove("north");
-                    break;
-                case 2: // South
-                    AttemptMove("south");
-                    break;
-                case 3: // East
-                    AttemptMove("east");
-                    break;
-                case 4: // West
-                    AttemptMove("west");
-                    break;
-                case 5: // Up
-                    AttemptMove("up");
-                    break;
-                case 6: // Down
-                    AttemptMove("down");
-                    break;
-                default:
-                    Console.WriteLine(GameMessages.GetMessage(9)); // "There is no way to go that direction."
-                    break;
-            }
-        }
+            // Get available travel options for this verb/direction
+            List<TravelEntry> availableOptions = gameState.GetAvailableTravelOptions(motion, random);
 
-        /// <summary>
-        /// Attempts to move in a given direction.
-        /// This is a simplified implementation - the full version would use travel tables.
-        /// </summary>
-        private void AttemptMove(string direction)
-        {
-            // Simplified movement logic
-            int newLocation = gameState.Location;
-
-            // Basic movement from starting location
-            switch (gameState.Location)
+            if (availableOptions.Count == 0)
             {
-                case 1: // End of road
-                    switch (direction)
-                    {
-                        case "west":
-                            newLocation = 3; // Into building
-                            break;
-                        case "up":
-                        case "north":
-                            newLocation = 2; // Up hill
-                            break;
-                        case "south":
-                            newLocation = 4; // Into valley
-                            break;
-                        case "east":
-                            newLocation = 5; // Into forest
-                            break;
-                    }
-                    break;
-                    
-                case 2: // Hill
-                    switch (direction)
-                    {
-                        case "south":
-                        case "down":
-                            newLocation = 1; // Back to road
-                            break;
-                    }
-                    break;
-                    
-                case 3: // Well house
-                    switch (direction)
-                    {
-                        case "east":
-                            newLocation = 1; // Back to road
-                            break;
-                        case "south":
-                            if (gameState.IsCarrying(GameConstants.Keys) && gameState.IsObjectHere(GameConstants.Grate))
-                            {
-                                // Check if grate is unlocked
-                                newLocation = 8; // To grate location
-                            }
-                            else
-                            {
-                                Console.WriteLine("The grate is locked and you have no keys.");
-                                return;
-                            }
-                            break;
-                    }
-                    break;
-                    
-                case 4: // Valley
-                    switch (direction)
-                    {
-                        case "north":
-                            newLocation = 1; // Back to road
-                            break;
-                        case "west":
-                            newLocation = 3; // To building
-                            break;
-                        case "east":
-                            newLocation = 5; // To forest
-                            break;
-                    }
-                    break;
-                    
-                case 5: // Forest
-                    switch (direction)
-                    {
-                        case "west":
-                            newLocation = 1; // Back to road
-                            break;
-                        case "south":
-                            newLocation = 4; // To valley
-                            break;
-                    }
-                    break;
-                    
-                case 8: // Outside grate
-                    switch (direction)
-                    {
-                        case "north":
-                            newLocation = 1; // Back to road
-                            break;
-                        case "down":
-                            if (gameState.IsObjectHere(GameConstants.Grate) && gameState.ObjectProperties[GameConstants.Grate] == 1)
-                            {
-                                newLocation = 9; // Below grate
-                            }
-                            else
-                            {
-                                Console.WriteLine("You can't go through a locked grate!");
-                                return;
-                            }
-                            break;
-                    }
-                    break;
-                    
-                case 9: // Below grate
-                    switch (direction)
-                    {
-                        case "up":
-                            newLocation = 8; // Back to grate
-                            break;
-                        case "west":
-                            newLocation = 10; // Cobble crawl
-                            break;
-                    }
-                    break;
+                Console.WriteLine(GameMessages.GetMessage(9)); // "There is no way to go that direction."
+                return;
             }
 
-            if (newLocation != gameState.Location)
+            // Use the first available option (conditions already evaluated)
+            TravelEntry selectedOption = availableOptions[0];
+            int destination = selectedOption.Destination;
+
+            // Handle special destinations
+            if (destination >= 500)
+            {
+                // Destination 500+ means print message and stay in place
+                int messageId = destination - 500;
+                if (messageId >= 1 && messageId <= GameConstants.MaxMessages)
+                {
+                    Console.WriteLine(GameMessages.GetMessage(messageId));
+                }
+                return;
+            }
+
+            if (destination >= 300)
+            {
+                // Special movement handlers (forced movement, etc.)
+                // For now, treat as regular movement to destination % 300
+                destination = destination % 300;
+            }
+
+            // Perform the movement
+            if (destination > 0 && destination <= GameConstants.MaxLocations)
             {
                 gameState.OldLocation2 = gameState.OldLocation;
                 gameState.OldLocation = gameState.Location;
-                gameState.Location = newLocation;
-                gameState.NewLocation = newLocation;
+                gameState.Location = destination;
+                gameState.NewLocation = destination;
                 ShowLocationDescription();
             }
             else
