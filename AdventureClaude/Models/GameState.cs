@@ -216,4 +216,85 @@ public class GameState
             }
             return objectsHere;
         }
+
+        /// <summary>
+        /// Gets available travel options from the current location,
+        /// filtering out options whose conditions are not met.
+        /// </summary>
+        /// <param name="verb">The verb/direction being attempted</param>
+        /// <param name="random">Random number generator for probability checks</param>
+        /// <returns>List of valid travel entries</returns>
+        public List<TravelEntry> GetAvailableTravelOptions(int verb, Random random)
+        {
+            var allOptions = AdventureClaude.Data.TravelData.GetTravelOptions(Location);
+            var availableOptions = new List<TravelEntry>();
+
+            foreach (var option in allOptions)
+            {
+                // Check if this option matches the requested verb (or verb 0 = any)
+                if (option.Verb == verb || option.Verb == 0)
+                {
+                    if (EvaluateCondition(option, random))
+                    {
+                        availableOptions.Add(option);
+                    }
+                }
+            }
+
+            return availableOptions;
+        }
+
+        /// <summary>
+        /// Evaluates whether a travel entry's condition is satisfied.
+        /// Based on TURN.C condition evaluation logic.
+        /// </summary>
+        /// <param name="entry">The travel entry to evaluate</param>
+        /// <param name="random">Random number generator for probability checks</param>
+        /// <returns>True if the condition is met</returns>
+        public bool EvaluateCondition(TravelEntry entry, Random random)
+        {
+            int condition = entry.Condition;
+            
+            // Condition 0 = always allowed
+            if (condition == 0)
+                return true;
+
+            // Condition 1-99 = probability check (percentage)
+            if (condition < 100)
+            {
+                int roll = random.Next(100); // 0-99
+                return roll < condition;
+            }
+
+            // Condition 100+ = object-based checks
+            int conditionType = entry.GetConditionType();
+            int objectId = entry.GetObjectId();
+
+            switch (conditionType)
+            {
+                case 0: // Should never happen for condition >= 100
+                    return true;
+
+                case 1: // Must be carrying object (or objectId=0 means always)
+                    return objectId == 0 || IsCarrying(objectId);
+
+                case 2: // Object must be present (carried or at location)
+                    return IsCarrying(objectId) || IsObjectHere(objectId);
+
+                case 3: // Object property must NOT be 0
+                    return ObjectProperties[objectId] != 0;
+
+                case 4: // Object property must NOT be 1
+                    return ObjectProperties[objectId] != 1;
+
+                case 5: // Object property must NOT be 2
+                    return ObjectProperties[objectId] != 2;
+
+                case 7: // Object property must NOT be 4
+                    return ObjectProperties[objectId] != 4;
+
+                default:
+                    return false;
+            }
+        }
     }
