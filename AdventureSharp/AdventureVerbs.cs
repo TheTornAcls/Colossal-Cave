@@ -130,8 +130,8 @@ public class AdventureVerbs
 
     public void Combine(int objId1, int objId2)
     {
-        AdventureDatabase.GameObject obj1 = this._db.Objects.Find(o => o.Id == objId1);
-        AdventureDatabase.GameObject obj2 = this._db.Objects.Find(o => o.Id == objId2);
+        AdventureDatabase.GameObject? obj1 = this._db.Objects.Find(o => o.Id == objId1);
+        AdventureDatabase.GameObject? obj2 = this._db.Objects.Find(o => o.Id == objId2);
         if (obj1 == null || obj2 == null)
         {
             Console.WriteLine("You can't combine those.");
@@ -151,7 +151,7 @@ public class AdventureVerbs
 
     public void Use(int objId)
     {
-        AdventureDatabase.GameObject obj = this._db.Objects.Find(o => o.Id == objId);
+        AdventureDatabase.GameObject? obj = this._db.Objects.Find(o => o.Id == objId);
         if (obj == null)
         {
             Console.WriteLine("You can't use that.");
