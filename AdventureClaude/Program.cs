@@ -1,7 +1,5 @@
 ﻿namespace AdventureClaude;
 
-using AdventureClaude.Game;
-
 /// <summary>
 /// Main program entry point for the Adventure game.
 /// This is the C# port of the classic Colossal Cave Adventure.
