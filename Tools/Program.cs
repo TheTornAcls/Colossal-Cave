@@ -11,8 +11,13 @@ class Program
 {
     static void Main(string[] args)
     {
-        string advCaveHPath = @"c:\Testing\source\repos\Colossal-Cave\Adventure\ADVCAVE.H";
-        string outputPath = @"c:\Testing\source\repos\Colossal-Cave\AdventureClaude\Data\TravelData.cs";
+        // Get the parent directory (Colossal-Cave folder) - Tools, Adventure, and AdventureClaude are siblings
+        string currentDir = Directory.GetCurrentDirectory();
+        string? parentDir = Directory.GetParent(currentDir)?.FullName 
+            ?? throw new InvalidOperationException("Could not find parent directory");
+        
+        string advCaveHPath = Path.Combine(parentDir, "Adventure", "ADVCAVE.H");
+        string outputPath = Path.Combine(parentDir, "AdventureClaude", "Data", "TravelData.cs");
 
         Console.WriteLine("Parsing ADVCAVE.H...");
         string content = File.ReadAllText(advCaveHPath);
