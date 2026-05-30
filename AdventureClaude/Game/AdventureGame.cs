@@ -149,7 +149,19 @@ public class AdventureGame
                 gameState.OldLocation = gameState.Location;
                 gameState.Location = destination;
                 gameState.NewLocation = destination;
+                
+                // Check for falling into pit in darkness
+                if (DarknessManager.CheckDarknessDanger(gameState, random))
+                {
+                    Console.WriteLine(GameMessages.GetMessage(23)); // "You fell into a pit and broke every bone in your body!"
+                    HandleDeath();
+                    return;
+                }
+                
                 ShowLocationDescription();
+                
+                // Update darkness state for next move
+                DarknessManager.UpdateDarknessState(gameState);
             }
             else
             {
@@ -184,6 +196,12 @@ public class AdventureGame
                     break;
                 case GameConstants.Drink: // 15
                     HandleDrink(objectId);
+                    break;
+                case GameConstants.On: // 7
+                    HandleLampOn();
+                    break;
+                case GameConstants.Off: // 8
+                    HandleLampOff();
                     break;
                 case GameConstants.Quit: // 18
                     HandleQuit();
@@ -423,6 +441,51 @@ public class AdventureGame
         }
 
         /// <summary>
+        /// Handles turning the lamp on.
+        /// Ported from von() in VERB.C.
+        /// </summary>
+        private void HandleLampOn()
+        {
+            if (!gameState.IsObjectHere(GameConstants.Lamp))
+            {
+                Console.WriteLine(GameMessages.GetMessage(28)); // "I see no lamp here."
+                return;
+            }
+
+            if (gameState.Limit < 0)
+            {
+                Console.WriteLine(GameMessages.GetMessage(184)); // "Your lamp has run out of power."
+                return;
+            }
+
+            gameState.ObjectProperties[GameConstants.Lamp] = 1; // Turn lamp on
+            Console.WriteLine(GameMessages.GetMessage(39)); // "Your lamp is now on."
+
+            // If location was dark, show the description
+            if (gameState.WizardDark)
+            {
+                gameState.WizardDark = false;
+                ShowLocationDescription();
+            }
+        }
+
+        /// <summary>
+        /// Handles turning the lamp off.
+        /// Ported from voff() in VERB.C.
+        /// </summary>
+        private void HandleLampOff()
+        {
+            if (!gameState.IsObjectHere(GameConstants.Lamp))
+            {
+                Console.WriteLine(GameMessages.GetMessage(28)); // "I see no lamp here."
+                return;
+            }
+
+            gameState.ObjectProperties[GameConstants.Lamp] = 0; // Turn lamp off
+            Console.WriteLine(GameMessages.GetMessage(40)); // "Your lamp is now off."
+        }
+
+        /// <summary>
         /// Handles quitting the game.
         /// </summary>
         private void HandleQuit()
@@ -468,6 +531,13 @@ public class AdventureGame
         /// </summary>
         private void ShowLocationDescription(bool forceLong = false)
         {
+            // Check if location is dark
+            if (DarknessManager.IsDark(gameState))
+            {
+                Console.WriteLine(GameMessages.GetMessage(16)); // "It is now pitch dark. If you proceed you will likely fall into a pit."
+                return;
+            }
+
             bool showLong = forceLong || gameState.VisitedLocations[gameState.Location] == 0;
             
             if (showLong && LocationDescriptions.LongDescriptions.TryGetValue(gameState.Location, out string? longDesc))
@@ -527,6 +597,13 @@ public class AdventureGame
         /// </summary>
         private void UpdateGameState()
         {
+            // Check lamp battery status and decrement if lamp is on
+            string? batteryMessage = DarknessManager.CheckBatteryStatus(gameState);
+            if (batteryMessage != null)
+            {
+                Console.WriteLine(batteryMessage);
+            }
+
             // Check for game end conditions
             if (gameState.Turns >= gameState.Limit)
             {
@@ -545,5 +622,16 @@ public class AdventureGame
                 
             string normalized = response.ToLowerInvariant().Trim();
             return normalized.StartsWith("y") || normalized == "yes";
+        }
+
+        /// <summary>
+        /// Handles player death.
+        /// </summary>
+        private void HandleDeath()
+        {
+            // TODO: Implement full death mechanics with resurrection
+            // For now, just end the game
+            gameState.SaveFlag = true;
+            gameState.NumDie++;
         }
     }
