@@ -59,6 +59,7 @@ public class TravelOption
         public const int Troll = 33;
         public const int Troll2 = 34;
         public const int Bear = 35;
+        public const int Batteries = 39;
 
         // Special location values
         public const int StartLocation = 1;
