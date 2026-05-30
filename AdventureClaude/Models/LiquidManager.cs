@@ -29,15 +29,18 @@ public static class LiquidManager
     /// <returns>Object ID of liquid in bottle: WATER (21), OIL (22), or 0 (empty)</returns>
     public static int Liq(GameState gameState)
     {
-        // Original C:
-        // int i, j;
-        // i = prop[BOTTLE];
-        // j = -1 - i;
-        // return(liq2(i > j ? i : j));
+        // Get the bottle's current property value (0=water, 1=empty, 2=oil)
+        int bottleProperty = gameState.ObjectProperties[GameConstants.Bottle];
         
-        int i = gameState.ObjectProperties[GameConstants.Bottle];
-        int j = -1 - i;
-        return Liq2(i > j ? i : j);
+        // Validation check from original C code: ensures non-negative property values
+        // For negative values, this calculation produces a larger value that gets selected
+        int validatedProperty = -1 - bottleProperty;
+        
+        // Use the maximum to ensure we always work with non-negative property values
+        int normalizedProperty = bottleProperty > validatedProperty ? bottleProperty : validatedProperty;
+        
+        // Convert the bottle property to the actual liquid object ID
+        return Liq2(normalizedProperty);
     }
 
     /// <summary>
