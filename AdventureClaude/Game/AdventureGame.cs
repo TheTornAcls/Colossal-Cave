@@ -107,6 +107,7 @@ public class AdventureGame
 
         /// <summary>
         /// Handles movement commands using the travel table system.
+        /// Includes support for forced movement and special destinations.
         /// </summary>
         private void HandleMotion(int motion)
         {
@@ -137,19 +138,77 @@ public class AdventureGame
 
             if (destination >= 300)
             {
-                // Special movement handlers (forced movement, etc.)
-                // For now, treat as regular movement to destination % 300
-                destination = destination % 300;
+                // Special movement handlers (plover, troll bridge, etc.)
+                destination = HandleSpecialDestination(destination);
+                if (destination == 0)
+                {
+                    return; // Special handler aborted movement
+                }
             }
 
             // Perform the movement
             if (destination > 0 && destination <= GameConstants.MaxLocations)
             {
+                PerformMove(destination);
+            }
+            else
+            {
+                Console.WriteLine(GameMessages.GetMessage(9)); // "There is no way to go that direction."
+            }
+        }
+
+        /// <summary>
+        /// Handles special destination codes (301-303).
+        /// Ported from spcmove() in TURN.C.
+        /// </summary>
+        /// <param name="specialCode">Special destination code (301-303)</param>
+        /// <returns>Actual destination location, or 0 to abort movement</returns>
+        private int HandleSpecialDestination(int specialCode)
+        {
+            switch (specialCode)
+            {
+                case 301:
+                    // Plover alcove teleportation
+                    // TODO: Implement full plover logic (emerald check, etc.)
+                    // For MVP: treat as regular movement
+                    Console.WriteLine("[Special: Plover alcove]");
+                    return specialCode % 300;
+
+                case 302:
+                    // Plover removal (bad route)
+                    // TODO: Implement emerald drop logic
+                    Console.WriteLine("[Special: Plover removal]");
+                    return specialCode % 300;
+
+                case 303:
+                    // Troll bridge
+                    // TODO: Implement full troll bridge logic
+                    Console.WriteLine("[Special: Troll bridge]");
+                    return specialCode % 300;
+
+                default:
+                    // Unknown special code, treat as regular movement
+                    return specialCode % 300;
+            }
+        }
+
+        /// <summary>
+        /// Performs the actual movement to a destination, handling forced movement cascades.
+        /// </summary>
+        /// <param name="destination">Destination location ID</param>
+        private void PerformMove(int destination)
+        {
+            const int MaxForcedMoves = 10; // Safety limit to prevent infinite loops
+            int forcedMoveCount = 0;
+
+            while (forcedMoveCount < MaxForcedMoves)
+            {
+                // Update location tracking
                 gameState.OldLocation2 = gameState.OldLocation;
                 gameState.OldLocation = gameState.Location;
                 gameState.Location = destination;
                 gameState.NewLocation = destination;
-                
+
                 // Check for falling into pit in darkness
                 if (DarknessManager.CheckDarknessDanger(gameState, random))
                 {
@@ -157,16 +216,59 @@ public class AdventureGame
                     HandleDeath();
                     return;
                 }
-                
+
+                // Show location description
                 ShowLocationDescription();
-                
+
                 // Update darkness state for next move
                 DarknessManager.UpdateDarknessState(gameState);
+
+                // Check if this location forces automatic movement
+                if (!DarknessManager.IsForced(gameState, gameState.Location))
+                {
+                    // Not forced, movement complete
+                    return;
+                }
+
+                // Location is forced - automatically move to next location
+                forcedMoveCount++;
+
+                // Get forced travel option (usually the first/only option)
+                List<TravelEntry> forcedOptions = gameState.GetAvailableTravelOptions(1, random);
+                if (forcedOptions.Count == 0)
+                {
+                    Console.WriteLine("[Warning: Forced location has no travel options]");
+                    return;
+                }
+
+                // Use first available forced movement option
+                destination = forcedOptions[0].Destination;
+
+                // Handle special destinations in forced movement
+                if (destination >= 500)
+                {
+                    int messageId = destination - 500;
+                    if (messageId >= 1 && messageId <= GameConstants.MaxMessages)
+                    {
+                        Console.WriteLine(GameMessages.GetMessage(messageId));
+                    }
+                    return;
+                }
+
+                if (destination >= 300)
+                {
+                    destination = HandleSpecialDestination(destination);
+                    if (destination == 0)
+                    {
+                        return;
+                    }
+                }
+
+                // Continue loop to move to forced destination
             }
-            else
-            {
-                Console.WriteLine(GameMessages.GetMessage(9)); // "There is no way to go that direction."
-            }
+
+            // Safety limit reached
+            Console.WriteLine("[Warning: Maximum forced movement cascade depth reached]");
         }
 
         /// <summary>
