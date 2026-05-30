@@ -164,19 +164,28 @@ public class AdventureGame
         {
             switch (verb)
             {
-                case 20: // Inventory
+                case GameConstants.Inventory: // 20
                     ShowInventory();
                     break;
-                case 57: // Look
+                case GameConstants.Look: // 57
                     ShowLocationDescription(true);
                     break;
-                case 1: // Take/Get
+                case GameConstants.Take: // 1
                     HandleTake(objectId);
                     break;
-                case 2: // Drop/Put
+                case GameConstants.Drop: // 2
                     HandleDrop(objectId);
                     break;
-                case 18: // Quit
+                case GameConstants.Fill: // 22
+                    HandleFill(objectId);
+                    break;
+                case GameConstants.Pour: // 13
+                    HandlePour(objectId);
+                    break;
+                case GameConstants.Drink: // 15
+                    HandleDrink(objectId);
+                    break;
+                case GameConstants.Quit: // 18
                     HandleQuit();
                     break;
                 case 51: // Help
@@ -190,6 +199,7 @@ public class AdventureGame
 
         /// <summary>
         /// Handles taking an object.
+        /// Ported from vtake() in VERB.C with liquid logic.
         /// </summary>
         private void HandleTake(int objectId)
         {
@@ -197,6 +207,22 @@ public class AdventureGame
             {
                 Console.WriteLine(GameMessages.GetMessage(43)); // "Where?"
                 return;
+            }
+
+            // Special handling for water/oil - redirect to bottle
+            if (objectId == GameConstants.Water || objectId == GameConstants.Oil)
+            {
+                if (!gameState.IsObjectHere(GameConstants.Bottle) || LiquidManager.Liq(gameState) != objectId)
+                {
+                    objectId = GameConstants.Bottle;
+                    if (gameState.IsCarrying(GameConstants.Bottle) && gameState.ObjectProperties[GameConstants.Bottle] == 1)
+                    {
+                        // Bottle is empty, try to fill it
+                        HandleFill(GameConstants.Bottle);
+                        return;
+                    }
+                }
+                objectId = GameConstants.Bottle;
             }
 
             if (gameState.IsCarrying(objectId))
@@ -221,11 +247,23 @@ public class AdventureGame
 
             gameState.ObjectLocations[objectId] = -1; // -1 means carried
             gameState.Holding++;
+            
+            // If taking bottle with liquid, mark liquid as being carried
+            if (objectId == GameConstants.Bottle)
+            {
+                int liquid = LiquidManager.Liq(gameState);
+                if (liquid != 0)
+                {
+                    gameState.ObjectLocations[liquid] = -1;
+                }
+            }
+            
             Console.WriteLine(GameMessages.GetMessage(54)); // "OK"
         }
 
         /// <summary>
         /// Handles dropping an object.
+        /// Ported from vdrop() in VERB.C with liquid logic.
         /// </summary>
         private void HandleDrop(int objectId)
         {
@@ -235,15 +273,153 @@ public class AdventureGame
                 return;
             }
 
+            // Special handling for water/oil - drop the bottle instead
+            int liquid = LiquidManager.Liq(gameState);
+            if (liquid == objectId)
+            {
+                objectId = GameConstants.Bottle;
+            }
+
             if (!gameState.IsCarrying(objectId))
             {
                 Console.WriteLine(GameMessages.GetMessage(29)); // "You aren't carrying it!"
                 return;
             }
 
+            // If dropping bottle with liquid, remove liquid from game
+            if (objectId == GameConstants.Bottle && liquid != 0)
+            {
+                gameState.ObjectLocations[liquid] = 0; // Remove from game
+            }
+
             gameState.ObjectLocations[objectId] = gameState.Location;
             gameState.Holding--;
             Console.WriteLine(GameMessages.GetMessage(54)); // "OK"
+        }
+
+        /// <summary>
+        /// Handles filling the bottle.
+        /// Ported from vfill() in VERB.C.
+        /// </summary>
+        private void HandleFill(int objectId)
+        {
+            // Default to bottle if no object specified
+            if (objectId == 0)
+            {
+                objectId = GameConstants.Bottle;
+            }
+
+            if (objectId != GameConstants.Bottle)
+            {
+                Console.WriteLine(GameMessages.GetMessage(106)); // "You can't fill that."
+                return;
+            }
+
+            if (LiquidManager.Liq(gameState) != 0)
+            {
+                Console.WriteLine(GameMessages.GetMessage(105)); // "Your bottle is already full."
+                return;
+            }
+
+            int liquidHere = LiquidManager.LiqLoc(gameState, gameState.Location);
+            if (liquidHere == 0)
+            {
+                Console.WriteLine(GameMessages.GetMessage(106)); // "There is nothing here with which to fill the bottle."
+                return;
+            }
+
+            // Fill the bottle with the liquid at this location
+            gameState.ObjectProperties[GameConstants.Bottle] = (short)LiquidManager.GetBottlePropertyForLiquid(liquidHere);
+            
+            if (gameState.IsCarrying(GameConstants.Bottle))
+            {
+                gameState.ObjectLocations[liquidHere] = -1; // Mark liquid as carried
+            }
+
+            int messageId = (liquidHere == GameConstants.Oil) ? 108 : 107; // Oil or water message
+            Console.WriteLine(GameMessages.GetMessage(messageId));
+        }
+
+        /// <summary>
+        /// Handles pouring liquid from the bottle.
+        /// Ported from vpour() in VERB.C.
+        /// </summary>
+        private void HandlePour(int objectId)
+        {
+            // Get what's in the bottle
+            if (objectId == GameConstants.Bottle || objectId == 0)
+            {
+                objectId = LiquidManager.Liq(gameState);
+            }
+
+            if (objectId == 0 || !gameState.IsCarrying(objectId))
+            {
+                Console.WriteLine(GameMessages.GetMessage(104)); // "You aren't carrying it!"
+                return;
+            }
+
+            // Special case: pouring on plant
+            if (gameState.IsObjectHere(GameConstants.Plant) || gameState.IsObjectHere(GameConstants.Plant2))
+            {
+                if (objectId != GameConstants.Water)
+                {
+                    Console.WriteLine(GameMessages.GetMessage(112)); // "The plant indignantly shakes the oil off its leaves and asks, 'Water?'"
+                }
+                else
+                {
+                    // Water the plant (causes it to grow)
+                    int plantId = gameState.IsObjectHere(GameConstants.Plant) ? GameConstants.Plant : GameConstants.Plant2;
+                    int currentProp = gameState.ObjectProperties[plantId];
+                    Console.WriteLine(GameMessages.GetMessage(112 + currentProp)); // Plant growth messages
+                    
+                    gameState.ObjectProperties[GameConstants.Plant] = (short)((currentProp + 2) % 6);
+                    gameState.ObjectProperties[GameConstants.Plant2] = (short)(gameState.ObjectProperties[GameConstants.Plant] / 2);
+                }
+            }
+            // Special case: pouring on door
+            else if (gameState.IsObjectHere(GameConstants.Door))
+            {
+                gameState.ObjectProperties[GameConstants.Door] = (short)((objectId == GameConstants.Oil) ? 1 : 0);
+                Console.WriteLine(GameMessages.GetMessage(113 + gameState.ObjectProperties[GameConstants.Door]));
+            }
+            else
+            {
+                Console.WriteLine(GameMessages.GetMessage(78)); // "The bottle is now empty."
+            }
+
+            // Empty the bottle and remove liquid from game
+            gameState.ObjectProperties[GameConstants.Bottle] = 1; // Empty
+            gameState.ObjectLocations[objectId] = 0; // Remove from game
+        }
+
+        /// <summary>
+        /// Handles drinking liquid.
+        /// Ported from vdrink() in VERB.C.
+        /// </summary>
+        private void HandleDrink(int objectId)
+        {
+            // Default to water if no object specified
+            if (objectId == 0)
+            {
+                objectId = GameConstants.Water;
+            }
+
+            if (objectId != GameConstants.Water)
+            {
+                Console.WriteLine(GameMessages.GetMessage(110)); // "Drink what?"
+                return;
+            }
+
+            if (LiquidManager.Liq(gameState) != GameConstants.Water || !gameState.IsObjectHere(GameConstants.Bottle))
+            {
+                Console.WriteLine(GameMessages.GetMessage(104)); // "You aren't carrying it!"
+                return;
+            }
+
+            // Drink the water
+            gameState.ObjectProperties[GameConstants.Bottle] = 1; // Empty bottle
+            gameState.ObjectLocations[GameConstants.Water] = 0; // Remove water from game
+            Console.WriteLine(GameMessages.GetMessage(74)); // "The bottle of water is now empty."
         }
 
         /// <summary>
