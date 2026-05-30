@@ -153,7 +153,18 @@ public class GameState
             // Oil location (LIQUID flag + WATOIL flag)
             LocationConditions[24] |= (GameConstants.Liquid | GameConstants.WatOil); // Dark room
 
-            // TODO: Initialize other location conditions (light, forced movement, hints, etc.)
+            // Initialize LIGHT flags for outdoor and early cave locations (1-8)
+            // These locations have natural light and don't require a lamp
+            LocationConditions[1] |= GameConstants.Light;  // End of road
+            LocationConditions[2] |= GameConstants.Light;  // Hill in road
+            LocationConditions[3] |= GameConstants.Light;  // Inside building (well house)
+            LocationConditions[4] |= GameConstants.Light;  // Valley
+            LocationConditions[5] |= GameConstants.Light;  // Forest
+            LocationConditions[6] |= GameConstants.Light;  // Forest
+            LocationConditions[7] |= GameConstants.Light;  // Slit in streambed
+            LocationConditions[8] |= GameConstants.Light;  // Outside grate
+
+            // TODO: Initialize other location conditions (forced movement, hints, etc.)
 
             // Initialize object locations
             InitializeObjectLocations();
@@ -177,6 +188,9 @@ public class GameState
             
             // Bottle starts empty (property = 1)
             ObjectProperties[GameConstants.Bottle] = 1;   // Empty bottle
+            
+            // Lamp starts off (property = 0)
+            ObjectProperties[GameConstants.Lamp] = 0;     // Lamp is off
             
             // Set fixed objects
             FixedObjectLocations[GameConstants.Grate] = 8;    // Grate at location 8
