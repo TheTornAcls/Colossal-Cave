@@ -120,4 +120,17 @@ public static class DarknessManager
     {
         gameState.WizardDark = IsDark(gameState);
     }
+
+    /// <summary>
+    /// Checks if a location has the FORCED flag set.
+    /// Ported from forced() in DATABASE.C.
+    /// </summary>
+    /// <param name="gameState">Current game state</param>
+    /// <param name="location">Location ID to check</param>
+    /// <returns>True if location forces automatic movement, false otherwise</returns>
+    public static bool IsForced(GameState gameState, int location)
+    {
+        // Original C: return((cond[atloc] & FORCED) != 0);
+        return (gameState.LocationConditions[location] & GameConstants.Forced) != 0;
+    }
 }
