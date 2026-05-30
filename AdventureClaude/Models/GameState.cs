@@ -164,7 +164,21 @@ public class GameState
             LocationConditions[7] |= GameConstants.Light;  // Slit in streambed
             LocationConditions[8] |= GameConstants.Light;  // Outside grate
 
-            // TODO: Initialize other location conditions (forced movement, hints, etc.)
+            // Initialize FORCED flags for automatic movement locations
+            // These locations force immediate automatic movement to next location
+            LocationConditions[16] |= GameConstants.Forced;  // Forced movement
+            LocationConditions[20] |= GameConstants.Forced;  // Forced movement
+            LocationConditions[21] |= GameConstants.Forced;  // Forced movement
+            LocationConditions[22] |= GameConstants.Forced;  // Forced movement
+            LocationConditions[26] |= GameConstants.Forced;  // Forced movement
+            LocationConditions[31] |= GameConstants.Forced;  // Forced movement
+            LocationConditions[32] |= GameConstants.Forced;  // Forced movement
+            LocationConditions[40] |= GameConstants.Forced;  // Forced movement
+            LocationConditions[49] |= GameConstants.Forced;  // Forced movement
+            LocationConditions[59] |= GameConstants.Forced;  // Forced movement
+            LocationConditions[89] |= GameConstants.Forced;  // Forced movement
+
+            // TODO: Initialize other location conditions (hints, etc.)
 
             // Initialize object locations
             InitializeObjectLocations();
