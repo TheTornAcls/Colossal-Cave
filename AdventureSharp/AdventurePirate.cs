@@ -29,7 +29,7 @@ public class AdventurePirate
         // Pirate chest can be found in maze after theft
         if (_chestStolen && this._game.loc == _pirateLoc)
         {
-            AdventureDatabase.GameObject chest = this._db.Objects.Find(o => o.Name.ToLower().Contains("chest"));
+            AdventureDatabase.GameObject? chest = this._db.Objects.Find(o => o.Name.ToLower().Contains("chest"));
             if (chest != null && this._game.place[chest.Id] == 0)
             {
                 this._game.place[chest.Id] = (short)this._game.loc;
