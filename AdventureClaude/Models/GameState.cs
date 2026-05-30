@@ -139,6 +139,22 @@ public class GameState
             
             DebugFlag = 0;
 
+            // Initialize location conditions for liquid locations
+            // Water locations (LIQUID flag, no WATOIL flag)
+            LocationConditions[1] |= GameConstants.Liquid;   // End of road
+            LocationConditions[3] |= GameConstants.Liquid;   // Well house
+            LocationConditions[4] |= GameConstants.Liquid;   // Valley
+            LocationConditions[7] |= GameConstants.Liquid;   // Slit in streambed
+            LocationConditions[38] |= GameConstants.Liquid;  // Y2
+            LocationConditions[95] |= GameConstants.Liquid;  // Mirror canyon
+            LocationConditions[112] |= GameConstants.Liquid; // Reservoir
+            LocationConditions[114] |= GameConstants.Liquid; // At reservoir
+
+            // Oil location (LIQUID flag + WATOIL flag)
+            LocationConditions[24] |= (GameConstants.Liquid | GameConstants.WatOil); // Dark room
+
+            // TODO: Initialize other location conditions (light, forced movement, hints, etc.)
+
             // Initialize object locations
             InitializeObjectLocations();
         }
@@ -154,6 +170,13 @@ public class GameState
             ObjectLocations[GameConstants.Lamp] = 3;      // Lamp in well house
             ObjectLocations[GameConstants.Food] = 3;      // Food in well house
             ObjectLocations[GameConstants.Bottle] = 3;    // Bottle in well house
+            
+            // Liquids start at location 0 (non-existent) until bottle is filled
+            ObjectLocations[GameConstants.Water] = 0;     // Water not in game initially
+            ObjectLocations[GameConstants.Oil] = 0;       // Oil not in game initially
+            
+            // Bottle starts empty (property = 1)
+            ObjectProperties[GameConstants.Bottle] = 1;   // Empty bottle
             
             // Set fixed objects
             FixedObjectLocations[GameConstants.Grate] = 8;    // Grate at location 8
