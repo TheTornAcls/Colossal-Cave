@@ -65,8 +65,28 @@ public class TravelOption
         public const int WellHouse = 3;
         public const int EndOfRoad = 1;
 
-        // Verb constants
-        public const int Say = 54;
-        public const int Look = 57;
+        // Verb constants (action verbs from ADVENT.H)
+        public const int Take = 1;
+        public const int Drop = 2;
+        public const int Say = 3;
+        public const int Open = 4;
+        public const int Lock = 6;
+        public const int On = 7;
+        public const int Off = 8;
+        public const int Wave = 9;
+        public const int Kill = 12;
+        public const int Pour = 13;
+        public const int Eat = 14;
+        public const int Drink = 15;
+        public const int Quit = 18;
         public const int Inventory = 20;
+        public const int Fill = 22;
+        public const int Look = 57;
+
+        // Location condition flags (bit mapping of cond array from ADVENT.H)
+        public const int Light = 1;      // Location has light
+        public const int WatOil = 2;     // Determines liquid type (0=water, 1=oil)
+        public const int Liquid = 4;     // Location has liquid available
+        public const int NoPirat = 8;    // Pirate cannot access
+        public const int Forced = 16;    // Forced movement location
     }
