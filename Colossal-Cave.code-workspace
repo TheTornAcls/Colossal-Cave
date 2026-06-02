@@ -7,6 +7,10 @@
 		{
 			"name": "Advent0 (Original)",
 			"path": "./Advent0"
+		},
+		{
+			"name": "AdventureClaude (C# Port)",
+			"path": "./AdventureClaude"
 		}
 	],
 	"settings": {
@@ -35,7 +39,9 @@
 			"**/*.vcxproj.user": true,
 			"**/*.opt": true,
 			"**/*.vtg": true,
-			"**/*.vpwhist": true
+			"**/*.vpwhist": true,
+			"**/bin/**": true,
+			"**/obj/**": true
 		},
 		"search.exclude": {
 			"**/Debug/**": true,
@@ -50,7 +56,9 @@
 		"recommendations": [
 			"ms-vscode.cpptools",
 			"ms-vscode.cpptools-extension-pack",
-			"ms-vscode.cmake-tools"
+			"ms-vscode.cmake-tools",
+			"ms-dotnettools.csharp",
+			"ms-dotnettools.csdevkit"
 		]
 	},
 	"tasks": {
@@ -85,6 +93,40 @@
 					"/p:Platform=x64"
 				],
 				"group": "build"
+			},
+			{
+				"label": "Build AdventureClaude",
+				"type": "shell",
+				"command": "dotnet",
+				"args": [
+					"build",
+					"AdventureClaude/AdventureClaude.csproj"
+				],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": false,
+					"panel": "shared"
+				},
+				"problemMatcher": "$msCompile"
+			},
+			{
+				"label": "Run AdventureClaude",
+				"type": "shell",
+				"command": "dotnet",
+				"args": [
+					"run",
+					"--project",
+					"AdventureClaude/AdventureClaude.csproj"
+				],
+				"group": "build",
+				"presentation": {
+					"echo": true,
+					"reveal": "always",
+					"focus": true,
+					"panel": "shared"
+				}
 			}
 		]
 	},
