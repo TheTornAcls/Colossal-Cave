@@ -365,8 +365,7 @@ public class AdventureGame
                 return;
             }
 
-            gameState.ObjectLocations[objectId] = -1; // -1 means carried
-            gameState.Holding++;
+            gameState.Carry(objectId, gameState.Location);
             
             // If taking bottle with liquid, mark liquid as being carried
             if (objectId == GameConstants.Bottle)
@@ -374,7 +373,7 @@ public class AdventureGame
                 int liquid = LiquidManager.Liq(gameState);
                 if (liquid != 0)
                 {
-                    gameState.ObjectLocations[liquid] = -1;
+                    gameState.SetObjectLocation(liquid, -1);
                 }
             }
             
@@ -409,11 +408,10 @@ public class AdventureGame
             // If dropping bottle with liquid, remove liquid from game
             if (objectId == GameConstants.Bottle && liquid != 0)
             {
-                gameState.ObjectLocations[liquid] = 0; // Remove from game
+                gameState.SetObjectLocation(liquid, 0);
             }
 
-            gameState.ObjectLocations[objectId] = gameState.Location;
-            gameState.Holding--;
+            gameState.Drop(objectId, gameState.Location);
             Console.WriteLine(GameMessages.GetMessage(54)); // "OK"
         }
 
@@ -449,11 +447,11 @@ public class AdventureGame
             }
 
             // Fill the bottle with the liquid at this location
-            gameState.ObjectProperties[GameConstants.Bottle] = (short)LiquidManager.GetBottlePropertyForLiquid(liquidHere);
+            gameState.SetObjectProperty(GameConstants.Bottle, LiquidManager.GetBottlePropertyForLiquid(liquidHere));
             
             if (gameState.IsCarrying(GameConstants.Bottle))
             {
-                gameState.ObjectLocations[liquidHere] = -1; // Mark liquid as carried
+                gameState.SetObjectLocation(liquidHere, -1);
             }
 
             int messageId = (liquidHere == GameConstants.Oil) ? 108 : 107; // Oil or water message
@@ -492,14 +490,14 @@ public class AdventureGame
                     int currentProp = gameState.ObjectProperties[plantId];
                     Console.WriteLine(GameMessages.GetMessage(112 + currentProp)); // Plant growth messages
                     
-                    gameState.ObjectProperties[GameConstants.Plant] = (short)((currentProp + 2) % 6);
-                    gameState.ObjectProperties[GameConstants.Plant2] = (short)(gameState.ObjectProperties[GameConstants.Plant] / 2);
+                    gameState.SetObjectProperty(GameConstants.Plant, (currentProp + 2) % 6);
+                    gameState.SetObjectProperty(GameConstants.Plant2, gameState.ObjectProperties[GameConstants.Plant] / 2);
                 }
             }
             // Special case: pouring on door
             else if (gameState.IsObjectHere(GameConstants.Door))
             {
-                gameState.ObjectProperties[GameConstants.Door] = (short)((objectId == GameConstants.Oil) ? 1 : 0);
+                gameState.SetObjectProperty(GameConstants.Door, objectId == GameConstants.Oil ? 1 : 0);
                 Console.WriteLine(GameMessages.GetMessage(113 + gameState.ObjectProperties[GameConstants.Door]));
             }
             else
@@ -508,8 +506,8 @@ public class AdventureGame
             }
 
             // Empty the bottle and remove liquid from game
-            gameState.ObjectProperties[GameConstants.Bottle] = 1; // Empty
-            gameState.ObjectLocations[objectId] = 0; // Remove from game
+            gameState.SetObjectProperty(GameConstants.Bottle, 1);
+            gameState.SetObjectLocation(objectId, 0);
         }
 
         /// <summary>
@@ -537,8 +535,8 @@ public class AdventureGame
             }
 
             // Drink the water
-            gameState.ObjectProperties[GameConstants.Bottle] = 1; // Empty bottle
-            gameState.ObjectLocations[GameConstants.Water] = 0; // Remove water from game
+            gameState.SetObjectProperty(GameConstants.Bottle, 1);
+            gameState.SetObjectLocation(GameConstants.Water, 0);
             Console.WriteLine(GameMessages.GetMessage(74)); // "The bottle of water is now empty."
         }
 
@@ -560,7 +558,7 @@ public class AdventureGame
                 return;
             }
 
-            gameState.ObjectProperties[GameConstants.Lamp] = 1; // Turn lamp on
+            gameState.SetObjectProperty(GameConstants.Lamp, 1);
             Console.WriteLine(GameMessages.GetMessage(39)); // "Your lamp is now on."
 
             // If location was dark, show the description
@@ -583,7 +581,7 @@ public class AdventureGame
                 return;
             }
 
-            gameState.ObjectProperties[GameConstants.Lamp] = 0; // Turn lamp off
+            gameState.SetObjectProperty(GameConstants.Lamp, 0);
             Console.WriteLine(GameMessages.GetMessage(40)); // "Your lamp is now off."
         }
 
