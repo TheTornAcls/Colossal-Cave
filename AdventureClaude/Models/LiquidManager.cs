@@ -14,11 +14,7 @@ public static class LiquidManager
     /// <returns>Object ID: WATER (21), 0 (empty), or OIL (22)</returns>
     public static int Liq2(int pbottle)
     {
-        // Original C: return((1 - pbottle) * WATER + (pbottle >> 1) * (WATER + OIL));
-        // When pbottle = 0: returns WATER (21)
-        // When pbottle = 1: returns 0 (empty)
-        // When pbottle = 2: returns OIL (22)
-        return (1 - pbottle) * GameConstants.Water + (pbottle >> 1) * (GameConstants.Water + GameConstants.Oil);
+        return GameState.Liq2(pbottle);
     }
 
     /// <summary>
@@ -29,18 +25,7 @@ public static class LiquidManager
     /// <returns>Object ID of liquid in bottle: WATER (21), OIL (22), or 0 (empty)</returns>
     public static int Liq(GameState gameState)
     {
-        // Get the bottle's current property value (0=water, 1=empty, 2=oil)
-        int bottleProperty = gameState.ObjectProperties[GameConstants.Bottle];
-        
-        // Validation check from original C code: ensures non-negative property values
-        // For negative values, this calculation produces a larger value that gets selected
-        int validatedProperty = -1 - bottleProperty;
-        
-        // Use the maximum to ensure we always work with non-negative property values
-        int normalizedProperty = bottleProperty > validatedProperty ? bottleProperty : validatedProperty;
-        
-        // Convert the bottle property to the actual liquid object ID
-        return Liq2(normalizedProperty);
+        return gameState.Liq();
     }
 
     /// <summary>
@@ -52,20 +37,7 @@ public static class LiquidManager
     /// <returns>Object ID of liquid at location: WATER (21), OIL (22), or 0 (none)</returns>
     public static int LiqLoc(GameState gameState, int location)
     {
-        // Original C:
-        // if (cond[iloc] & LIQUID)
-        //     return(liq2(cond[iloc] & WATOIL));
-        // else
-        //     return(liq2(1));
-        
-        if ((gameState.LocationConditions[location] & GameConstants.Liquid) != 0)
-        {
-            return Liq2(gameState.LocationConditions[location] & GameConstants.WatOil);
-        }
-        else
-        {
-            return Liq2(1); // Returns 0 (no liquid)
-        }
+        return gameState.LiqLoc(location);
     }
 
     /// <summary>
