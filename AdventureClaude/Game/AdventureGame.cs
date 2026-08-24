@@ -98,12 +98,20 @@ public class AdventureGame
                 return;
             }
 
-            // Handle verb commands
-            if (gameState.Verb > 0)
+            if (gameState.Verb == GameConstants.Say)
             {
-                HandleVerb(gameState.Verb, gameState.Object);
+                TransitiveVerb();
                 return;
             }
+
+            if (gameState.Object > 0)
+            {
+                DoObject();
+                return;
+            }
+
+            if (gameState.Verb > 0)
+                IntransitiveVerb();
         }
 
         /// <summary>
@@ -421,297 +429,764 @@ public class AdventureGame
                 Console.WriteLine(message);
         }
 
-        /// <summary>
-        /// Handles verb commands.
-        /// </summary>
-        private void HandleVerb(int verb, int objectId)
+        private void DoObject()
         {
-            switch (verb)
+            int objectId = gameState.Object;
+
+            if (gameState.FixedObjectLocations[objectId] == gameState.Location || gameState.Here(objectId))
             {
-                case GameConstants.Inventory: // 20
-                    ShowInventory();
+                TransitiveObject();
+                return;
+            }
+
+            if (objectId == GameConstants.Grate)
+            {
+                if (gameState.Location == 1 || gameState.Location == 4 || gameState.Location == 7)
+                {
+                    gameState.Motion = GameConstants.Depression;
+                    DoMove();
+                    ApplyLocationChange();
+                    return;
+                }
+
+                if (gameState.Location > 9 && gameState.Location < 15)
+                {
+                    gameState.Motion = GameConstants.Entrance;
+                    DoMove();
+                    ApplyLocationChange();
+                    return;
+                }
+            }
+            else if (gameState.DCheck() != 0 && gameState.DwarfFlag >= 2)
+            {
+                gameState.Object = GameConstants.Dwarf;
+                TransitiveObject();
+                return;
+            }
+            else if ((gameState.Liq() == objectId && gameState.Here(GameConstants.Bottle)) ||
+                gameState.LiqLoc(gameState.Location) == objectId)
+            {
+                TransitiveObject();
+                return;
+            }
+            else if (objectId == GameConstants.Plant &&
+                gameState.At(GameConstants.Plant2) &&
+                gameState.ObjectProperties[GameConstants.Plant2] == 0)
+            {
+                gameState.Object = GameConstants.Plant2;
+                TransitiveObject();
+                return;
+            }
+            else if (objectId == GameConstants.Knife && gameState.KnifeLocation == gameState.Location)
+            {
+                Speak(116);
+                gameState.KnifeLocation = -1;
+                return;
+            }
+            else if (objectId == GameConstants.Rod && gameState.Here(GameConstants.Rod2))
+            {
+                gameState.Object = GameConstants.Rod2;
+                TransitiveObject();
+                return;
+            }
+            else if (objectId == GameConstants.Troll && gameState.Here(GameConstants.Troll2))
+            {
+                gameState.Object = GameConstants.Troll2;
+                TransitiveObject();
+                return;
+            }
+            else if (objectId == GameConstants.Plant && gameState.Here(GameConstants.Plant2))
+            {
+                gameState.Object = GameConstants.Plant2;
+                TransitiveObject();
+                return;
+            }
+
+            SpeakObjectNotHere(objectId);
+        }
+
+        private void TransitiveObject()
+        {
+            if (gameState.Verb != 0)
+                TransitiveVerb();
+            else
+                Console.WriteLine($"What do you want to do with the {GetObjectWord(gameState.Object)}?");
+        }
+
+        private void TransitiveVerb()
+        {
+            switch (gameState.Verb)
+            {
+                case GameConstants.Calm:
+                case GameConstants.Walk:
+                case GameConstants.Quit:
+                case GameConstants.Score:
+                case GameConstants.Foo:
+                case GameConstants.Brief:
+                case GameConstants.Suspend:
+                case GameConstants.Hours:
+                case GameConstants.Log:
+                    ActSpeak(gameState.Verb);
                     break;
-                case GameConstants.Look: // 57
-                    ShowLocationDescription(true);
+                case GameConstants.Take:
+                    VTake();
                     break;
-                case GameConstants.Take: // 1
-                    HandleTake(objectId);
+                case GameConstants.Drop:
+                    VDrop();
                     break;
-                case GameConstants.Drop: // 2
-                    HandleDrop(objectId);
+                case GameConstants.Open:
+                case GameConstants.Lock:
+                    VOpen();
                     break;
-                case GameConstants.Fill: // 22
-                    HandleFill(objectId);
+                case GameConstants.Say:
+                    VSay();
                     break;
-                case GameConstants.Pour: // 13
-                    HandlePour(objectId);
+                case GameConstants.Nothing:
+                    Speak(54);
                     break;
-                case GameConstants.Drink: // 15
-                    HandleDrink(objectId);
+                case GameConstants.On:
+                    VOn();
                     break;
-                case GameConstants.On: // 7
-                    HandleLampOn();
+                case GameConstants.Off:
+                    VOff();
                     break;
-                case GameConstants.Off: // 8
-                    HandleLampOff();
+                case GameConstants.Wave:
+                    VWave();
                     break;
-                case GameConstants.Quit: // 18
-                    HandleQuit();
+                case GameConstants.Kill:
+                    VKill();
                     break;
-                case 51: // Help
-                    Console.WriteLine(GameMessages.GetMessage(51));
+                case GameConstants.Pour:
+                    VPour();
+                    break;
+                case GameConstants.Eat:
+                    VEat();
+                    break;
+                case GameConstants.Drink:
+                    VDrink();
+                    break;
+                case GameConstants.Rub:
+                    if (gameState.Object != GameConstants.Lamp)
+                        Speak(76);
+                    else
+                        ActSpeak(GameConstants.Rub);
+                    break;
+                case GameConstants.Throw:
+                    VThrow();
+                    break;
+                case GameConstants.Feed:
+                    VFeed();
+                    break;
+                case GameConstants.Find:
+                case GameConstants.Inventory:
+                    VFind();
+                    break;
+                case GameConstants.Fill:
+                    VFill();
+                    break;
+                case GameConstants.Read:
+                    VRead();
+                    break;
+                case GameConstants.Blast:
+                    VBlast();
+                    break;
+                case GameConstants.Break:
+                    VBreak();
+                    break;
+                case GameConstants.Wake:
+                    VWake();
                     break;
                 default:
-                    Console.WriteLine(GameMessages.GetMessage(12)); // "I don't know how to apply that word here."
+                    Console.WriteLine("This verb is not implemented yet.");
                     break;
             }
         }
 
-        /// <summary>
-        /// Handles taking an object.
-        /// Ported from vtake() in VERB.C with liquid logic.
-        /// </summary>
-        private void HandleTake(int objectId)
+        private void IntransitiveVerb()
         {
-            if (objectId == 0)
+            switch (gameState.Verb)
             {
-                Console.WriteLine(GameMessages.GetMessage(43)); // "Where?"
+                case GameConstants.Drop:
+                case GameConstants.Say:
+                case GameConstants.Wave:
+                case GameConstants.Calm:
+                case GameConstants.Rub:
+                case GameConstants.Throw:
+                case GameConstants.Find:
+                case GameConstants.Feed:
+                case GameConstants.Break:
+                case GameConstants.Wake:
+                    NeedObject();
+                    break;
+                case GameConstants.Take:
+                    IVTake();
+                    break;
+                case GameConstants.Open:
+                case GameConstants.Lock:
+                    IVOpen();
+                    break;
+                case GameConstants.Nothing:
+                    Speak(54);
+                    break;
+                case GameConstants.On:
+                case GameConstants.Off:
+                case GameConstants.Pour:
+                    TransitiveVerb();
+                    break;
+                case GameConstants.Walk:
+                    ActSpeak(gameState.Verb);
+                    break;
+                case GameConstants.Kill:
+                    IVKill();
+                    break;
+                case GameConstants.Eat:
+                    IVEat();
+                    break;
+                case GameConstants.Drink:
+                    IVDrink();
+                    break;
+                case GameConstants.Quit:
+                    IVQuit();
+                    break;
+                case GameConstants.Fill:
+                    IVFill();
+                    break;
+                case GameConstants.Blast:
+                    VBlast();
+                    break;
+                case GameConstants.Score:
+                    PrintScore();
+                    break;
+                case GameConstants.Fee:
+                case GameConstants.Fie:
+                case GameConstants.Foe:
+                case GameConstants.Foo:
+                case GameConstants.Fum:
+                    IVFoo();
+                    break;
+                case GameConstants.Suspend:
+                    gameState.SaveFlag = true;
+                    break;
+                case GameConstants.Read:
+                    IVRead();
+                    break;
+                case GameConstants.Inventory:
+                    ShowInventory();
+                    break;
+                case GameConstants.Brief:
+                    gameState.Detail |= 2;
+                    ActSpeak(gameState.Verb);
+                    break;
+                case GameConstants.Help:
+                    Speak(51);
+                    break;
+                default:
+                    Console.WriteLine("This intransitive verb is not implemented yet.");
+                    break;
+            }
+        }
+
+        private void IVTake()
+        {
+            int candidate = 0;
+            for (int item = 1; item < GameConstants.MaxObjects; item++)
+            {
+                if (gameState.ObjectLocations[item] != gameState.Location)
+                    continue;
+
+                if (candidate != 0)
+                {
+                    NeedObject();
+                    return;
+                }
+
+                candidate = item;
+            }
+
+            if (candidate == 0 || (gameState.DCheck() != 0 && gameState.DwarfFlag >= 2))
+            {
+                NeedObject();
                 return;
             }
 
-            // Special handling for water/oil - redirect to bottle
+            gameState.Object = candidate;
+            VTake();
+        }
+
+        private void IVOpen()
+        {
+            int candidate = 0;
+            if (gameState.Here(GameConstants.Clam))
+                candidate = GameConstants.Clam;
+            if (gameState.Here(GameConstants.Oyster))
+                candidate = GameConstants.Oyster;
+            if (gameState.At(GameConstants.Door))
+                candidate = GameConstants.Door;
+            if (gameState.At(GameConstants.Grate))
+                candidate = GameConstants.Grate;
+            if (gameState.Here(GameConstants.Chain))
+            {
+                if (candidate != 0)
+                {
+                    NeedObject();
+                    return;
+                }
+
+                candidate = GameConstants.Chain;
+            }
+
+            if (candidate == 0)
+            {
+                Speak(28);
+                return;
+            }
+
+            gameState.Object = candidate;
+            VOpen();
+        }
+
+        private void IVKill()
+        {
+            int candidate = 0;
+            bool ambiguous = false;
+
+            if (gameState.DCheck() != 0 && gameState.DwarfFlag >= 2)
+                candidate = GameConstants.Dwarf;
+            AddCandidate(GameConstants.Snake, gameState.Here(GameConstants.Snake), ref candidate, ref ambiguous);
+            AddCandidate(GameConstants.Dragon, gameState.At(GameConstants.Dragon) && gameState.ObjectProperties[GameConstants.Dragon] == 0, ref candidate, ref ambiguous);
+            AddCandidate(GameConstants.Troll, gameState.At(GameConstants.Troll), ref candidate, ref ambiguous);
+            AddCandidate(GameConstants.Bear, gameState.Here(GameConstants.Bear) && gameState.ObjectProperties[GameConstants.Bear] == 0, ref candidate, ref ambiguous);
+
+            if (ambiguous)
+            {
+                NeedObject();
+                return;
+            }
+
+            if (candidate != 0)
+            {
+                gameState.Object = candidate;
+                VKill();
+                return;
+            }
+
+            if (gameState.Here(GameConstants.Bird) && gameState.Verb != GameConstants.Throw)
+                candidate = GameConstants.Bird;
+            AddCandidate(GameConstants.Clam, gameState.Here(GameConstants.Clam) || gameState.Here(GameConstants.Oyster), ref candidate, ref ambiguous);
+
+            if (ambiguous)
+            {
+                NeedObject();
+                return;
+            }
+
+            gameState.Object = candidate;
+            VKill();
+        }
+
+        private void IVEat()
+        {
+            if (!gameState.Here(GameConstants.Food))
+            {
+                NeedObject();
+                return;
+            }
+
+            gameState.Object = GameConstants.Food;
+            VEat();
+        }
+
+        private void IVDrink()
+        {
+            if (gameState.LiqLoc(gameState.Location) != GameConstants.Water &&
+                (gameState.Liq() != GameConstants.Water || !gameState.Here(GameConstants.Bottle)))
+            {
+                NeedObject();
+                return;
+            }
+
+            gameState.Object = GameConstants.Water;
+            VDrink();
+        }
+
+        private void IVQuit()
+        {
+            gameState.GaveUp = AskYesNo(22, 0, 54);
+            if (gameState.GaveUp)
+                NormalEnd();
+        }
+
+        private void IVFill()
+        {
+            if (!gameState.Here(GameConstants.Bottle))
+            {
+                NeedObject();
+                return;
+            }
+
+            gameState.Object = GameConstants.Bottle;
+            VFill();
+        }
+
+        private void IVFoo()
+        {
+            int k = gameState.Verb - GameConstants.Fee + 1;
+            int message = 42;
+
+            if (gameState.FooBar != 1 - k)
+            {
+                if (gameState.FooBar != 0)
+                    message = 151;
+                Speak(message);
+                return;
+            }
+
+            gameState.FooBar = k;
+            if (k != 4)
+                return;
+
+            gameState.FooBar = 0;
+            if (gameState.ObjectLocations[GameConstants.Eggs] == 92 ||
+                (gameState.Toting(GameConstants.Eggs) && gameState.Location == 92))
+            {
+                Speak(message);
+                return;
+            }
+
+            if (gameState.ObjectLocations[GameConstants.Eggs] == 0 &&
+                gameState.ObjectLocations[GameConstants.Troll] == 0 &&
+                gameState.ObjectProperties[GameConstants.Troll] == 0)
+            {
+                gameState.SetObjectProperty(GameConstants.Troll, 1);
+            }
+
+            if (gameState.Here(GameConstants.Eggs))
+                k = 1;
+            else if (gameState.Location == 92)
+                k = 0;
+            else
+                k = 2;
+
+            gameState.MoveObject(GameConstants.Eggs, 92);
+            PrintObjectMessage(GameConstants.Eggs, k);
+        }
+
+        private void IVRead()
+        {
+            int candidate = 0;
+            if (gameState.Here(GameConstants.Magazine))
+                candidate = GameConstants.Magazine;
+            if (gameState.Here(GameConstants.Tablet))
+                candidate = candidate * 100 + GameConstants.Tablet;
+            if (gameState.Here(GameConstants.Message))
+                candidate = candidate * 100 + GameConstants.Message;
+
+            if (candidate > 100 || candidate == 0 || DarknessManager.IsDark(gameState))
+            {
+                NeedObject();
+                return;
+            }
+
+            gameState.Object = candidate;
+            VRead();
+        }
+
+        private void VTake()
+        {
+            int objectId = gameState.Object;
+            if (gameState.Toting(objectId))
+            {
+                ActSpeak(gameState.Verb);
+                return;
+            }
+
+            int message = 25;
+            if (objectId == GameConstants.Plant && gameState.ObjectProperties[GameConstants.Plant] <= 0)
+                message = 115;
+            if (objectId == GameConstants.Bear && gameState.ObjectProperties[GameConstants.Bear] == 1)
+                message = 169;
+            if (objectId == GameConstants.Chain && gameState.ObjectProperties[GameConstants.Bear] != 0)
+                message = 170;
+            if (gameState.FixedObjectLocations[objectId] != 0)
+            {
+                Speak(message);
+                return;
+            }
+
             if (objectId == GameConstants.Water || objectId == GameConstants.Oil)
             {
-                if (!gameState.IsObjectHere(GameConstants.Bottle) || LiquidManager.Liq(gameState) != objectId)
+                if (!gameState.Here(GameConstants.Bottle) || gameState.Liq() != objectId)
                 {
-                    objectId = GameConstants.Bottle;
-                    if (gameState.IsCarrying(GameConstants.Bottle) && gameState.ObjectProperties[GameConstants.Bottle] == 1)
+                    gameState.Object = GameConstants.Bottle;
+                    if (gameState.Toting(GameConstants.Bottle) && gameState.ObjectProperties[GameConstants.Bottle] == 1)
                     {
-                        // Bottle is empty, try to fill it
-                        HandleFill(GameConstants.Bottle);
+                        VFill();
                         return;
                     }
+
+                    if (gameState.ObjectProperties[GameConstants.Bottle] != 1)
+                        message = 105;
+                    if (!gameState.Toting(GameConstants.Bottle))
+                        message = 104;
+                    Speak(message);
+                    return;
                 }
+
                 objectId = GameConstants.Bottle;
+                gameState.Object = objectId;
             }
 
-            if (gameState.IsCarrying(objectId))
+            if (gameState.Holding >= 7)
             {
-                Console.WriteLine(GameMessages.GetMessage(24)); // "You are already carrying it!"
+                Speak(92);
                 return;
             }
 
-            if (!gameState.IsObjectHere(objectId))
+            if (objectId == GameConstants.Bird && gameState.ObjectProperties[GameConstants.Bird] == 0)
             {
-                Console.WriteLine(GameMessages.GetMessage(170)); // "I see no {object} here."
-                return;
+                if (gameState.Toting(GameConstants.Rod))
+                {
+                    Speak(26);
+                    return;
+                }
+
+                if (!gameState.Toting(GameConstants.Cage))
+                {
+                    Speak(27);
+                    return;
+                }
+
+                gameState.SetObjectProperty(GameConstants.Bird, 1);
             }
 
-            // Count carried objects
-            List<int> carriedObjects = gameState.GetCarriedObjects();
-            if (carriedObjects.Count >= 7) // Adventure limit
+            if ((objectId == GameConstants.Bird || objectId == GameConstants.Cage) &&
+                gameState.ObjectProperties[GameConstants.Bird] != 0)
             {
-                Console.WriteLine("You can't carry any more!");
-                return;
+                gameState.Carry(GameConstants.Bird + GameConstants.Cage - objectId, gameState.Location);
             }
 
             gameState.Carry(objectId, gameState.Location);
-            
-            // If taking bottle with liquid, mark liquid as being carried
-            if (objectId == GameConstants.Bottle)
-            {
-                int liquid = LiquidManager.Liq(gameState);
-                if (liquid != 0)
-                {
-                    gameState.SetObjectLocation(liquid, -1);
-                }
-            }
-            
-            Console.WriteLine(GameMessages.GetMessage(54)); // "OK"
+            int liquid = gameState.Liq();
+            if (objectId == GameConstants.Bottle && liquid != 0)
+                gameState.SetObjectLocation(liquid, -1);
+
+            Speak(54);
         }
 
-        /// <summary>
-        /// Handles dropping an object.
-        /// Ported from vdrop() in VERB.C with liquid logic.
-        /// </summary>
-        private void HandleDrop(int objectId)
+        private void VDrop()
         {
-            if (objectId == 0)
+            int objectId = gameState.Object;
+            if (gameState.Toting(GameConstants.Rod2) && objectId == GameConstants.Rod && !gameState.Toting(GameConstants.Rod))
             {
-                Console.WriteLine(GameMessages.GetMessage(43)); // "Where?"
+                objectId = GameConstants.Rod2;
+                gameState.Object = objectId;
+            }
+
+            if (!gameState.Toting(objectId))
+            {
+                ActSpeak(gameState.Verb);
                 return;
             }
 
-            // Special handling for water/oil - drop the bottle instead
-            int liquid = LiquidManager.Liq(gameState);
+            int message = 54;
+            if (objectId == GameConstants.Bird && gameState.Here(GameConstants.Snake))
+            {
+                Speak(30);
+                message = 0;
+                if (gameState.Closed)
+                    DwarfEnd(136);
+                gameState.Destroy(GameConstants.Snake);
+                gameState.SetObjectProperty(GameConstants.Snake, -1);
+            }
+            else if (objectId == GameConstants.Coins && gameState.Here(GameConstants.Vend))
+            {
+                gameState.Destroy(GameConstants.Coins);
+                gameState.Drop(GameConstants.Batteries, gameState.Location);
+                PrintObjectMessage(GameConstants.Batteries, 0);
+                return;
+            }
+            else if (objectId == GameConstants.Bird &&
+                gameState.At(GameConstants.Dragon) &&
+                gameState.ObjectProperties[GameConstants.Dragon] == 0)
+            {
+                Speak(154);
+                gameState.Destroy(GameConstants.Bird);
+                gameState.SetObjectProperty(GameConstants.Bird, 0);
+                if (gameState.ObjectLocations[GameConstants.Snake] != 0)
+                    gameState.Tally2++;
+                return;
+            }
+
+            if (objectId == GameConstants.Bear && gameState.At(GameConstants.Troll))
+            {
+                Speak(163);
+                message = 0;
+                gameState.MoveObject(GameConstants.Troll, 0);
+                gameState.MoveObject(GameConstants.Troll + GameConstants.MaxObjects, 0);
+                gameState.MoveObject(GameConstants.Troll2, 117);
+                gameState.MoveObject(GameConstants.Troll2 + GameConstants.MaxObjects, 122);
+                GameState.Juggle(GameConstants.Chasm);
+                gameState.SetObjectProperty(GameConstants.Troll, 2);
+            }
+            else if (objectId == GameConstants.Vase)
+            {
+                if (gameState.Location == 96)
+                    Speak(54);
+                else
+                {
+                    int vaseProperty = gameState.At(GameConstants.Pillow) ? 0 : 2;
+                    gameState.SetObjectProperty(GameConstants.Vase, vaseProperty);
+                    PrintObjectMessage(GameConstants.Vase, vaseProperty + 1);
+                    if (vaseProperty != 0)
+                        gameState.FixedObjectLocations[GameConstants.Vase] = -1;
+                }
+
+                message = 0;
+            }
+
+            int liquid = gameState.Liq();
             if (liquid == objectId)
             {
                 objectId = GameConstants.Bottle;
+                gameState.Object = objectId;
             }
 
-            if (!gameState.IsCarrying(objectId))
-            {
-                Console.WriteLine(GameMessages.GetMessage(29)); // "You aren't carrying it!"
-                return;
-            }
-
-            // If dropping bottle with liquid, remove liquid from game
             if (objectId == GameConstants.Bottle && liquid != 0)
-            {
                 gameState.SetObjectLocation(liquid, 0);
-            }
+            if (objectId == GameConstants.Cage && gameState.ObjectProperties[GameConstants.Bird] != 0)
+                gameState.Drop(GameConstants.Bird, gameState.Location);
+            if (objectId == GameConstants.Bird)
+                gameState.SetObjectProperty(GameConstants.Bird, 0);
 
             gameState.Drop(objectId, gameState.Location);
-            Console.WriteLine(GameMessages.GetMessage(54)); // "OK"
+            if (message != 0)
+                Speak(message);
         }
 
-        /// <summary>
-        /// Handles filling the bottle.
-        /// Ported from vfill() in VERB.C.
-        /// </summary>
-        private void HandleFill(int objectId)
+        private void VOpen()
         {
-            // Default to bottle if no object specified
-            if (objectId == 0)
+            int message;
+            switch (gameState.Object)
             {
-                objectId = GameConstants.Bottle;
+                case GameConstants.Clam:
+                case GameConstants.Oyster:
+                    int oysterOffset = gameState.Object == GameConstants.Oyster ? 1 : 0;
+                    if (gameState.Verb == GameConstants.Lock)
+                        message = 61;
+                    else if (!gameState.Toting(GameConstants.Trident))
+                        message = 122 + oysterOffset;
+                    else if (gameState.Toting(gameState.Object))
+                        message = 120 + oysterOffset;
+                    else
+                    {
+                        message = 124 + oysterOffset;
+                        gameState.Destroy(GameConstants.Clam);
+                        gameState.Drop(GameConstants.Oyster, gameState.Location);
+                        gameState.Drop(GameConstants.Pearl, 105);
+                    }
+                    break;
+                case GameConstants.Door:
+                    message = gameState.ObjectProperties[GameConstants.Door] == 1 ? 54 : 111;
+                    break;
+                case GameConstants.Cage:
+                    message = 32;
+                    break;
+                case GameConstants.Keys:
+                    message = 55;
+                    break;
+                case GameConstants.Chain:
+                    message = OpenChain();
+                    break;
+                case GameConstants.Grate:
+                    message = OpenGrate();
+                    break;
+                default:
+                    message = 33;
+                    break;
             }
 
-            if (objectId != GameConstants.Bottle)
-            {
-                Console.WriteLine(GameMessages.GetMessage(106)); // "You can't fill that."
-                return;
-            }
-
-            if (LiquidManager.Liq(gameState) != 0)
-            {
-                Console.WriteLine(GameMessages.GetMessage(105)); // "Your bottle is already full."
-                return;
-            }
-
-            int liquidHere = LiquidManager.LiqLoc(gameState, gameState.Location);
-            if (liquidHere == 0)
-            {
-                Console.WriteLine(GameMessages.GetMessage(106)); // "There is nothing here with which to fill the bottle."
-                return;
-            }
-
-            // Fill the bottle with the liquid at this location
-            gameState.SetObjectProperty(GameConstants.Bottle, LiquidManager.GetBottlePropertyForLiquid(liquidHere));
-            
-            if (gameState.IsCarrying(GameConstants.Bottle))
-            {
-                gameState.SetObjectLocation(liquidHere, -1);
-            }
-
-            int messageId = (liquidHere == GameConstants.Oil) ? 108 : 107; // Oil or water message
-            Console.WriteLine(GameMessages.GetMessage(messageId));
+            Speak(message);
         }
 
-        /// <summary>
-        /// Handles pouring liquid from the bottle.
-        /// Ported from vpour() in VERB.C.
-        /// </summary>
-        private void HandlePour(int objectId)
+        private int OpenChain()
         {
-            // Get what's in the bottle
-            if (objectId == GameConstants.Bottle || objectId == 0)
+            if (!gameState.Here(GameConstants.Keys))
+                return 31;
+
+            if (gameState.Verb == GameConstants.Lock)
             {
-                objectId = LiquidManager.Liq(gameState);
+                if (gameState.ObjectProperties[GameConstants.Chain] != 0)
+                    return 34;
+                if (gameState.Location != 130)
+                    return 173;
+
+                gameState.SetObjectProperty(GameConstants.Chain, 2);
+                if (gameState.Toting(GameConstants.Chain))
+                    gameState.Drop(GameConstants.Chain, gameState.Location);
+                gameState.FixedObjectLocations[GameConstants.Chain] = -1;
+                return 172;
             }
 
-            if (objectId == 0 || !gameState.IsCarrying(objectId))
-            {
-                Console.WriteLine(GameMessages.GetMessage(104)); // "You aren't carrying it!"
-                return;
-            }
+            if (gameState.ObjectProperties[GameConstants.Bear] == 400)
+                return 41;
+            if (gameState.ObjectProperties[GameConstants.Chain] == 0)
+                return 37;
 
-            // Special case: pouring on plant
-            if (gameState.IsObjectHere(GameConstants.Plant) || gameState.IsObjectHere(GameConstants.Plant2))
+            gameState.SetObjectProperty(GameConstants.Chain, 0);
+            gameState.FixedObjectLocations[GameConstants.Chain] = 0;
+            if (gameState.ObjectProperties[GameConstants.Bear] != 3)
+                gameState.SetObjectProperty(GameConstants.Bear, 2);
+            gameState.FixedObjectLocations[GameConstants.Bear] = 2 - gameState.ObjectProperties[GameConstants.Bear];
+            return 171;
+        }
+
+        private int OpenGrate()
+        {
+            if (!gameState.Here(GameConstants.Keys))
+                return 31;
+
+            if (gameState.Closing)
             {
-                if (objectId != GameConstants.Water)
+                if (!gameState.Panic)
                 {
-                    Console.WriteLine(GameMessages.GetMessage(112)); // "The plant indignantly shakes the oil off its leaves and asks, 'Water?'"
+                    gameState.Clock2 = 15;
+                    gameState.Panic = true;
                 }
-                else
-                {
-                    // Water the plant (causes it to grow)
-                    int plantId = gameState.IsObjectHere(GameConstants.Plant) ? GameConstants.Plant : GameConstants.Plant2;
-                    int currentProp = gameState.ObjectProperties[plantId];
-                    Console.WriteLine(GameMessages.GetMessage(112 + currentProp)); // Plant growth messages
-                    
-                    gameState.SetObjectProperty(GameConstants.Plant, (currentProp + 2) % 6);
-                    gameState.SetObjectProperty(GameConstants.Plant2, gameState.ObjectProperties[GameConstants.Plant] / 2);
-                }
-            }
-            // Special case: pouring on door
-            else if (gameState.IsObjectHere(GameConstants.Door))
-            {
-                gameState.SetObjectProperty(GameConstants.Door, objectId == GameConstants.Oil ? 1 : 0);
-                Console.WriteLine(GameMessages.GetMessage(113 + gameState.ObjectProperties[GameConstants.Door]));
-            }
-            else
-            {
-                Console.WriteLine(GameMessages.GetMessage(78)); // "The bottle is now empty."
+
+                return 130;
             }
 
-            // Empty the bottle and remove liquid from game
-            gameState.SetObjectProperty(GameConstants.Bottle, 1);
-            gameState.SetObjectLocation(objectId, 0);
+            int message = 34 + gameState.ObjectProperties[GameConstants.Grate];
+            gameState.SetObjectProperty(GameConstants.Grate, gameState.Verb == GameConstants.Lock ? 0 : 1);
+            return message + 2 * gameState.ObjectProperties[GameConstants.Grate];
         }
 
-        /// <summary>
-        /// Handles drinking liquid.
-        /// Ported from vdrink() in VERB.C.
-        /// </summary>
-        private void HandleDrink(int objectId)
+        private void VSay()
         {
-            // Default to water if no object specified
-            if (objectId == 0)
-            {
-                objectId = GameConstants.Water;
-            }
-
-            if (objectId != GameConstants.Water)
-            {
-                Console.WriteLine(GameMessages.GetMessage(110)); // "Drink what?"
-                return;
-            }
-
-            if (LiquidManager.Liq(gameState) != GameConstants.Water || !gameState.IsObjectHere(GameConstants.Bottle))
-            {
-                Console.WriteLine(GameMessages.GetMessage(104)); // "You aren't carrying it!"
-                return;
-            }
-
-            // Drink the water
-            gameState.SetObjectProperty(GameConstants.Bottle, 1);
-            gameState.SetObjectLocation(GameConstants.Water, 0);
-            Console.WriteLine(GameMessages.GetMessage(74)); // "The bottle of water is now empty."
+            string said = string.Equals(gameState.Word1, "say", StringComparison.OrdinalIgnoreCase)
+                ? gameState.Word2
+                : gameState.Word1;
+            Console.WriteLine("Okay.");
+            if (!string.IsNullOrWhiteSpace(said))
+                Console.WriteLine(said);
         }
 
-        /// <summary>
-        /// Handles turning the lamp on.
-        /// Ported from von() in VERB.C.
-        /// </summary>
-        private void HandleLampOn()
+        private void VOn()
         {
-            if (!gameState.IsObjectHere(GameConstants.Lamp))
+            if (!gameState.Here(GameConstants.Lamp))
             {
-                Console.WriteLine(GameMessages.GetMessage(28)); // "I see no lamp here."
+                ActSpeak(gameState.Verb);
                 return;
             }
 
             if (gameState.Limit < 0)
             {
-                Console.WriteLine(GameMessages.GetMessage(184)); // "Your lamp has run out of power."
+                Speak(184);
                 return;
             }
 
             gameState.SetObjectProperty(GameConstants.Lamp, 1);
-            Console.WriteLine(GameMessages.GetMessage(39)); // "Your lamp is now on."
-
-            // If location was dark, show the description
+            Speak(39);
             if (gameState.WizardDark)
             {
                 gameState.WizardDark = false;
@@ -719,34 +1194,720 @@ public class AdventureGame
             }
         }
 
-        /// <summary>
-        /// Handles turning the lamp off.
-        /// Ported from voff() in VERB.C.
-        /// </summary>
-        private void HandleLampOff()
+        private void VOff()
         {
-            if (!gameState.IsObjectHere(GameConstants.Lamp))
+            if (!gameState.Here(GameConstants.Lamp))
             {
-                Console.WriteLine(GameMessages.GetMessage(28)); // "I see no lamp here."
+                ActSpeak(gameState.Verb);
                 return;
             }
 
             gameState.SetObjectProperty(GameConstants.Lamp, 0);
-            Console.WriteLine(GameMessages.GetMessage(40)); // "Your lamp is now off."
+            Speak(40);
         }
 
-        /// <summary>
-        /// Handles quitting the game.
-        /// </summary>
-        private void HandleQuit()
+        private void VWave()
         {
-            Console.WriteLine(GameMessages.GetMessage(22)); // "Do you really want to quit now?"
-            string response = Console.ReadLine() ?? string.Empty;
-            
-            if (IsYesResponse(response))
+            int objectId = gameState.Object;
+            if (!gameState.Toting(objectId) &&
+                (objectId != GameConstants.Rod || !gameState.Toting(GameConstants.Rod2)))
             {
-                gameState.SaveFlag = true;
+                Speak(29);
             }
+            else if (objectId != GameConstants.Rod ||
+                !gameState.At(GameConstants.Fissure) ||
+                !gameState.Toting(objectId) ||
+                gameState.Closing)
+            {
+                ActSpeak(gameState.Verb);
+            }
+            else
+            {
+                gameState.SetObjectProperty(GameConstants.Fissure, 1 - gameState.ObjectProperties[GameConstants.Fissure]);
+                PrintObjectMessage(GameConstants.Fissure, 2 - gameState.ObjectProperties[GameConstants.Fissure]);
+            }
+        }
+
+        private void VKill()
+        {
+            int message;
+            switch (gameState.Object)
+            {
+                case GameConstants.Bird:
+                    if (gameState.Closed)
+                        message = 137;
+                    else
+                    {
+                        gameState.Destroy(GameConstants.Bird);
+                        gameState.SetObjectProperty(GameConstants.Bird, 0);
+                        if (gameState.ObjectLocations[GameConstants.Snake] == 19)
+                            gameState.Tally2++;
+                        message = 45;
+                    }
+                    break;
+                case 0:
+                    message = 44;
+                    break;
+                case GameConstants.Clam:
+                case GameConstants.Oyster:
+                    message = 150;
+                    break;
+                case GameConstants.Snake:
+                    message = 46;
+                    break;
+                case GameConstants.Dwarf:
+                    if (gameState.Closed)
+                        DwarfEnd(136);
+                    message = 49;
+                    break;
+                case GameConstants.Troll:
+                    message = 157;
+                    break;
+                case GameConstants.Bear:
+                    message = 165 + (gameState.ObjectProperties[GameConstants.Bear] + 1) / 2;
+                    break;
+                case GameConstants.Dragon:
+                    if (gameState.ObjectProperties[GameConstants.Dragon] != 0)
+                    {
+                        message = 167;
+                        break;
+                    }
+
+                    if (!AskYesNo(49, 0, 0))
+                        return;
+
+                    PrintObjectMessage(GameConstants.Dragon, 1);
+                    gameState.SetObjectProperty(GameConstants.Dragon, 2);
+                    gameState.SetObjectProperty(GameConstants.Rug, 0);
+                    gameState.MoveObject(GameConstants.Dragon + GameConstants.MaxObjects, -1);
+                    gameState.MoveObject(GameConstants.Rug + GameConstants.MaxObjects, 0);
+                    gameState.MoveObject(GameConstants.Dragon, 120);
+                    gameState.MoveObject(GameConstants.Rug, 120);
+                    for (int item = 1; item < GameConstants.MaxObjects; item++)
+                    {
+                        if (gameState.ObjectLocations[item] == 119 || gameState.ObjectLocations[item] == 121)
+                            gameState.MoveObject(item, 120);
+                    }
+
+                    gameState.NewLocation = 120;
+                    ApplyLocationChange();
+                    return;
+                default:
+                    ActSpeak(gameState.Verb);
+                    return;
+            }
+
+            Speak(message);
+        }
+
+        private void VPour()
+        {
+            int objectId = gameState.Object;
+            if (objectId == GameConstants.Bottle || objectId == 0)
+                objectId = gameState.Liq();
+            if (objectId == 0)
+            {
+                NeedObject();
+                return;
+            }
+
+            if (!gameState.Toting(objectId))
+            {
+                ActSpeak(gameState.Verb);
+                return;
+            }
+
+            if (objectId != GameConstants.Oil && objectId != GameConstants.Water)
+            {
+                Speak(78);
+                return;
+            }
+
+            gameState.SetObjectProperty(GameConstants.Bottle, 1);
+            gameState.SetObjectLocation(objectId, 0);
+
+            if (gameState.At(GameConstants.Plant))
+            {
+                if (objectId != GameConstants.Water)
+                {
+                    Speak(112);
+                }
+                else
+                {
+                    PrintObjectMessage(GameConstants.Plant, gameState.ObjectProperties[GameConstants.Plant] + 1);
+                    gameState.SetObjectProperty(GameConstants.Plant, (gameState.ObjectProperties[GameConstants.Plant] + 2) % 6);
+                    gameState.SetObjectProperty(GameConstants.Plant2, gameState.ObjectProperties[GameConstants.Plant] / 2);
+                    ShowLocationDescription();
+                }
+            }
+            else if (gameState.At(GameConstants.Door))
+            {
+                gameState.SetObjectProperty(GameConstants.Door, objectId == GameConstants.Oil ? 1 : 0);
+                Speak(113 + gameState.ObjectProperties[GameConstants.Door]);
+            }
+            else
+            {
+                Speak(77);
+            }
+        }
+
+        private void VEat()
+        {
+            switch (gameState.Object)
+            {
+                case GameConstants.Food:
+                    gameState.Destroy(GameConstants.Food);
+                    Speak(72);
+                    break;
+                case GameConstants.Bird:
+                case GameConstants.Snake:
+                case GameConstants.Clam:
+                case GameConstants.Oyster:
+                case GameConstants.Dwarf:
+                case GameConstants.Dragon:
+                case GameConstants.Troll:
+                case GameConstants.Bear:
+                    Speak(71);
+                    break;
+                default:
+                    ActSpeak(gameState.Verb);
+                    break;
+            }
+        }
+
+        private void VDrink()
+        {
+            if (gameState.Object != GameConstants.Water)
+            {
+                Speak(110);
+            }
+            else if (gameState.Liq() != GameConstants.Water || !gameState.Here(GameConstants.Bottle))
+            {
+                ActSpeak(gameState.Verb);
+            }
+            else
+            {
+                gameState.SetObjectProperty(GameConstants.Bottle, 1);
+                gameState.SetObjectLocation(GameConstants.Water, 0);
+                Speak(74);
+            }
+        }
+
+        private void VThrow()
+        {
+            int objectId = gameState.Object;
+            if (gameState.Toting(GameConstants.Rod2) && objectId == GameConstants.Rod && !gameState.Toting(GameConstants.Rod))
+            {
+                objectId = GameConstants.Rod2;
+                gameState.Object = objectId;
+            }
+
+            if (!gameState.Toting(objectId))
+            {
+                ActSpeak(gameState.Verb);
+                return;
+            }
+
+            if (gameState.At(GameConstants.Troll) && objectId >= GameConstants.Nugget && objectId < GameConstants.MaxObjects)
+            {
+                Speak(159);
+                gameState.Drop(objectId, 0);
+                gameState.MoveObject(GameConstants.Troll, 0);
+                gameState.MoveObject(GameConstants.Troll + GameConstants.MaxObjects, 0);
+                gameState.Drop(GameConstants.Troll2, 117);
+                gameState.Drop(GameConstants.Troll2 + GameConstants.MaxObjects, 122);
+                GameState.Juggle(GameConstants.Chasm);
+                return;
+            }
+
+            if (objectId == GameConstants.Food && gameState.Here(GameConstants.Bear))
+            {
+                gameState.Object = GameConstants.Bear;
+                VFeed();
+                return;
+            }
+
+            if (objectId != GameConstants.Axe)
+            {
+                VDrop();
+                return;
+            }
+
+            int message;
+            int dwarf = gameState.DCheck();
+            if (dwarf != 0)
+            {
+                message = 48;
+                if (GameState.Pct(random, 33))
+                {
+                    gameState.DwarfSeen[dwarf] = false;
+                    gameState.DwarfLocations[dwarf] = 0;
+                    message = 47;
+                    gameState.DwarfKill++;
+                    if (gameState.DwarfKill == 1)
+                        message = 149;
+                }
+            }
+            else if (gameState.At(GameConstants.Dragon) && gameState.ObjectProperties[GameConstants.Dragon] == 0)
+            {
+                message = 152;
+            }
+            else if (gameState.At(GameConstants.Troll))
+            {
+                message = 158;
+            }
+            else if (gameState.Here(GameConstants.Bear) && gameState.ObjectProperties[GameConstants.Bear] == 0)
+            {
+                Speak(164);
+                gameState.Drop(GameConstants.Axe, gameState.Location);
+                gameState.FixedObjectLocations[GameConstants.Axe] = -1;
+                gameState.SetObjectProperty(GameConstants.Axe, 1);
+                GameState.Juggle(GameConstants.Bear);
+                return;
+            }
+            else
+            {
+                gameState.Verb = GameConstants.Kill;
+                gameState.Object = 0;
+                IVKill();
+                return;
+            }
+
+            Speak(message);
+            gameState.Drop(GameConstants.Axe, gameState.Location);
+            ShowLocationDescription();
+        }
+
+        private void VFind()
+        {
+            int objectId = gameState.Object;
+            if (gameState.Toting(objectId))
+                Speak(24);
+            else if (gameState.Closed)
+                Speak(138);
+            else if (gameState.DCheck() != 0 && gameState.DwarfFlag >= 2 && objectId == GameConstants.Dwarf)
+                Speak(94);
+            else if (gameState.At(objectId) ||
+                (gameState.Liq() == objectId && gameState.Here(GameConstants.Bottle)) ||
+                objectId == gameState.LiqLoc(gameState.Location))
+                Speak(94);
+            else
+                ActSpeak(gameState.Verb);
+        }
+
+        private void VFill()
+        {
+            switch (gameState.Object)
+            {
+                case GameConstants.Bottle:
+                    if (gameState.Liq() != 0)
+                    {
+                        Speak(105);
+                    }
+                    else
+                    {
+                        int liquidHere = gameState.LiqLoc(gameState.Location);
+                        if (liquidHere == 0)
+                        {
+                            Speak(106);
+                        }
+                        else
+                        {
+                            gameState.SetObjectProperty(GameConstants.Bottle, gameState.LocationConditions[gameState.Location] & GameConstants.WatOil);
+                            int liquid = gameState.Liq();
+                            if (gameState.Toting(GameConstants.Bottle))
+                                gameState.SetObjectLocation(liquid, -1);
+                            Speak(liquid == GameConstants.Oil ? 108 : 107);
+                        }
+                    }
+                    break;
+                case GameConstants.Vase:
+                    if (gameState.LiqLoc(gameState.Location) == 0)
+                    {
+                        Speak(144);
+                    }
+                    else if (!gameState.Toting(GameConstants.Vase))
+                    {
+                        Speak(29);
+                    }
+                    else
+                    {
+                        Speak(145);
+                        VDrop();
+                    }
+                    break;
+                default:
+                    Speak(29);
+                    break;
+            }
+        }
+
+        private void VFeed()
+        {
+            int message;
+            switch (gameState.Object)
+            {
+                case GameConstants.Bird:
+                    message = 100;
+                    break;
+                case GameConstants.Dwarf:
+                    if (!gameState.Here(GameConstants.Food))
+                    {
+                        ActSpeak(gameState.Verb);
+                        return;
+                    }
+                    gameState.DwarfFlag++;
+                    message = 103;
+                    break;
+                case GameConstants.Bear:
+                    if (!gameState.Here(GameConstants.Food))
+                    {
+                        if (gameState.ObjectProperties[GameConstants.Bear] == 0)
+                            message = 102;
+                        else if (gameState.ObjectProperties[GameConstants.Bear] == 3)
+                            message = 110;
+                        else
+                        {
+                            ActSpeak(gameState.Verb);
+                            return;
+                        }
+                        break;
+                    }
+
+                    gameState.Destroy(GameConstants.Food);
+                    gameState.SetObjectProperty(GameConstants.Bear, 1);
+                    gameState.FixedObjectLocations[GameConstants.Axe] = 0;
+                    gameState.SetObjectProperty(GameConstants.Axe, 0);
+                    message = 168;
+                    break;
+                case GameConstants.Dragon:
+                    message = gameState.ObjectProperties[GameConstants.Dragon] != 0 ? 110 : 102;
+                    break;
+                case GameConstants.Troll:
+                    message = 182;
+                    break;
+                case GameConstants.Snake:
+                    if (gameState.Closed || !gameState.Here(GameConstants.Bird))
+                    {
+                        message = 102;
+                        break;
+                    }
+
+                    message = 101;
+                    gameState.Destroy(GameConstants.Bird);
+                    gameState.SetObjectProperty(GameConstants.Bird, 0);
+                    gameState.Tally2++;
+                    break;
+                default:
+                    message = 14;
+                    break;
+            }
+
+            Speak(message);
+        }
+
+        private void VRead()
+        {
+            if (DarknessManager.IsDark(gameState))
+            {
+                SpeakObjectNotHere(gameState.Object);
+                return;
+            }
+
+            switch (gameState.Object)
+            {
+                case GameConstants.Magazine:
+                    Speak(190);
+                    break;
+                case GameConstants.Tablet:
+                    Speak(196);
+                    break;
+                case GameConstants.Message:
+                    Speak(191);
+                    break;
+                case GameConstants.Oyster:
+                    if (!gameState.Toting(GameConstants.Oyster) || !gameState.Closed)
+                    {
+                        ActSpeak(gameState.Verb);
+                        break;
+                    }
+
+                    if ((gameState.HintAvailable & GameConstants.HintO) != 0)
+                    {
+                        if (AskYesNo(192, 193, 54))
+                        {
+                            gameState.HintTaken++;
+                            gameState.HintAvailable &= ~GameConstants.HintO;
+                        }
+                    }
+                    else
+                    {
+                        Speak(194);
+                    }
+                    break;
+                default:
+                    ActSpeak(gameState.Verb);
+                    break;
+            }
+        }
+
+        private void VBlast()
+        {
+            if (gameState.ObjectProperties[GameConstants.Rod2] < 0 || !gameState.Closed)
+            {
+                ActSpeak(gameState.Verb);
+                return;
+            }
+
+            gameState.Bonus = 133;
+            if (gameState.Location == 115)
+                gameState.Bonus = 134;
+            if (gameState.Here(GameConstants.Rod2))
+                gameState.Bonus = 135;
+
+            Speak(gameState.Bonus);
+            NormalEnd();
+        }
+
+        private void VBreak()
+        {
+            if (gameState.Object == GameConstants.Mirror)
+            {
+                if (gameState.Closed)
+                {
+                    Speak(197);
+                    DwarfEnd(136);
+                    return;
+                }
+
+                Speak(148);
+            }
+            else if (gameState.Object == GameConstants.Vase && gameState.ObjectProperties[GameConstants.Vase] == 0)
+            {
+                if (gameState.Toting(GameConstants.Vase))
+                    gameState.Drop(GameConstants.Vase, gameState.Location);
+                gameState.SetObjectProperty(GameConstants.Vase, 2);
+                gameState.FixedObjectLocations[GameConstants.Vase] = -1;
+                Speak(198);
+            }
+            else
+            {
+                ActSpeak(gameState.Verb);
+            }
+        }
+
+        private void VWake()
+        {
+            if (gameState.Object != GameConstants.Dwarf || !gameState.Closed)
+                ActSpeak(gameState.Verb);
+            else
+                DwarfEnd(199);
+        }
+
+        private void AddCandidate(int objectId, bool condition, ref int candidate, ref bool ambiguous)
+        {
+            if (!condition || ambiguous)
+                return;
+
+            if (candidate != 0)
+            {
+                ambiguous = true;
+                return;
+            }
+
+            candidate = objectId;
+        }
+
+        private void ActSpeak(int verb)
+        {
+            int message = gameState.GetActionMessageId(verb);
+            if (message != 0)
+                Speak(message);
+        }
+
+        private void Speak(int messageId)
+        {
+            if (messageId == 0)
+                return;
+
+            if (messageId == 54)
+            {
+                Console.WriteLine("OK");
+                return;
+            }
+
+            Console.WriteLine(GameMessages.GetMessage(messageId));
+        }
+
+        private void SpeakObjectNotHere(int objectId)
+        {
+            Console.WriteLine($"I see no {GetObjectWord(objectId)} here.");
+        }
+
+        private void NeedObject()
+        {
+            string word = IsVerbWord(gameState.Word1) ? gameState.Word1 : gameState.Word2;
+            if (string.IsNullOrWhiteSpace(word))
+                word = "do";
+            Console.WriteLine($"{word} what?");
+        }
+
+        private bool IsVerbWord(string word)
+        {
+            return !string.IsNullOrWhiteSpace(word) &&
+                Vocabulary.AnalyzeWord(word, out int type, out _) &&
+                type == Vocabulary.WordTypes.Verb;
+        }
+
+        private string GetObjectWord(int objectId)
+        {
+            if (IsObjectWord(gameState.Word1, objectId))
+                return gameState.Word1;
+            if (IsObjectWord(gameState.Word2, objectId))
+                return gameState.Word2;
+
+            return GameObjects.Objects.TryGetValue(objectId, out GameObjectData? objectData)
+                ? objectData.Name.ToLowerInvariant()
+                : $"object #{objectId}";
+        }
+
+        private static bool IsObjectWord(string word, int objectId)
+        {
+            return !string.IsNullOrWhiteSpace(word) &&
+                Vocabulary.AnalyzeWord(word, out int type, out int value) &&
+                type == Vocabulary.WordTypes.Object &&
+                value == objectId;
+        }
+
+        private bool AskYesNo(int promptMessage, int yesMessage, int noMessage)
+        {
+            if (promptMessage != 0)
+                Speak(promptMessage);
+
+            while (true)
+            {
+                Console.Write("> ");
+                string response = Console.ReadLine() ?? string.Empty;
+                string normalized = response.ToLowerInvariant().Trim();
+
+                if (string.IsNullOrEmpty(normalized))
+                {
+                    Speak(89);
+                    continue;
+                }
+
+                if ("no".StartsWith(normalized, StringComparison.Ordinal))
+                {
+                    if (noMessage != 0)
+                        Speak(noMessage);
+                    return false;
+                }
+
+                if ("yes".StartsWith(normalized, StringComparison.Ordinal))
+                {
+                    if (yesMessage != 0)
+                        Speak(yesMessage);
+                    return true;
+                }
+
+                Speak(89);
+            }
+        }
+
+        private void DwarfEnd(int message)
+        {
+            if (message != 0)
+                Speak(message);
+            HandleDeath();
+            NormalEnd();
+        }
+
+        private void NormalEnd()
+        {
+            int total = PrintScore();
+            int[] limits = [35, 100, 200, 250, 300, 330, 350, 1000];
+            int ratingIndex = 0;
+            while (ratingIndex < limits.Length && limits[ratingIndex] <= total)
+                ratingIndex++;
+
+            Console.WriteLine();
+            int ratingMessage = 202 + ratingIndex;
+            if (ratingMessage <= 209)
+                Speak(ratingMessage);
+
+            int next = ratingIndex < limits.Length ? limits[ratingIndex] - total : 0;
+            if (next > 0)
+                Console.WriteLine($"To achieve the next higher rating, you need {next} more point{(next == 1 ? string.Empty : "s")}.");
+
+            gameState.SaveFlag = true;
+        }
+
+        private int PrintScore()
+        {
+            int score = 0;
+            int treasures = 0;
+
+            for (int item = GameConstants.Nugget; item <= GameConstants.MaxTreasures; item++)
+            {
+                int itemScore = item == GameConstants.Chest ? 14 : item > GameConstants.Chest ? 16 : 12;
+                if (gameState.ObjectProperties[item] >= 0)
+                    treasures += 2;
+                if (gameState.ObjectLocations[item] == GameConstants.WellHouse && gameState.ObjectProperties[item] == 0)
+                    treasures += itemScore - 2;
+            }
+
+            PrintScoreLine("Treasures:", treasures);
+            score += treasures;
+
+            int survival = (GameConstants.MaxDeaths - gameState.NumDie) * 10;
+            if (survival != 0)
+                PrintScoreLine("Survival:", survival);
+            score += survival;
+
+            if (!gameState.GaveUp)
+                score += 4;
+
+            int gettingIn = gameState.VisitedLocations[19] != 0 ? 25 : 0;
+            if (gettingIn != 0)
+                PrintScoreLine("Getting well in:", gettingIn);
+            score += gettingIn;
+
+            int masters = gameState.Closing ? 25 : 0;
+            if (masters != 0)
+                PrintScoreLine("Masters section:", masters);
+            score += masters;
+
+            if (gameState.Closed)
+            {
+                int bonus = gameState.Bonus == 0 ? 10 :
+                    gameState.Bonus == 135 ? 25 :
+                    gameState.Bonus == 134 ? 30 :
+                    gameState.Bonus == 133 ? 45 : 0;
+                PrintScoreLine("Bonus:", bonus);
+                score += bonus;
+            }
+
+            if (gameState.ObjectLocations[GameConstants.Magazine] == 108)
+                score += 1;
+
+            int hints = -15 * gameState.HintTaken;
+            if (hints != 0)
+            {
+                PrintScoreLine("Hints & instructions:", hints);
+                score += hints;
+            }
+
+            score += 2;
+            if (score < 0)
+                score = 0;
+
+            PrintScoreLine("Score:", score);
+            return score;
+        }
+
+        private static void PrintScoreLine(string label, int value)
+        {
+            Console.WriteLine($"{label,-22}{value,4}");
         }
 
         /// <summary>
@@ -847,6 +2008,9 @@ public class AdventureGame
         /// </summary>
         private void UpdateGameState()
         {
+            gameState.FooBar = gameState.FooBar > 0 ? -gameState.FooBar : 0;
+            gameState.TestBr = 2;
+
             // Check lamp battery status and decrement if lamp is on
             string? batteryMessage = DarknessManager.CheckBatteryStatus(gameState);
             if (batteryMessage != null)
