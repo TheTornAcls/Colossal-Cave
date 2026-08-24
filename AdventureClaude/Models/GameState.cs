@@ -229,13 +229,197 @@ public class GameState
         }
 
         /// <summary>
+        /// C DATABASE.C toting(): true when an object is being carried.
+        /// </summary>
+        public bool Toting(int item)
+        {
+            return ObjectLocations[item] == -1;
+        }
+
+        /// <summary>
+        /// C DATABASE.C here(): true when an object is at the current location or carried.
+        /// </summary>
+        public bool Here(int item)
+        {
+            return ObjectLocations[item] == Location || Toting(item);
+        }
+
+        /// <summary>
+        /// C DATABASE.C at(): true when an object is physically or fixed at the current location.
+        /// </summary>
+        public bool At(int item)
+        {
+            return ObjectLocations[item] == Location || FixedObjectLocations[item] == Location;
+        }
+
+        /// <summary>
+        /// C DATABASE.C forced(): true when a location forces automatic movement.
+        /// </summary>
+        public bool Forced(int atLocation)
+        {
+            return (LocationConditions[atLocation] & GameConstants.Forced) != 0;
+        }
+
+        public bool LocationHasFlag(int location, int flag)
+        {
+            return (LocationConditions[location] & flag) != 0;
+        }
+
+        /// <summary>
+        /// C DATABASE.C dstroy(): removes an object from the game.
+        /// </summary>
+        public void Destroy(int obj)
+        {
+            MoveObject(obj, 0);
+        }
+
+        /// <summary>
+        /// C DATABASE.C carry(): marks an object as carried and updates Holding.
+        /// </summary>
+        public void Carry(int obj, int fromLocation)
+        {
+            if (obj >= GameConstants.MaxObjects)
+                return;
+
+            if (ObjectLocations[obj] == -1)
+                return;
+
+            ObjectLocations[obj] = -1;
+            Holding++;
+        }
+
+        /// <summary>
+        /// C DATABASE.C drop(): places an object or fixed-object side at a location.
+        /// </summary>
+        public void Drop(int obj, int where)
+        {
+            if (obj < GameConstants.MaxObjects)
+            {
+                if (ObjectLocations[obj] == -1)
+                    Holding--;
+
+                ObjectLocations[obj] = where;
+            }
+            else
+            {
+                FixedObjectLocations[obj - GameConstants.MaxObjects] = where;
+            }
+        }
+
+        /// <summary>
+        /// C DATABASE.C move(): moves an object, preserving Holding bookkeeping.
+        /// </summary>
+        public void MoveObject(int obj, int where)
+        {
+            int from = obj < GameConstants.MaxObjects
+                ? ObjectLocations[obj]
+                : FixedObjectLocations[obj - GameConstants.MaxObjects];
+
+            if (from > 0 && from <= 300)
+                Carry(obj, from);
+
+            Drop(obj, where);
+        }
+
+        /// <summary>
+        /// C DATABASE.C put(): moves an object and returns the encoded repository property.
+        /// </summary>
+        public int Put(int obj, int where, int propertyValue)
+        {
+            MoveObject(obj, where);
+            return -1 - propertyValue;
+        }
+
+        /// <summary>
+        /// C DATABASE.C dcheck(): returns the first dwarf in the player's location.
+        /// </summary>
+        public int DCheck()
+        {
+            for (int i = 1; i < GameConstants.MaxDwarves - 1; i++)
+            {
+                if (DwarfLocations[i] == Location)
+                    return i;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// C DATABASE.C liq(): returns WATER, OIL, or 0 for the bottle contents.
+        /// </summary>
+        public int Liq()
+        {
+            int bottleProperty = ObjectProperties[GameConstants.Bottle];
+            int validatedProperty = -1 - bottleProperty;
+            return Liq2(bottleProperty > validatedProperty ? bottleProperty : validatedProperty);
+        }
+
+        /// <summary>
+        /// C DATABASE.C liqloc(): returns WATER, OIL, or 0 for a location's available liquid.
+        /// </summary>
+        public int LiqLoc(int location)
+        {
+            if ((LocationConditions[location] & GameConstants.Liquid) != 0)
+                return Liq2(LocationConditions[location] & GameConstants.WatOil);
+
+            return Liq2(1);
+        }
+
+        /// <summary>
+        /// C DATABASE.C liq2(): converts a bottle/location liquid code to an object id.
+        /// </summary>
+        public static int Liq2(int pbottle)
+        {
+            return (1 - pbottle) * GameConstants.Water +
+                (pbottle >> 1) * (GameConstants.Water + GameConstants.Oil);
+        }
+
+        /// <summary>
+        /// C DATABASE.C pct(): true with the requested percentage chance.
+        /// </summary>
+        public static bool Pct(Random random, int percent)
+        {
+            return random.Next(100) < percent;
+        }
+
+        /// <summary>
+        /// C DATABASE.C rrand(): random inclusive integer helper.
+        /// </summary>
+        public static int RRand(Random random, int low, int high)
+        {
+            return random.Next(low, high + 1);
+        }
+
+        /// <summary>
+        /// C DATABASE.C juggle(): intentionally a no-op in this C port.
+        /// </summary>
+        public static void Juggle(int location)
+        {
+        }
+
+        public int GetActionMessageId(int verb)
+        {
+            return verb >= 0 && verb < ActionMessages.Length ? ActionMessages[verb] : 0;
+        }
+
+        public void SetObjectLocation(int objectId, int location)
+        {
+            ObjectLocations[objectId] = location;
+        }
+
+        public void SetObjectProperty(int objectId, int property)
+        {
+            ObjectProperties[objectId] = (short)property;
+        }
+
+        /// <summary>
         /// Checks if the player is carrying a specific object.
         /// </summary>
         /// <param name="objectId">The ID of the object to check</param>
         /// <returns>True if the player is carrying the object</returns>
         public bool IsCarrying(int objectId)
         {
-            return ObjectLocations[objectId] == -1;
+            return Toting(objectId);
         }
 
         /// <summary>
@@ -245,8 +429,7 @@ public class GameState
         /// <returns>True if the object is at the current location</returns>
         public bool IsObjectHere(int objectId)
         {
-            return ObjectLocations[objectId] == Location || 
-                   FixedObjectLocations[objectId] == Location;
+            return Here(objectId) || FixedObjectLocations[objectId] == Location;
         }
 
         /// <summary>
@@ -347,17 +530,11 @@ public class GameState
                 case 2: // Object must be present (carried or at location)
                     return IsCarrying(objectId) || IsObjectHere(objectId);
 
-                case 3: // Object property must NOT be 0
-                    return ObjectProperties[objectId] != 0;
-
-                case 4: // Object property must NOT be 1
-                    return ObjectProperties[objectId] != 1;
-
-                case 5: // Object property must NOT be 2
-                    return ObjectProperties[objectId] != 2;
-
-                case 7: // Object property must NOT be 4
-                    return ObjectProperties[objectId] != 4;
+                case 3:
+                case 4:
+                case 5:
+                case 7:
+                    return ObjectProperties[objectId] != conditionType - 3;
 
                 default:
                     return false;
