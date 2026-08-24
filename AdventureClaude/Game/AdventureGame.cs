@@ -45,9 +45,6 @@ public class AdventureGame
                 gameState.Limit = 330;
             }
 
-            Console.WriteLine();
-            ShowLocationDescription();
-            
             // Main game loop
             while (!gameState.SaveFlag)
             {
@@ -61,16 +58,23 @@ public class AdventureGame
         /// </summary>
         private void Turn()
         {
-            gameState.Turns++;
+            if (!RunTurnLifecycleBeforeInput())
+                return;
 
             // Get player input
-            Console.Write("> ");
-            string input = Console.ReadLine() ?? string.Empty;
-
-            // Parse input
-            if (!inputParser.ParseInput(input, gameState, out int verb, out int objectId, out int motion))
+            int verb;
+            int objectId;
+            int motion;
+            while (true)
             {
-                return; // Invalid input, try again
+                Console.Write("> ");
+                string input = Console.ReadLine() ?? string.Empty;
+
+                if (inputParser.ParseInput(input, gameState, out verb, out objectId, out motion))
+                    break;
+
+                if (gameState.SaveFlag)
+                    return;
             }
 
             // Store parsed values in game state
@@ -80,9 +84,6 @@ public class AdventureGame
 
             // Process the command
             ProcessCommand();
-
-            // Update game state and check for end conditions
-            UpdateGameState();
         }
 
         /// <summary>
@@ -94,7 +95,6 @@ public class AdventureGame
             if (gameState.Motion > 0)
             {
                 DoMove();
-                ApplyLocationChange();
                 return;
             }
 
@@ -367,6 +367,75 @@ public class AdventureGame
         /// <summary>
         /// Applies the NewLocation chosen by DoTravel. This is the movement subset of TURN.C turn().
         /// </summary>
+        private bool RunTurnLifecycleBeforeInput()
+        {
+            ApplyClosingExitGuard();
+            ApplyDwarfBlock();
+            RunDwarvesPlaceholder();
+            ApplyLocationChange();
+
+            if (gameState.SaveFlag || gameState.Location == 0)
+                return false;
+
+            ApplyClosedInventoryState();
+            gameState.WizardDark = DarknessManager.IsDark(gameState);
+            if (gameState.KnifeLocation > 0 && gameState.KnifeLocation != gameState.Location)
+                gameState.KnifeLocation = 0;
+
+            if (RunSpecialTimer())
+                return false;
+
+            TryLocationHint();
+            return !gameState.SaveFlag;
+        }
+
+        private void ApplyClosingExitGuard()
+        {
+            if (gameState.NewLocation >= 9 || gameState.NewLocation == 0 || !gameState.Closing)
+                return;
+
+            Speak(130);
+            gameState.NewLocation = gameState.Location;
+            if (!gameState.Panic)
+                gameState.Clock2 = 15;
+            gameState.Panic = true;
+        }
+
+        private void ApplyDwarfBlock()
+        {
+            if (gameState.NewLocation == gameState.Location ||
+                gameState.Forced(gameState.Location) ||
+                gameState.LocationHasFlag(gameState.Location, GameConstants.NoPirat))
+            {
+                return;
+            }
+
+            for (int i = 1; i < GameConstants.MaxDwarves - 1; i++)
+            {
+                if (gameState.OldDwarfLocations[i] == gameState.NewLocation && gameState.DwarfSeen[i])
+                {
+                    gameState.NewLocation = gameState.Location;
+                    Speak(2);
+                    return;
+                }
+            }
+        }
+
+        private void RunDwarvesPlaceholder()
+        {
+            // Full dwarf and pirate movement is the next port step. This preserves the turn hook,
+            // activation flag, and constraints that other lifecycle code depends on.
+            if (gameState.NewLocation == 0 ||
+                gameState.Forced(gameState.NewLocation) ||
+                gameState.LocationHasFlag(gameState.NewLocation, GameConstants.NoPirat))
+            {
+                return;
+            }
+
+            if (gameState.DwarfFlag == 0 && gameState.NewLocation > 15)
+                gameState.DwarfFlag++;
+        }
+
         private void ApplyLocationChange()
         {
             const int MaxForcedMoves = 20;
@@ -379,6 +448,7 @@ public class AdventureGame
                     gameState.VisitedLocations[gameState.NewLocation] =
                         (short)((gameState.VisitedLocations[gameState.NewLocation] + 3) & ~3);
 
+                gameState.Turns++;
                 gameState.Location = gameState.NewLocation;
 
                 if (gameState.Location == 0)
@@ -412,8 +482,6 @@ public class AdventureGame
                 if (!DarknessManager.IsDark(gameState))
                     gameState.VisitedLocations[gameState.Location]++;
             }
-
-            gameState.WizardDark = DarknessManager.IsDark(gameState);
         }
 
         private void PrintObjectMessage(int objectId, int state)
@@ -427,6 +495,222 @@ public class AdventureGame
             string message = objectData.States[state].RoomDescription;
             if (!string.IsNullOrEmpty(message))
                 Console.WriteLine(message);
+        }
+
+        private void ApplyClosedInventoryState()
+        {
+            if (!gameState.Closed)
+                return;
+
+            if (gameState.ObjectProperties[GameConstants.Oyster] < 0 && gameState.Toting(GameConstants.Oyster))
+                PrintObjectMessage(GameConstants.Oyster, 1);
+
+            for (int item = 1; item <= GameConstants.MaxObjects; item++)
+            {
+                if (gameState.Toting(item) && gameState.ObjectProperties[item] < 0)
+                    gameState.SetObjectProperty(item, -1 - gameState.ObjectProperties[item]);
+            }
+        }
+
+        private bool RunSpecialTimer()
+        {
+            gameState.FooBar = gameState.FooBar > 0 ? -gameState.FooBar : 0;
+            gameState.TestBr = 2;
+
+            if (gameState.Tally == 0 && gameState.Location >= 15 && gameState.Location != 33)
+                gameState.Clock1--;
+
+            if (gameState.Clock1 == 0)
+            {
+                gameState.SetObjectProperty(GameConstants.Grate, 0);
+                gameState.SetObjectProperty(GameConstants.Fissure, 0);
+                for (int i = 1; i < GameConstants.MaxDwarves; i++)
+                    gameState.DwarfSeen[i] = false;
+
+                gameState.MoveObject(GameConstants.Troll, 0);
+                gameState.MoveObject(GameConstants.Troll + GameConstants.MaxObjects, 0);
+                gameState.MoveObject(GameConstants.Troll2, 117);
+                gameState.MoveObject(GameConstants.Troll2 + GameConstants.MaxObjects, 122);
+                GameState.Juggle(GameConstants.Chasm);
+                if (gameState.ObjectProperties[GameConstants.Bear] != 3)
+                    gameState.Destroy(GameConstants.Bear);
+                gameState.SetObjectProperty(GameConstants.Chain, 0);
+                gameState.FixedObjectLocations[GameConstants.Chain] = 0;
+                gameState.SetObjectProperty(GameConstants.Axe, 0);
+                gameState.FixedObjectLocations[GameConstants.Axe] = 0;
+                Speak(129);
+                gameState.Clock1 = -1;
+                gameState.Closing = true;
+                return false;
+            }
+
+            if (gameState.Clock1 < 0)
+                gameState.Clock2--;
+
+            if (gameState.Clock2 == 0)
+            {
+                CloseCave();
+                return true;
+            }
+
+            if (gameState.ObjectProperties[GameConstants.Lamp] == 1)
+                gameState.Limit--;
+
+            if (gameState.Limit <= 30 &&
+                gameState.Here(GameConstants.Batteries) &&
+                gameState.ObjectProperties[GameConstants.Batteries] == 0 &&
+                gameState.Here(GameConstants.Lamp))
+            {
+                Speak(188);
+                gameState.SetObjectProperty(GameConstants.Batteries, 1);
+                if (gameState.Toting(GameConstants.Batteries))
+                    gameState.Drop(GameConstants.Batteries, gameState.Location);
+                gameState.Limit += 2500;
+                gameState.LampWarning = 0;
+                return false;
+            }
+
+            if (gameState.Limit == 0)
+            {
+                gameState.Limit--;
+                gameState.SetObjectProperty(GameConstants.Lamp, 0);
+                if (gameState.Here(GameConstants.Lamp))
+                    Speak(184);
+                return false;
+            }
+
+            if (gameState.Limit < 0 && gameState.Location <= 8)
+            {
+                Speak(185);
+                gameState.GaveUp = true;
+                NormalEnd();
+                return true;
+            }
+
+            if (gameState.Limit <= 30)
+            {
+                if (gameState.LampWarning != 0 || !gameState.Here(GameConstants.Lamp))
+                    return false;
+
+                gameState.LampWarning = 1;
+                int message = 187;
+                if (gameState.ObjectLocations[GameConstants.Batteries] == 0)
+                    message = 183;
+                if (gameState.ObjectProperties[GameConstants.Batteries] == 1)
+                    message = 189;
+                Speak(message);
+            }
+
+            return false;
+        }
+
+        private void CloseCave()
+        {
+            gameState.SetObjectProperty(GameConstants.Bottle, gameState.Put(GameConstants.Bottle, 115, 1));
+            gameState.SetObjectProperty(GameConstants.Plant, gameState.Put(GameConstants.Plant, 115, 0));
+            gameState.SetObjectProperty(GameConstants.Oyster, gameState.Put(GameConstants.Oyster, 115, 0));
+            gameState.SetObjectProperty(GameConstants.Lamp, gameState.Put(GameConstants.Lamp, 115, 0));
+            gameState.SetObjectProperty(GameConstants.Rod, gameState.Put(GameConstants.Rod, 115, 0));
+            gameState.SetObjectProperty(GameConstants.Dwarf, gameState.Put(GameConstants.Dwarf, 115, 0));
+
+            gameState.Location = 115;
+            gameState.OldLocation = 115;
+            gameState.NewLocation = 115;
+
+            gameState.Put(GameConstants.Grate, 116, 0);
+            gameState.SetObjectProperty(GameConstants.Snake, gameState.Put(GameConstants.Snake, 116, 1));
+            gameState.SetObjectProperty(GameConstants.Bird, gameState.Put(GameConstants.Bird, 116, 1));
+            gameState.SetObjectProperty(GameConstants.Cage, gameState.Put(GameConstants.Cage, 116, 0));
+            gameState.SetObjectProperty(GameConstants.Rod2, gameState.Put(GameConstants.Rod2, 116, 0));
+            gameState.SetObjectProperty(GameConstants.Pillow, gameState.Put(GameConstants.Pillow, 116, 0));
+            gameState.SetObjectProperty(GameConstants.Mirror, gameState.Put(GameConstants.Mirror, 115, 0));
+            gameState.FixedObjectLocations[GameConstants.Mirror] = 116;
+
+            for (int item = 1; item <= GameConstants.MaxObjects; item++)
+            {
+                if (gameState.Toting(item))
+                    gameState.Destroy(item);
+            }
+
+            Speak(132);
+            gameState.Closed = true;
+            gameState.Location = 0;
+        }
+
+        private void TryLocationHint()
+        {
+            if ((gameState.LocationConditions[gameState.Location] & gameState.HintAvailable) == 0)
+            {
+                Array.Clear(gameState.HintLocations);
+                return;
+            }
+
+            switch (gameState.LocationConditions[gameState.Location] & GameConstants.Hint)
+            {
+                case GameConstants.HintF:
+                    gameState.HintLocations[GameConstants.HintAreaF]++;
+                    if (gameState.HintLocations[GameConstants.HintAreaF] > 20 && gameState.VisitedLocations[8] == 0)
+                        TryHint(56, GameConstants.HintF, GameConstants.HintAreaF);
+                    break;
+                case GameConstants.HintC:
+                    gameState.HintLocations[GameConstants.HintAreaC]++;
+                    if (gameState.HintLocations[GameConstants.HintAreaC] > 3 &&
+                        gameState.ObjectProperties[GameConstants.Grate] == 0 &&
+                        !gameState.Toting(GameConstants.Keys))
+                    {
+                        TryHint(62, GameConstants.HintC, GameConstants.HintAreaC);
+                    }
+                    break;
+                case GameConstants.HintB:
+                    gameState.HintLocations[GameConstants.HintAreaB]++;
+                    if (gameState.HintLocations[GameConstants.HintAreaB] > 4 &&
+                        gameState.ObjectLocations[GameConstants.Bird] == gameState.Location &&
+                        gameState.Toting(GameConstants.Rod))
+                    {
+                        TryHint(18, GameConstants.HintB, GameConstants.HintAreaB);
+                    }
+                    break;
+                case GameConstants.HintS:
+                    gameState.HintLocations[GameConstants.HintAreaS]++;
+                    if (gameState.HintLocations[GameConstants.HintAreaS] > 5 &&
+                        gameState.ObjectLocations[GameConstants.Snake] == gameState.Location &&
+                        !gameState.Toting(GameConstants.Bird))
+                    {
+                        TryHint(20, GameConstants.HintS, GameConstants.HintAreaS);
+                    }
+                    break;
+                case GameConstants.HintM:
+                    gameState.HintLocations[GameConstants.HintAreaM]++;
+                    if (gameState.HintLocations[GameConstants.HintAreaM] > 15)
+                        TryHint(176, GameConstants.HintM, GameConstants.HintAreaM);
+                    break;
+                case GameConstants.HintP:
+                    gameState.HintLocations[GameConstants.HintAreaP]++;
+                    if (gameState.HintLocations[GameConstants.HintAreaP] > 5 &&
+                        gameState.ObjectLocations[GameConstants.Emerald] != 100)
+                    {
+                        TryHint(178, GameConstants.HintP, GameConstants.HintAreaP);
+                    }
+                    break;
+                case GameConstants.HintW:
+                    gameState.HintLocations[GameConstants.HintAreaW]++;
+                    if (gameState.HintLocations[GameConstants.HintAreaW] > 15)
+                        TryHint(180, GameConstants.HintW, GameConstants.HintAreaW);
+                    break;
+            }
+        }
+
+        private void TryHint(int promptMessage, int mask, int hintArea)
+        {
+            Console.WriteLine();
+            if (AskYesNo(promptMessage, 0, 54) &&
+                AskYesNo(87, promptMessage + 1, 54))
+            {
+                gameState.HintTaken++;
+                gameState.HintAvailable &= ~mask;
+            }
+
+            gameState.HintLocations[hintArea] = 0;
         }
 
         private void DoObject()
@@ -445,7 +729,6 @@ public class AdventureGame
                 {
                     gameState.Motion = GameConstants.Depression;
                     DoMove();
-                    ApplyLocationChange();
                     return;
                 }
 
@@ -453,7 +736,6 @@ public class AdventureGame
                 {
                     gameState.Motion = GameConstants.Entrance;
                     DoMove();
-                    ApplyLocationChange();
                     return;
                 }
             }
@@ -1290,7 +1572,6 @@ public class AdventureGame
                     }
 
                     gameState.NewLocation = 120;
-                    ApplyLocationChange();
                     return;
                 default:
                     ActSpeak(gameState.Verb);
@@ -1942,32 +2223,39 @@ public class AdventureGame
         /// </summary>
         private void ShowLocationDescription(bool forceLong = false)
         {
-            // Check if location is dark
+            if (gameState.Toting(GameConstants.Bear))
+                Speak(141);
+
             if (DarknessManager.IsDark(gameState))
             {
-                Console.WriteLine(GameMessages.GetMessage(16)); // "It is now pitch dark. If you proceed you will likely fall into a pit."
-                return;
-            }
-
-            bool showLong = forceLong || gameState.VisitedLocations[gameState.Location] == 0;
-            
-            if (showLong && LocationDescriptions.LongDescriptions.TryGetValue(gameState.Location, out string? longDesc))
-            {
-                Console.WriteLine(longDesc);
-            }
-            else if (LocationDescriptions.ShortDescriptions.TryGetValue(gameState.Location, out string? shortDesc))
-            {
-                Console.WriteLine(shortDesc);
+                Speak(16);
             }
             else
             {
-                Console.WriteLine($"You are in location {gameState.Location}.");
+                bool useShortDescription = !forceLong &&
+                    ((gameState.VisitedLocations[gameState.Location] & 3) != 0 ||
+                    ((gameState.Detail & gameState.TestBr) != 0 && gameState.VisitedLocations[gameState.Location] != 0));
+
+                if (!useShortDescription &&
+                    LocationDescriptions.LongDescriptions.TryGetValue(gameState.Location, out string? longDesc))
+                {
+                    Console.WriteLine(longDesc);
+                }
+                else if (LocationDescriptions.ShortDescriptions.TryGetValue(gameState.Location, out string? shortDesc))
+                {
+                    Console.WriteLine(shortDesc);
+                }
+                else
+                {
+                    Console.WriteLine($"You are in location {gameState.Location}.");
+                }
+
+                if (!DarknessManager.IsDark(gameState))
+                    ShowObjectsHere();
             }
 
-            gameState.VisitedLocations[gameState.Location] = 1;
-
-            // Show objects at this location
-            ShowObjectsHere();
+            if (gameState.Location == 33 && GameState.Pct(random, 25) && !gameState.Closing)
+                Speak(8);
         }
 
         /// <summary>
@@ -1975,24 +2263,43 @@ public class AdventureGame
         /// </summary>
         private void ShowObjectsHere()
         {
-            List<int> objectsHere = gameState.GetObjectsHere();
-            
-            foreach (int objectId in objectsHere)
+            bool printedAny = false;
+
+            for (int objectId = 1; objectId < GameConstants.MaxObjects; objectId++)
             {
-                if (!gameState.IsCarrying(objectId) && 
-                    GameObjects.Objects.TryGetValue(objectId, out GameObjectData? objectData))
+                if (!gameState.At(objectId))
+                    continue;
+
+                if (objectId == GameConstants.Steps && gameState.Toting(GameConstants.Nugget))
+                    continue;
+
+                if (gameState.ObjectProperties[objectId] < 0)
                 {
-                    if (objectData.States.Count > 0)
-                    {
-                        int stateIndex = Math.Min(gameState.ObjectProperties[objectId], objectData.States.Count - 1);
-                        string description = objectData.States[stateIndex].RoomDescription;
-                        if (!string.IsNullOrEmpty(description))
-                        {
-                            Console.WriteLine(description);
-                        }
-                    }
+                    if (gameState.Closed)
+                        continue;
+
+                    gameState.SetObjectProperty(objectId, 0);
+                    if (objectId == GameConstants.Rug || objectId == GameConstants.Chain)
+                        gameState.SetObjectProperty(objectId, gameState.ObjectProperties[objectId] + 1);
+                    gameState.Tally--;
                 }
+
+                int state = objectId == GameConstants.Steps &&
+                    gameState.Location == gameState.FixedObjectLocations[GameConstants.Steps]
+                    ? 1
+                    : gameState.ObjectProperties[objectId];
+
+                if (!printedAny && (gameState.Detail & 2) == 0)
+                {
+                    Console.WriteLine();
+                    printedAny = true;
+                }
+
+                PrintObjectMessage(objectId, state);
             }
+
+            if (gameState.Tally == gameState.Tally2 && gameState.Tally != 0 && gameState.Limit > 35)
+                gameState.Limit = 35;
         }
 
         /// <summary>
@@ -2043,9 +2350,36 @@ public class AdventureGame
         /// </summary>
         private void HandleDeath()
         {
-            // TODO: Implement full death mechanics with resurrection
-            // For now, just end the game
-            gameState.SaveFlag = true;
+            if (!gameState.Closing)
+            {
+                bool reincarnate = AskYesNo(81 + gameState.NumDie * 2, 82 + gameState.NumDie * 2, 54);
+                gameState.NumDie++;
+
+                if (gameState.NumDie >= GameConstants.MaxDeaths || !reincarnate)
+                {
+                    NormalEnd();
+                    return;
+                }
+
+                gameState.SetObjectLocation(GameConstants.Water, 0);
+                gameState.SetObjectLocation(GameConstants.Oil, 0);
+                if (gameState.Toting(GameConstants.Lamp))
+                    gameState.SetObjectProperty(GameConstants.Lamp, 0);
+
+                for (int item = GameConstants.MaxObjects; item >= 1; item--)
+                {
+                    if (gameState.Toting(item))
+                        gameState.Drop(item, item == GameConstants.Lamp ? GameConstants.EndOfRoad : gameState.OldLocation2);
+                }
+
+                gameState.NewLocation = GameConstants.WellHouse;
+                gameState.OldLocation = gameState.Location;
+                gameState.Location = 0;
+                return;
+            }
+
+            Speak(131);
             gameState.NumDie++;
+            NormalEnd();
         }
     }
