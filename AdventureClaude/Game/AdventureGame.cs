@@ -93,7 +93,8 @@ public class AdventureGame
             // Handle motion commands
             if (gameState.Motion > 0)
             {
-                HandleMotion(gameState.Motion);
+                DoMove();
+                ApplyLocationChange();
                 return;
             }
 
@@ -106,169 +107,318 @@ public class AdventureGame
         }
 
         /// <summary>
-        /// Handles movement commands using the travel table system.
-        /// Includes support for forced movement and special destinations.
+        /// C TURN.C domove(): dispatches special motion words and normal travel.
         /// </summary>
-        private void HandleMotion(int motion)
+        private void DoMove()
         {
-            // Get available travel options for this verb/direction
-            List<TravelEntry> availableOptions = gameState.GetAvailableTravelOptions(motion, random);
-
-            if (availableOptions.Count == 0)
+            switch (gameState.Motion)
             {
-                Console.WriteLine(GameMessages.GetMessage(9)); // "There is no way to go that direction."
+                case GameConstants.NullMotion:
+                    break;
+                case GameConstants.Back:
+                    GoBack();
+                    break;
+                case GameConstants.Look:
+                    if (gameState.Detail == 0)
+                    {
+                        Console.WriteLine(GameMessages.GetMessage(15));
+                        gameState.Detail |= 1;
+                    }
+
+                    gameState.WizardDark = false;
+                    gameState.VisitedLocations[gameState.Location] =
+                        (short)((gameState.VisitedLocations[gameState.Location] + 3) & ~3);
+                    gameState.TestBr = 0;
+                    gameState.NewLocation = gameState.Location;
+                    gameState.Location = 0;
+                    break;
+                case GameConstants.Cave:
+                    Console.WriteLine(GameMessages.GetMessage(gameState.Location < 8 ? 57 : 58));
+                    break;
+                default:
+                    gameState.OldLocation2 = gameState.OldLocation;
+                    gameState.OldLocation = gameState.Location;
+                    DoTravel();
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// C TURN.C goback(): tries to infer the reverse route through the travel table.
+        /// </summary>
+        private void GoBack()
+        {
+            int want = gameState.Forced(gameState.OldLocation)
+                ? gameState.OldLocation2
+                : gameState.OldLocation;
+
+            gameState.OldLocation2 = gameState.OldLocation;
+            gameState.OldLocation = gameState.Location;
+
+            if (want == gameState.Location)
+            {
+                Console.WriteLine(GameMessages.GetMessage(91));
                 return;
             }
 
-            // Use the first available option (conditions already evaluated)
-            TravelEntry selectedOption = availableOptions[0];
-            int destination = selectedOption.Destination;
+            List<TravelEntry> travel = TravelData.GetTravelOptions(gameState.Location);
+            TravelEntry? fallback = null;
 
-            // Handle special destinations
-            if (destination >= 500)
+            foreach (TravelEntry entry in travel)
             {
-                // Destination 500+ means print message and stay in place
-                int messageId = destination - 500;
-                if (messageId >= 1 && messageId <= GameConstants.MaxMessages)
+                if (entry.Condition == 0 && entry.Destination == want)
                 {
-                    Console.WriteLine(GameMessages.GetMessage(messageId));
+                    gameState.Motion = entry.Verb;
+                    DoTravel();
+                    return;
                 }
-                return;
+
+                if (entry.Condition != 0)
+                    continue;
+
+                fallback = entry;
+                int destination = entry.Destination;
+                if (destination <= GameConstants.MaxLocations)
+                {
+                    List<TravelEntry> destinationTravel = TravelData.GetTravelOptions(destination);
+                    if (gameState.Forced(destination) &&
+                        destinationTravel.Count > 0 &&
+                        destinationTravel[0].Destination == want)
+                    {
+                        fallback = entry;
+                    }
+                }
+                else
+                {
+                    fallback = null;
+                }
             }
 
-            if (destination >= 300)
+            if (fallback != null)
             {
-                // Special movement handlers (plover, troll bridge, etc.)
-                destination = HandleSpecialDestination(destination);
-                if (destination == 0)
-                {
-                    return; // Special handler aborted movement
-                }
-            }
-
-            // Perform the movement
-            if (destination > 0 && destination <= GameConstants.MaxLocations)
-            {
-                PerformMove(destination);
+                gameState.Motion = fallback.Verb;
+                DoTravel();
             }
             else
             {
-                Console.WriteLine(GameMessages.GetMessage(9)); // "There is no way to go that direction."
+                Console.WriteLine(GameMessages.GetMessage(140));
             }
         }
 
         /// <summary>
-        /// Handles special destination codes (301-303).
-        /// Ported from spcmove() in TURN.C.
+        /// C TURN.C dotrav(): evaluates travel table entries and sets NewLocation.
         /// </summary>
-        /// <param name="specialCode">Special destination code (301-303)</param>
-        /// <returns>Actual destination location, or 0 to abort movement</returns>
-        private int HandleSpecialDestination(int specialCode)
+        private void DoTravel()
         {
-            switch (specialCode)
+            List<TravelEntry> travel = TravelData.GetTravelOptions(gameState.Location);
+            gameState.NewLocation = gameState.Location;
+            bool hit = false;
+            bool moved = false;
+            int selectedDestination = gameState.Location;
+            int roll = GameState.RRand(random, 0, 99);
+
+            foreach (TravelEntry entry in travel)
             {
-                case 301:
-                    // Plover alcove teleportation
-                    // TODO: Implement full plover logic (emerald check, etc.)
-                    // For MVP: treat as regular movement
-                    Console.WriteLine("[Special: Plover alcove]");
-                    return specialCode % 300;
+                int destination = entry.Destination;
+                int verb = entry.Verb;
+                int condition = entry.Condition;
 
-                case 302:
-                    // Plover removal (bad route)
-                    // TODO: Implement emerald drop logic
-                    Console.WriteLine("[Special: Plover removal]");
-                    return specialCode % 300;
+                if (verb != 1 && verb != gameState.Motion && !hit)
+                    continue;
 
-                case 303:
-                    // Troll bridge
-                    // TODO: Implement full troll bridge logic
-                    Console.WriteLine("[Special: Troll bridge]");
-                    return specialCode % 300;
-
-                default:
-                    // Unknown special code, treat as regular movement
-                    return specialCode % 300;
-            }
-        }
-
-        /// <summary>
-        /// Performs the actual movement to a destination, handling forced movement cascades.
-        /// </summary>
-        /// <param name="destination">Destination location ID</param>
-        private void PerformMove(int destination)
-        {
-            const int MaxForcedMoves = 10; // Safety limit to prevent infinite loops
-            int forcedMoveCount = 0;
-
-            while (forcedMoveCount < MaxForcedMoves)
-            {
-                // Update location tracking
-                gameState.OldLocation2 = gameState.OldLocation;
-                gameState.OldLocation = gameState.Location;
-                gameState.Location = destination;
-                gameState.NewLocation = destination;
-
-                // Check for falling into pit in darkness
-                if (DarknessManager.CheckDarknessDanger(gameState, random))
+                hit = true;
+                if (IsTravelConditionMet(condition, roll))
                 {
-                    Console.WriteLine(GameMessages.GetMessage(23)); // "You fell into a pit and broke every bone in your body!"
+                    selectedDestination = destination;
+                    moved = true;
+                    break;
+                }
+            }
+
+            if (!moved)
+            {
+                BadMove();
+            }
+            else if (selectedDestination > 500)
+            {
+                Console.WriteLine(GameMessages.GetMessage(selectedDestination - 500));
+            }
+            else if (selectedDestination > 300)
+            {
+                SpecialMove(selectedDestination);
+            }
+            else
+            {
+                gameState.NewLocation = selectedDestination;
+                if (gameState.NewLocation == gameState.Location)
+                    gameState.Location = 0;
+            }
+        }
+
+        private bool IsTravelConditionMet(int condition, int roll)
+        {
+            int referencedObject = condition % 100;
+            int conditionType = condition / 100;
+
+            return conditionType switch
+            {
+                0 => condition == 0 || roll < condition,
+                1 => referencedObject == 0 || gameState.Toting(referencedObject),
+                2 => gameState.Toting(referencedObject) || gameState.At(referencedObject),
+                3 or 4 or 5 or 7 => gameState.ObjectProperties[referencedObject] != conditionType - 3,
+                _ => false,
+            };
+        }
+
+        /// <summary>
+        /// C TURN.C badmove(): chooses the best failed-movement message.
+        /// </summary>
+        private void BadMove()
+        {
+            int message = 12;
+            if (gameState.Motion >= 43 && gameState.Motion <= 50)
+                message = 9;
+            if (gameState.Motion == 29 || gameState.Motion == 30)
+                message = 9;
+            if (gameState.Motion == 7 || gameState.Motion == 36 || gameState.Motion == 37)
+                message = 10;
+            if (gameState.Motion == 11 || gameState.Motion == 19)
+                message = 11;
+            if (gameState.Verb == GameConstants.Find || gameState.Verb == GameConstants.Inventory)
+                message = 59;
+            if (gameState.Motion == 62 || gameState.Motion == 65)
+                message = 42;
+            if (gameState.Motion == 17)
+                message = 80;
+
+            Console.WriteLine(GameMessages.GetMessage(message));
+        }
+
+        /// <summary>
+        /// C TURN.C spcmove(): handles plover and troll bridge travel destinations.
+        /// </summary>
+        private void SpecialMove(int destination)
+        {
+            switch (destination - 300)
+            {
+                case 1:
+                    if (gameState.Holding == 0 ||
+                        (gameState.Holding == 1 && gameState.Toting(GameConstants.Emerald)))
+                    {
+                        gameState.NewLocation = 199 - gameState.Location;
+                    }
+                    else
+                    {
+                        Console.WriteLine(GameMessages.GetMessage(117));
+                    }
+                    break;
+                case 2:
+                    gameState.Drop(GameConstants.Emerald, gameState.Location);
+                    Console.WriteLine(GameMessages.GetMessage(54));
+                    break;
+                case 3:
+                    if (gameState.ObjectProperties[GameConstants.Troll] == 1)
+                    {
+                        PrintObjectMessage(GameConstants.Troll, 1);
+                        gameState.SetObjectProperty(GameConstants.Troll, 0);
+                        gameState.MoveObject(GameConstants.Troll2, 0);
+                        gameState.MoveObject(GameConstants.Troll2 + GameConstants.MaxObjects, 0);
+                        gameState.MoveObject(GameConstants.Troll, 117);
+                        gameState.MoveObject(GameConstants.Troll + GameConstants.MaxObjects, 122);
+                        GameState.Juggle(GameConstants.Chasm);
+                        gameState.NewLocation = gameState.Location;
+                    }
+                    else
+                    {
+                        gameState.NewLocation = gameState.Location == 117 ? 122 : 117;
+                        if (gameState.ObjectProperties[GameConstants.Troll] == 0)
+                            gameState.SetObjectProperty(GameConstants.Troll, gameState.ObjectProperties[GameConstants.Troll] + 1);
+
+                        if (!gameState.Toting(GameConstants.Bear))
+                            return;
+
+                        Console.WriteLine(GameMessages.GetMessage(162));
+                        gameState.SetObjectProperty(GameConstants.Chasm, 1);
+                        gameState.SetObjectProperty(GameConstants.Troll, 2);
+                        gameState.Drop(GameConstants.Bear, gameState.NewLocation);
+                        gameState.FixedObjectLocations[GameConstants.Bear] = -1;
+                        gameState.SetObjectProperty(GameConstants.Bear, 3);
+                        if (gameState.ObjectProperties[GameConstants.Spices] < 0)
+                            gameState.Tally2++;
+                        gameState.OldLocation2 = gameState.NewLocation;
+                        HandleDeath();
+                    }
+                    break;
+                default:
+                    Console.WriteLine($"Fatal error number 38");
+                    gameState.SaveFlag = true;
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Applies the NewLocation chosen by DoTravel. This is the movement subset of TURN.C turn().
+        /// </summary>
+        private void ApplyLocationChange()
+        {
+            const int MaxForcedMoves = 20;
+            int forcedMoves = 0;
+
+            while (gameState.Location != gameState.NewLocation && !gameState.SaveFlag)
+            {
+                bool forceLongDescription = gameState.Location == 0;
+                if (forceLongDescription)
+                    gameState.VisitedLocations[gameState.NewLocation] =
+                        (short)((gameState.VisitedLocations[gameState.NewLocation] + 3) & ~3);
+
+                gameState.Location = gameState.NewLocation;
+
+                if (gameState.Location == 0)
+                {
                     HandleDeath();
                     return;
                 }
 
-                // Show location description
-                ShowLocationDescription();
-
-                // Update darkness state for next move
-                DarknessManager.UpdateDarknessState(gameState);
-
-                // Check if this location forces automatic movement
-                if (!DarknessManager.IsForced(gameState, gameState.Location))
+                if (gameState.Forced(gameState.Location))
                 {
-                    // Not forced, movement complete
-                    return;
-                }
-
-                // Location is forced - automatically move to next location
-                forcedMoveCount++;
-
-                // Get forced travel option (usually the first/only option)
-                List<TravelEntry> forcedOptions = gameState.GetAvailableTravelOptions(1, random);
-                if (forcedOptions.Count == 0)
-                {
-                    Console.WriteLine("[Warning: Forced location has no travel options]");
-                    return;
-                }
-
-                // Use first available forced movement option
-                destination = forcedOptions[0].Destination;
-
-                // Handle special destinations in forced movement
-                if (destination >= 500)
-                {
-                    int messageId = destination - 500;
-                    if (messageId >= 1 && messageId <= GameConstants.MaxMessages)
+                    ShowLocationDescription(forceLongDescription);
+                    gameState.Motion = 1;
+                    DoMove();
+                    if (++forcedMoves >= MaxForcedMoves)
                     {
-                        Console.WriteLine(GameMessages.GetMessage(messageId));
-                    }
-                    return;
-                }
-
-                if (destination >= 300)
-                {
-                    destination = HandleSpecialDestination(destination);
-                    if (destination == 0)
-                    {
+                        Console.WriteLine("[Warning: Maximum forced movement cascade depth reached]");
                         return;
                     }
+                    continue;
                 }
 
-                // Continue loop to move to forced destination
+                if (gameState.WizardDark && DarknessManager.IsDark(gameState) && GameState.Pct(random, 35))
+                {
+                    Console.WriteLine(GameMessages.GetMessage(23));
+                    gameState.OldLocation2 = gameState.Location;
+                    HandleDeath();
+                    return;
+                }
+
+                ShowLocationDescription(forceLongDescription);
+                if (!DarknessManager.IsDark(gameState))
+                    gameState.VisitedLocations[gameState.Location]++;
             }
 
-            // Safety limit reached
-            Console.WriteLine("[Warning: Maximum forced movement cascade depth reached]");
+            gameState.WizardDark = DarknessManager.IsDark(gameState);
+        }
+
+        private void PrintObjectMessage(int objectId, int state)
+        {
+            if (!GameObjects.Objects.TryGetValue(objectId, out GameObjectData? objectData))
+                return;
+
+            if (state < 0 || state >= objectData.States.Count)
+                return;
+
+            string message = objectData.States[state].RoomDescription;
+            if (!string.IsNullOrEmpty(message))
+                Console.WriteLine(message);
         }
 
         /// <summary>
