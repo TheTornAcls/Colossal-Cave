@@ -8,6 +8,62 @@ using System.Collections.Generic;
 /// </summary>
 public class GameState
     {
+        private static readonly short[] InitialLocationConditions =
+        [
+            0, 2053, 2049, 2053, 2053, 2049, 2049, 2053, 33, 1,
+            1, 0, 0, 64, 0, 0, 16, 0, 0, 128,
+            16, 16, 16, 0, 6, 0, 16, 0, 0, 0,
+            0, 16, 16, 0, 0, 0, 0, 0, 4, 0,
+            16, 0, 256, 256, 256, 256, 264, 264, 264, 256,
+            256, 256, 256, 264, 256, 264, 0, 8, 0, 16,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 3,
+            256, 256, 264, 0, 0, 8, 264, 256, 0, 16,
+            16, 0, 0, 0, 0, 4, 0, 0, 0, 512,
+            513, 0, 0, 0, 0, 0, 0, 0, 1024, 0,
+            0, 0, 0, 4, 0, 1, 1, 0, 0, 0,
+            0, 0, 8, 8, 8, 8, 8, 8, 8, 8,
+            8, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        ];
+
+        private static readonly int[] InitialObjectLocations =
+        [
+            0, 3, 3, 8, 10, 11, 0, 14, 13, 94,
+            96, 19, 17, 101, 103, 0, 106, 0, 0, 3,
+            3, 0, 0, 109, 25, 23, 111, 35, 0, 97,
+            0, 119, 117, 117, 0, 130, 0, 126, 140, 0,
+            96, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            18, 27, 28, 29, 30, 0, 92, 95, 97, 100,
+            101, 0, 119, 127, 130, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        ];
+
+        private static readonly int[] InitialFixedObjectLocations =
+        [
+            0, 0, 0, 9, 0, 0, 0, 15, 0, -1,
+            0, -1, 27, -1, 0, 0, 0, -1, 0, 0,
+            0, 0, 0, -1, -1, 67, -1, 110, 0, -1,
+            -1, 121, 122, 122, 0, -1, -1, -1, -1, 0,
+            -1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 121, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        ];
+
+        private static readonly short[] InitialActionMessages =
+        [
+            0, 24, 29, 0, 33, 0, 33, 38, 38, 42,
+            14, 43, 110, 29, 110, 73, 75, 29, 13, 59,
+            59, 174, 109, 67, 13, 0, 90, 195, 146, 110,
+            13, 13, 155
+        ];
+
+        private static readonly int[] InitialDwarfLocations = [0, 19, 27, 33, 44, 64, 114];
+
         // Location-related variables
         public int Turns { get; set; } = 0;
         public int Location { get; set; } = GameConstants.StartLocation;
@@ -16,11 +72,11 @@ public class GameState
         public int NewLocation { get; set; } = GameConstants.StartLocation;
 
         // Arrays for location and object status
-        public short[] LocationConditions { get; set; } = new short[GameConstants.MaxLocations];
-        public int[] ObjectLocations { get; set; } = new int[GameConstants.MaxObjects];
-        public int[] FixedObjectLocations { get; set; } = new int[GameConstants.MaxObjects];
-        public short[] VisitedLocations { get; set; } = new short[GameConstants.MaxLocations];
-        public short[] ObjectProperties { get; set; } = new short[GameConstants.MaxObjects];
+        public short[] LocationConditions { get; set; } = new short[GameConstants.LocationArraySize];
+        public int[] ObjectLocations { get; set; } = new int[GameConstants.ObjectArraySize];
+        public int[] FixedObjectLocations { get; set; } = new int[GameConstants.ObjectArraySize];
+        public short[] VisitedLocations { get; set; } = new short[GameConstants.LocationArraySize];
+        public short[] ObjectProperties { get; set; } = new short[GameConstants.ObjectArraySize];
 
         // Game progress variables
         public int Tally { get; set; } = 0;
@@ -36,10 +92,10 @@ public class GameState
         public int ChestLocation2 { get; set; } = 0;
 
         // Dwarf-related variables
-        public int[] DwarfLocations { get; set; } = new int[GameConstants.MaxDwarves];
-        public int[] OldDwarfLocations { get; set; } = new int[GameConstants.MaxDwarves];
+        public int[] DwarfLocations { get; set; } = new int[GameConstants.DwarfArraySize];
+        public int[] OldDwarfLocations { get; set; } = new int[GameConstants.DwarfArraySize];
         public int DwarfKill { get; set; } = 0;
-        public bool[] DwarfSeen { get; set; } = new bool[GameConstants.MaxDwarves];
+        public bool[] DwarfSeen { get; set; } = new bool[GameConstants.DwarfArraySize];
 
         // Time and event variables
         public int Clock1 { get; set; } = 0;
@@ -57,7 +113,7 @@ public class GameState
         public bool SaveFlag { get; set; } = false;
         public int HintTaken { get; set; } = 0;
         public int HintAvailable { get; set; } = 0;
-        public int[] HintLocations { get; set; } = new int[GameConstants.MaxLocations];
+        public int[] HintLocations { get; set; } = new int[GameConstants.HintArraySize];
         public int TestBr { get; set; } = 0;
 
         // Action messages
@@ -82,45 +138,49 @@ public class GameState
         /// </summary>
         public void InitializeGame()
         {
-            // Initialize arrays
-            LocationConditions = new short[GameConstants.MaxLocations];
-            ObjectLocations = new int[GameConstants.MaxObjects];
-            FixedObjectLocations = new int[GameConstants.MaxObjects];
-            VisitedLocations = new short[GameConstants.MaxLocations];
-            ObjectProperties = new short[GameConstants.MaxObjects];
-            DwarfLocations = new int[GameConstants.MaxDwarves];
-            OldDwarfLocations = new int[GameConstants.MaxDwarves];
-            DwarfSeen = new bool[GameConstants.MaxDwarves];
-            HintLocations = new int[GameConstants.MaxLocations];
-            ActionMessages = new short[GameConstants.ActionMessageSize];
+            LocationConditions = CopyLocationConditions();
+            ObjectLocations = CopyObjectLocations(InitialObjectLocations);
+            FixedObjectLocations = CopyObjectLocations(InitialFixedObjectLocations);
+            VisitedLocations = new short[GameConstants.LocationArraySize];
+            ObjectProperties = new short[GameConstants.ObjectArraySize];
+            for (int i = GameConstants.Nugget; i < GameConstants.MaxObjects; i++)
+            {
+                ObjectProperties[i] = -1;
+            }
+
+            DwarfLocations = CopyDwarfLocations();
+            OldDwarfLocations = new int[GameConstants.DwarfArraySize];
+            DwarfSeen = new bool[GameConstants.DwarfArraySize];
+            HintLocations = new int[GameConstants.HintArraySize];
+            ActionMessages = CopyActionMessages();
 
             // Set default values
             Turns = 0;
-            Location = GameConstants.StartLocation;
-            OldLocation = GameConstants.StartLocation;
-            OldLocation2 = GameConstants.StartLocation;
-            NewLocation = GameConstants.StartLocation;
+            NewLocation = 1;
+            Location = 2;
+            OldLocation = 2;
+            OldLocation2 = 2;
             
             WizardDark = false;
             Closed = false;
             Closing = false;
             Holding = 0;
             Detail = 0;
-            Limit = 330;
-            Tally = 0;
+            Limit = 100;
+            Tally = 15;
             Tally2 = 0;
             
             KnifeLocation = 0;
-            ChestLocation = 0;
-            ChestLocation2 = 0;
+            ChestLocation = 114;
+            ChestLocation2 = 140;
             
             DwarfKill = 0;
-            Clock1 = 0;
-            Clock2 = 0;
+            Clock1 = 30;
+            Clock2 = 50;
             Panic = false;
             Bonus = 0;
             NumDie = 0;
-            DwarfAlternateLocation = 0;
+            DwarfAlternateLocation = 18;
             LampWarning = 0;
             FooBar = 0;
             
@@ -128,8 +188,8 @@ public class GameState
             GaveUp = false;
             SaveFlag = false;
             HintTaken = 0;
-            HintAvailable = 0;
-            TestBr = 0;
+            HintAvailable = GameConstants.Hint;
+            TestBr = 2;
             
             Verb = 0;
             Object = 0;
@@ -138,79 +198,34 @@ public class GameState
             Word2 = string.Empty;
             
             DebugFlag = 0;
-
-            // Initialize location conditions for liquid locations
-            // Water locations (LIQUID flag, no WATOIL flag)
-            LocationConditions[1] |= GameConstants.Liquid;   // End of road
-            LocationConditions[3] |= GameConstants.Liquid;   // Well house
-            LocationConditions[4] |= GameConstants.Liquid;   // Valley
-            LocationConditions[7] |= GameConstants.Liquid;   // Slit in streambed
-            LocationConditions[38] |= GameConstants.Liquid;  // Y2
-            LocationConditions[95] |= GameConstants.Liquid;  // Mirror canyon
-            LocationConditions[112] |= GameConstants.Liquid; // Reservoir
-            LocationConditions[114] |= GameConstants.Liquid; // At reservoir
-
-            // Oil location (LIQUID flag + WATOIL flag)
-            LocationConditions[24] |= (GameConstants.Liquid | GameConstants.WatOil); // Dark room
-
-            // Initialize LIGHT flags for outdoor and early cave locations (1-8)
-            // These locations have natural light and don't require a lamp
-            LocationConditions[1] |= GameConstants.Light;  // End of road
-            LocationConditions[2] |= GameConstants.Light;  // Hill in road
-            LocationConditions[3] |= GameConstants.Light;  // Inside building (well house)
-            LocationConditions[4] |= GameConstants.Light;  // Valley
-            LocationConditions[5] |= GameConstants.Light;  // Forest
-            LocationConditions[6] |= GameConstants.Light;  // Forest
-            LocationConditions[7] |= GameConstants.Light;  // Slit in streambed
-            LocationConditions[8] |= GameConstants.Light;  // Outside grate
-
-            // Initialize FORCED flags for automatic movement locations
-            // These locations force immediate automatic movement to next location
-            LocationConditions[16] |= GameConstants.Forced;  // Forced movement
-            LocationConditions[20] |= GameConstants.Forced;  // Forced movement
-            LocationConditions[21] |= GameConstants.Forced;  // Forced movement
-            LocationConditions[22] |= GameConstants.Forced;  // Forced movement
-            LocationConditions[26] |= GameConstants.Forced;  // Forced movement
-            LocationConditions[31] |= GameConstants.Forced;  // Forced movement
-            LocationConditions[32] |= GameConstants.Forced;  // Forced movement
-            LocationConditions[40] |= GameConstants.Forced;  // Forced movement
-            LocationConditions[49] |= GameConstants.Forced;  // Forced movement
-            LocationConditions[59] |= GameConstants.Forced;  // Forced movement
-            LocationConditions[89] |= GameConstants.Forced;  // Forced movement
-
-            // TODO: Initialize other location conditions (hints, etc.)
-
-            // Initialize object locations
-            InitializeObjectLocations();
         }
 
-        /// <summary>
-        /// Sets up initial object locations.
-        /// This would be populated from the original cave data.
-        /// </summary>
-        private void InitializeObjectLocations()
+        private static short[] CopyLocationConditions()
         {
-            // Set initial object locations based on the original adventure
-            ObjectLocations[GameConstants.Keys] = 3;      // Keys in well house
-            ObjectLocations[GameConstants.Lamp] = 3;      // Lamp in well house
-            ObjectLocations[GameConstants.Food] = 3;      // Food in well house
-            ObjectLocations[GameConstants.Bottle] = 3;    // Bottle in well house
-            
-            // Liquids start at location 0 (non-existent) until bottle is filled
-            ObjectLocations[GameConstants.Water] = 0;     // Water not in game initially
-            ObjectLocations[GameConstants.Oil] = 0;       // Oil not in game initially
-            
-            // Bottle starts empty (property = 1)
-            ObjectProperties[GameConstants.Bottle] = 1;   // Empty bottle
-            
-            // Lamp starts off (property = 0)
-            ObjectProperties[GameConstants.Lamp] = 0;     // Lamp is off
-            
-            // Set fixed objects
-            FixedObjectLocations[GameConstants.Grate] = 8;    // Grate at location 8
-            FixedObjectLocations[GameConstants.Steps] = 8;    // Steps at location 8
-            
-            // Initialize other objects as needed
+            short[] result = new short[GameConstants.LocationArraySize];
+            Array.Copy(InitialLocationConditions, result, InitialLocationConditions.Length);
+            return result;
+        }
+
+        private static int[] CopyObjectLocations(int[] source)
+        {
+            int[] result = new int[GameConstants.ObjectArraySize];
+            Array.Copy(source, result, source.Length);
+            return result;
+        }
+
+        private static short[] CopyActionMessages()
+        {
+            short[] result = new short[GameConstants.ActionMessageSize];
+            Array.Copy(InitialActionMessages, result, InitialActionMessages.Length);
+            return result;
+        }
+
+        private static int[] CopyDwarfLocations()
+        {
+            int[] result = new int[GameConstants.DwarfArraySize];
+            Array.Copy(InitialDwarfLocations, result, InitialDwarfLocations.Length);
+            return result;
         }
 
         /// <summary>
@@ -241,7 +256,7 @@ public class GameState
         public List<int> GetCarriedObjects()
         {
             List<int> carriedObjects = new ();
-            for (int i = 1; i < GameConstants.MaxObjects; i++)
+            for (int i = 1; i <= GameConstants.MaxObjects; i++)
             {
                 if (IsCarrying(i))
                 {
@@ -258,7 +273,7 @@ public class GameState
         public List<int> GetObjectsHere()
         {
             List<int> objectsHere = new ();
-            for (int i = 1; i < GameConstants.MaxObjects; i++)
+            for (int i = 1; i <= GameConstants.MaxObjects; i++)
             {
                 if (IsObjectHere(i))
                 {
