@@ -68,7 +68,7 @@ public class AdventureGame
             string input = Console.ReadLine() ?? string.Empty;
 
             // Parse input
-            if (!inputParser.ParseInput(input, out int verb, out int objectId, out int motion))
+            if (!inputParser.ParseInput(input, gameState, out int verb, out int objectId, out int motion))
             {
                 return; // Invalid input, try again
             }
