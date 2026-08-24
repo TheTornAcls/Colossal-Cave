@@ -25,6 +25,14 @@ public class InputParser
         /// <returns>True if the input was successfully parsed, false otherwise</returns>
         public bool ParseInput(string input, out int verb, out int objectId, out int motion)
         {
+            return ParseInput(input, null, out verb, out objectId, out motion);
+        }
+
+        /// <summary>
+        /// Parses a two-word player command using the original Adventure grammar.
+        /// </summary>
+        public bool ParseInput(string input, GameState? gameState, out int verb, out int objectId, out int motion)
+        {
             verb = 0;
             objectId = 0;
             motion = 0;
@@ -39,15 +47,13 @@ public class InputParser
             if (string.IsNullOrEmpty(word1))
                 return false;
 
-            // Analyze first word
-            if (!VocabularySimple.AnalyzeWord(word1, out int type1, out int val1))
+            if (!Vocabulary.AnalyzeWord(word1, out int type1, out int val1))
             {
                 Console.WriteLine($"I don't know the word \"{word1}\".");
                 return false;
             }
 
-            // Handle SAY command specially
-            if (type1 == VocabularySimple.WordTypes.Verb && val1 == GameConstants.Say)
+            if (type1 == Vocabulary.WordTypes.Verb && val1 == GameConstants.Say)
             {
                 verb = GameConstants.Say;
                 objectId = 1;
@@ -59,15 +65,22 @@ public class InputParser
             // Analyze second word if present
             if (!string.IsNullOrEmpty(word2))
             {
-                if (!VocabularySimple.AnalyzeWord(word2, out type2, out val2))
+                if (!Vocabulary.AnalyzeWord(word2, out type2, out val2))
                 {
                     Console.WriteLine($"I don't know the word \"{word2}\".");
                     return false;
                 }
             }
 
-            // Determine verb, object, and motion based on word types
-            return AnalyzeWordTypes(type1, val1, type2, val2, out verb, out objectId, out motion);
+            return AnalyzeWordTypes(
+                type1,
+                val1,
+                type2,
+                val2,
+                gameState,
+                out verb,
+                out objectId,
+                out motion);
         }
 
         /// <summary>
@@ -81,14 +94,15 @@ public class InputParser
             if (string.IsNullOrWhiteSpace(input))
                 return new string[0];
 
-            // Convert to lowercase and split on whitespace, taking only first two words
-            string[] allWords = input.ToLowerInvariant().Split(new char[] { ' ', '\t' }, 
+            string[] allWords = input.ToLowerInvariant().Split(new char[] { ' ', '\t' },
                 StringSplitOptions.RemoveEmptyEntries);
 
             string[] result = new string[Math.Min(2, allWords.Length)];
             for (int i = 0; i < result.Length; i++)
             {
-                result[i] = allWords[i];
+                result[i] = allWords[i].Length >= GameConstants.MaxWordSize
+                    ? allWords[i][..(GameConstants.MaxWordSize - 1)]
+                    : allWords[i];
             }
 
             return result;
@@ -98,107 +112,115 @@ public class InputParser
         /// Analyzes word types and determines appropriate verb, object, and motion.
         /// Converted from the grammar analysis logic in english().
         /// </summary>
-        private bool AnalyzeWordTypes(int type1, int val1, int type2, int val2, 
+        private bool AnalyzeWordTypes(int type1, int val1, int type2, int val2, GameState? gameState,
                                     out int verb, out int objectId, out int motion)
         {
             verb = 0;
             objectId = 0;
             motion = 0;
 
-            // Single word commands
-            if (type2 == -1)
+            if (type1 == Vocabulary.WordTypes.Special &&
+                type2 == Vocabulary.WordTypes.Special &&
+                val1 == GameConstants.Help &&
+                val2 == GameConstants.Help)
             {
-                switch (type1)
-                {
-                    case VocabularySimple.WordTypes.Motion:
-                        motion = val1;
-                        return true;
-                    case VocabularySimple.WordTypes.Verb:
-                        verb = val1;
-                        return true;
-                    case VocabularySimple.WordTypes.Object:
-                        Console.WriteLine("What do you want to do with it?");
-                        return false;
-                    default:
-                        Console.WriteLine("I don't understand that!");
-                        return false;
-                }
+                ShowKnownWords();
+                return false;
             }
 
-            // Two word commands - analyze combinations
-            if (IsValidTwoWordCombination(type1, val1, type2, val2, out verb, out objectId, out motion))
+            if (type1 == Vocabulary.WordTypes.Special)
             {
+                Console.WriteLine(GameMessages.GetMessage(val1));
+                return false;
+            }
+
+            if (type2 == Vocabulary.WordTypes.Special)
+            {
+                Console.WriteLine(GameMessages.GetMessage(val2));
+                return false;
+            }
+
+            if (type1 == Vocabulary.WordTypes.Motion)
+            {
+                if (type2 == Vocabulary.WordTypes.Motion)
+                {
+                    Console.WriteLine("bad grammar...");
+                    return false;
+                }
+
+                motion = val1;
                 return true;
             }
 
-            Console.WriteLine("Bad grammar...");
+            if (type2 == Vocabulary.WordTypes.Motion)
+            {
+                motion = val2;
+                return true;
+            }
+
+            if (type1 == Vocabulary.WordTypes.Object)
+            {
+                objectId = val1;
+                if (type2 == Vocabulary.WordTypes.Verb)
+                {
+                    verb = val2;
+                    return true;
+                }
+
+                if (type2 == Vocabulary.WordTypes.Object)
+                {
+                    if ((objectId == GameConstants.Water || objectId == GameConstants.Oil) &&
+                        gameState != null &&
+                        gameState.IsObjectHere(val2))
+                    {
+                        verb = GameConstants.Pour;
+                        return true;
+                    }
+
+                    Console.WriteLine("bad grammar...");
+                    return false;
+                }
+
+                return true;
+            }
+
+            if (type1 == Vocabulary.WordTypes.Verb)
+            {
+                verb = val1;
+                if (type2 == Vocabulary.WordTypes.Object)
+                {
+                    objectId = val2;
+                    return true;
+                }
+
+                if (type2 == Vocabulary.WordTypes.Verb)
+                {
+                    Console.WriteLine("bad grammar...");
+                    return false;
+                }
+
+                return true;
+            }
+
+            Console.WriteLine("Fatal parser error.");
             return false;
         }
 
-        /// <summary>
-        /// Validates and processes two-word command combinations.
-        /// </summary>
-        private bool IsValidTwoWordCombination(int type1, int val1, int type2, int val2,
-                                             out int verb, out int objectId, out int motion)
+        private void ShowKnownWords()
         {
-            verb = 0;
-            objectId = 0;
-            motion = 0;
-
-            // verb + object
-            if (type1 == VocabularySimple.WordTypes.Verb && type2 == VocabularySimple.WordTypes.Object)
+            int column = 0;
+            foreach (string word in Vocabulary.GetMotionAndVerbWords())
             {
-                verb = val1;
-                objectId = val2;
-                return true;
-            }
-
-            // object + verb
-            if (type1 == VocabularySimple.WordTypes.Object && type2 == VocabularySimple.WordTypes.Verb)
-            {
-                verb = val2;
-                objectId = val1;
-                return true;
-            }
-
-            // motion + object (like "west building")
-            if (type1 == VocabularySimple.WordTypes.Motion && type2 == VocabularySimple.WordTypes.Object)
-            {
-                motion = val1;
-                objectId = val2;
-                return true;
-            }
-
-            // object + motion (like "building west")
-            if (type1 == VocabularySimple.WordTypes.Object && type2 == VocabularySimple.WordTypes.Motion)
-            {
-                motion = val2;
-                objectId = val1;
-                return true;
-            }
-
-            // verb + motion (like "go east")
-            if (type1 == VocabularySimple.WordTypes.Verb && type2 == VocabularySimple.WordTypes.Motion)
-            {
-                // If first word is "go", just use the motion
-                if (val1 == 1) // "go" verb
+                Console.Write($"{word,-12}");
+                column++;
+                if (column == 6)
                 {
-                    motion = val2;
-                    return true;
+                    Console.WriteLine();
+                    column = 0;
                 }
-                verb = val1;
-                motion = val2;
-                return true;
             }
 
-            // motion + verb (like "east go")
-            if (type1 == VocabularySimple.WordTypes.Motion && type2 == VocabularySimple.WordTypes.Verb)
-            {
-                motion = val1;
-                verb = val2;
-                return true;
-            }
-
-            return false;
+            if (column != 0)
+                Console.WriteLine();
         }
     }
