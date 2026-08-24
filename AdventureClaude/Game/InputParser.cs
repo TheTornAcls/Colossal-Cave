@@ -43,6 +43,11 @@ public class InputParser
             string[] words = GetWords(input);
             string word1 = words.Length > 0 ? words[0] : string.Empty;
             string word2 = words.Length > 1 ? words[1] : string.Empty;
+            if (gameState != null)
+            {
+                gameState.Word1 = word1;
+                gameState.Word2 = word2;
+            }
 
             if (string.IsNullOrEmpty(word1))
                 return false;
