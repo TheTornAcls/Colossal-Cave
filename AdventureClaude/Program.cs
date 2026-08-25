@@ -31,13 +31,20 @@ internal class Program
             {
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                Console.WriteLine("Press any key to exit...");
-                Console.ReadKey();
+                PauseBeforeExit();
             }
 
             Console.WriteLine();
             Console.WriteLine("Thanks for playing!");
+            PauseBeforeExit();
+        }
+
+        private static void PauseBeforeExit()
+        {
+            if (Console.IsInputRedirected)
+                return;
+
             Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
+            Console.ReadKey(intercept: true);
         }
     }
