@@ -36,7 +36,7 @@ internal static class Program
                     "There is a shiny brass lamp nearby.",
                     "There is tasty food here.",
                     "There is a bottle of water here.",
-                    "You are currently carrying:",
+                    "You are currently holding the following:",
                     "Brass lantern",
                     "You are obviously a rank amateur. Better luck next time.",
                 ]),
