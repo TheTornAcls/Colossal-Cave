@@ -54,7 +54,7 @@ public class InputParser
 
             if (!Vocabulary.AnalyzeWord(word1, out int type1, out int val1))
             {
-                Console.WriteLine($"I don't know the word \"{word1}\".");
+                Console.WriteLine("I don't know that word.");
                 return false;
             }
 
@@ -72,7 +72,7 @@ public class InputParser
             {
                 if (!Vocabulary.AnalyzeWord(word2, out type2, out val2))
                 {
-                    Console.WriteLine($"I don't know the word \"{word2}\".");
+                    Console.WriteLine(GameMessages.GetMessage(13));
                     return false;
                 }
             }
