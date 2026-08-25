@@ -2393,11 +2393,11 @@ public class AdventureGame
             
             if (carriedObjects.Count == 0)
             {
-                Console.WriteLine("You are currently empty-handed.");
+                Console.WriteLine("You're not carrying anything.");
                 return;
             }
 
-            Console.WriteLine("You are currently carrying:");
+            Console.WriteLine("You are currently holding the following:");
             foreach (int objectId in carriedObjects)
             {
                 if (GameObjects.Objects.TryGetValue(objectId, out GameObjectData? objectData))
