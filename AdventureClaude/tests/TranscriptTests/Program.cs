@@ -17,7 +17,7 @@ internal static class Program
         TestCase[] tests =
         [
             new TestCase(
-                "Quit shows original score rating",
+                "Parity quit_score",
                 InputLines("n", "quit", "y"),
                 [
                     "You are standing at the end of a road before a small brick building.",
@@ -28,7 +28,7 @@ internal static class Program
                     "Thanks for playing!",
                 ]),
             new TestCase(
-                "Building inventory flow",
+                "Parity building_inventory",
                 InputLines("n", "enter", "take lamp", "inventory", "drop lamp", "quit", "y"),
                 [
                     "You are inside a building, a well house for a large spring.",
@@ -41,11 +41,82 @@ internal static class Program
                     "You are obviously a rank amateur. Better luck next time.",
                 ]),
             new TestCase(
-                "Parser and object-not-here responses",
+                "Parity magic_noop_and_missing_lamp",
                 InputLines("n", "xyzzy", "take lamp", "quit", "y"),
                 [
                     "Nothing happens.",
                     "I see no lamp here.",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity get_keys_unlock_grate",
+                InputLines("n", "enter", "take keys", "exit", "down", "unlock grate", "down", "quit", "y"),
+                [
+                    "You are inside a building, a well house for a large spring.",
+                    "There are some keys on the ground here.",
+                    "OK",
+                    "You're at end of road again.",
+                    "You are in a valley in the forest beside a stream tumbling along a rocky bed.",
+                    "The grate is locked.",
+                    "You can't go through a locked steel grate!",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity take_food_eat",
+                InputLines("n", "enter", "take food", "eat food", "quit", "y"),
+                [
+                    "You are inside a building, a well house for a large spring.",
+                    "There is tasty food here.",
+                    "OK",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity basic_movement_cycle",
+                InputLines("n", "enter", "out", "south", "north", "west", "east", "quit", "y"),
+                [
+                    "You are inside a building, a well house for a large spring.",
+                    "You're at end of road again.",
+                    "You are in a valley in the forest beside a stream tumbling along a rocky bed.",
+                    "You have walked up a hill, still in the forest.",
+                    "There is a building in the distance.",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity lamp_on_off",
+                InputLines("n", "enter", "take lamp", "light lamp", "extinguish lamp", "quit", "y"),
+                [
+                    "You are inside a building, a well house for a large spring.",
+                    "There is a shiny brass lamp nearby.",
+                    "OK",
+                    "Your lamp is now on.",
+                    "Your lamp is now off.",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity keys_lock_unlock",
+                InputLines("n", "enter", "take keys", "out", "down", "unlock grate", "lock grate", "quit", "y"),
+                [
+                    "You are inside a building, a well house for a large spring.",
+                    "There are some keys on the ground here.",
+                    "OK",
+                    "The grate is locked.",
+                    "It was already locked.",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity inventory_empty",
+                InputLines("n", "inventory", "quit", "y"),
+                [
+                    "You are standing at the end of a road before a small brick building.",
+                    "You're not carrying anything.",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity unknown_words",
+                InputLines("n", "foobar", "take foobar", "quit", "y"),
+                [
+                    "I don't know that word.",
+                    "I don't understand that!",
                     "You are obviously a rank amateur. Better luck next time.",
                 ]),
         ];
