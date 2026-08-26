@@ -193,6 +193,60 @@ internal static class Program
                     "There is a small wicker cage discarded nearby.",
                     "You are obviously a rank amateur. Better luck next time.",
                 ]),
+            new TestCase(
+                "Parity deeper_hall_king_snake_score",
+                InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down", "west", "west", "west", "west", "west", "down", "n", "quit", "y"),
+                [
+                    "You are at one end of a vast hall stretching forward out of sight to the",
+                    "You are in the hall of the mountain king, with passages off in all directions.",
+                    "A huge green fierce snake bars the way!",
+                    "Getting well in:        25",
+                    "Score:                  57",
+                    "Your score qualifies you as a novice-class adventurer.",
+                ]),
+            new TestCase(
+                "Parity deeper_nugget_inventory_score",
+                InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down", "west", "west", "west", "west", "west", "down", "south", "take nugget", "inventory", "score", "quit", "y"),
+                [
+                    "There is a large sparkling nugget of gold here!",
+                    "You are currently holding the following:",
+                    "Large gold nugget",
+                    "Treasures:               2",
+                    "Score:                  38",
+                    "Score:                  34",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity deeper_dwarf_pirate_warning",
+                InputLines(
+                    [
+                        "n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down",
+                        "west", "west", "west", "west", "west", "down",
+                        "west", "east", "west", "east", "west", "east", "west", "east", "west", "east",
+                        "west", "east", "west", "east", "west", "east", "west", "east", "west", "east",
+                        "west", "east", "west", "east", "west", "east", "west", "east", "west", "east",
+                        "quit", "y", "n", "y",
+                    ]),
+                [
+                    "A little dwarf just walked around a corner, saw you, threw a little axe at",
+                    "There is a little axe here.",
+                    "There are faint rustling noises from the darkness behind you.",
+                    "There is a threatening little dwarf in the room with you!",
+                    "One sharp, nasty knife is thrown at you!",
+                    "It misses!",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity deeper_fissure_jump_death_no",
+                InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down", "west", "west", "west", "west", "west", "down", "west", "jump", "n"),
+                [
+                    "You are on the east bank of a fissure slicing clear across the hall.",
+                    "You didn't make it.",
+                    "Oh dear, you seem to have gotten yourself killed.",
+                    "reincarnate you?",
+                    "Score:                  26",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
         ];
 
         int failures = 0;
