@@ -11,6 +11,9 @@ using AdventureClaude.Models;
 /// </summary>
 public class AdventureGame
     {
+        // Matches the C reference's srand(511) call so random-dependent parity routes stay deterministic.
+        private const int ReferenceRandomSeed = 511;
+
         private readonly GameState gameState;
         private readonly InputParser inputParser;
         private readonly Random random;
@@ -19,7 +22,7 @@ public class AdventureGame
         {
             gameState = new GameState();
             inputParser = new InputParser();
-            random = new Random(511); // Same seed as original
+            random = new CReferenceRandom(ReferenceRandomSeed);
         }
 
         /// <summary>
