@@ -119,6 +119,80 @@ internal static class Program
                     "I don't understand that!",
                     "You are obviously a rank amateur. Better luck next time.",
                 ]),
+            new TestCase(
+                "Parity deeper_cave_entry_lamp_on",
+                InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down", "quit", "y"),
+                [
+                    "You are in a 20-foot depression floored with bare dirt.",
+                    "The grate is locked.",
+                    "The grate is now unlocked.",
+                    "You are in a small chamber beneath a 3x3 steel grate to the surface.",
+                    "The grate is open.",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity deeper_cobble_debris_xyzzy",
+                InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down", "west", "west", "xyzzy", "quit", "y"),
+                [
+                    "You are crawling over cobbles in a low passage.",
+                    "There is a small wicker cage discarded nearby.",
+                    "You are in a debris room filled with stuff washed in from the surface.",
+                    "Magic Word \"XYZZY\"",
+                    "A three foot black rod with a rusty star on an end lies nearby.",
+                    "You're inside building.",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity deeper_cage_rod_inventory",
+                InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down", "west", "take cage", "west", "take rod", "inventory", "quit", "y"),
+                [
+                    "There is a small wicker cage discarded nearby.",
+                    "A three foot black rod with a rusty star on an end lies nearby.",
+                    "You are currently holding the following:",
+                    "Set of keys.",
+                    "Brass lantern",
+                    "Wicker cage",
+                    "Black rod",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity deeper_bird_room_attempt",
+                InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down", "west", "west", "west", "take bird", "quit", "y"),
+                [
+                    "You are in an awkward sloping east/west canyon.",
+                    "I see no bird here.",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity deeper_nugget_score",
+                InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down", "west", "west", "west", "take nugget", "score", "quit", "y"),
+                [
+                    "You are in an awkward sloping east/west canyon.",
+                    "I see no nugget here.",
+                    "Treasures:               0",
+                    "Score:                  36",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity deeper_plugh_from_bird_chamber",
+                InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down", "west", "west", "west", "west", "plugh", "quit", "y"),
+                [
+                    "You are in a splendid chamber thirty feet high.",
+                    "A cheerful little bird is sitting here singing.",
+                    "Nothing happens.",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
+                "Parity deeper_lamp_off_below_grate",
+                InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "extinguish lamp", "down", "west", "quit", "y"),
+                [
+                    "The grate is now unlocked.",
+                    "Your lamp is now off.",
+                    "You are in a small chamber beneath a 3x3 steel grate to the surface.",
+                    "You are crawling over cobbles in a low passage.",
+                    "There is a small wicker cage discarded nearby.",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
         ];
 
         int failures = 0;
