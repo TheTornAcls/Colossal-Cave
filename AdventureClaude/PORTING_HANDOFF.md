@@ -76,6 +76,8 @@ The C# port now supports both native C# randomness for normal gameplay and `Mode
 
 The first `AdventureGame` call-site migration slice is complete. Startup flags, parsed command storage/dispatch, basic motion handling, travel selection, failed-move messaging, the pre-input lifecycle save/location checks, and the closing-exit guard now use the named `GameState` groups directly. Object-heavy verb logic still mostly uses the compatibility pass-throughs and should be migrated in smaller follow-up slices.
 
+The dwarf/pirate lifecycle slice is complete. `ApplyDwarfBlock`, `RunDwarves`, `DoPirate`, and `PirateStealsTreasure` now use the named `Position`, `Dwarves`, `Objects`, and `TreasureProgress` groups directly while keeping object movement through the existing `GameState` helpers so carrying/holding bookkeeping remains centralized.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
