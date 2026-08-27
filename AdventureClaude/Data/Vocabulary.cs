@@ -8,207 +8,368 @@ using System.Collections.Generic;
 public class WordEntry
     {
         public string Word { get; set; } = string.Empty;
-        public int Type { get; set; }  // 1=motion, 2=verb, 3=object, etc.
-        public int Value { get; set; } // The encoded value from the original
+        public int Type { get; set; }
+        public int Value { get; set; }
     }
 
     /// <summary>
     /// Contains the adventure game vocabulary.
-    /// Converted from ADVWORD.H file.
+    /// Converted from ADVWORD.H.
     /// </summary>
     public static class Vocabulary
     {
         /// <summary>
-        /// Dictionary of all known words mapped to their types and values.
+        /// Dictionary of all known words mapped to their decoded original type and value.
         /// </summary>
-        public static readonly Dictionary<string, WordEntry> Words = new Dictionary<string, WordEntry>
-        {
-            {"?", new WordEntry { Word = "?", Type = 3, Value = 51 }},
-            {"above", new WordEntry { Word = "above", Type = 1, Value = 29 }},
-            {"abra", new WordEntry { Word = "abra", Type = 3, Value = 50 }},
-            {"abracadabra", new WordEntry { Word = "abracadabra", Type = 3, Value = 50 }},
-            {"across", new WordEntry { Word = "across", Type = 1, Value = 42 }},
-            {"ascend", new WordEntry { Word = "ascend", Type = 1, Value = 29 }},
-            {"attack", new WordEntry { Word = "attack", Type = 2, Value = 12 }},
-            {"awkward", new WordEntry { Word = "awkward", Type = 1, Value = 26 }},
-            {"axe", new WordEntry { Word = "axe", Type = 1, Value = 28 }},
-            {"back", new WordEntry { Word = "back", Type = 1, Value = 8 }},
-            {"barren", new WordEntry { Word = "barren", Type = 1, Value = 40 }},
-            {"bars", new WordEntry { Word = "bars", Type = 1, Value = 52 }},
-            {"batteries", new WordEntry { Word = "batteries", Type = 1, Value = 39 }},
-            {"battery", new WordEntry { Word = "battery", Type = 1, Value = 39 }},
-            {"beans", new WordEntry { Word = "beans", Type = 1, Value = 24 }},
-            {"bear", new WordEntry { Word = "bear", Type = 1, Value = 35 }},
-            {"bed", new WordEntry { Word = "bed", Type = 1, Value = 16 }},
-            {"bedquilt", new WordEntry { Word = "bedquilt", Type = 1, Value = 70 }},
-            {"bird", new WordEntry { Word = "bird", Type = 1, Value = 8 }},
-            {"blast", new WordEntry { Word = "blast", Type = 2, Value = 23 }},
-            {"blowup", new WordEntry { Word = "blowup", Type = 2, Value = 23 }},
-            {"bottle", new WordEntry { Word = "bottle", Type = 1, Value = 20 }},
-            {"box", new WordEntry { Word = "box", Type = 1, Value = 55 }},
-            {"break", new WordEntry { Word = "break", Type = 2, Value = 28 }},
-            {"brief", new WordEntry { Word = "brief", Type = 2, Value = 26 }},
-            {"broken", new WordEntry { Word = "broken", Type = 1, Value = 54 }},
-            {"building", new WordEntry { Word = "building", Type = 1, Value = 12 }},
-            {"cage", new WordEntry { Word = "cage", Type = 1, Value = 4 }},
-            {"calm", new WordEntry { Word = "calm", Type = 2, Value = 10 }},
-            {"canyon", new WordEntry { Word = "canyon", Type = 1, Value = 25 }},
-            {"capture", new WordEntry { Word = "capture", Type = 2, Value = 1 }},
-            {"carpet", new WordEntry { Word = "carpet", Type = 1, Value = 40 }},
-            {"carry", new WordEntry { Word = "carry", Type = 2, Value = 1 }},
-            {"catch", new WordEntry { Word = "catch", Type = 2, Value = 1 }},
-            {"cave", new WordEntry { Word = "cave", Type = 1, Value = 67 }},
-            {"cavern", new WordEntry { Word = "cavern", Type = 1, Value = 73 }},
-            {"chain", new WordEntry { Word = "chain", Type = 1, Value = 64 }},
-            {"chant", new WordEntry { Word = "chant", Type = 2, Value = 3 }},
-            {"chasm", new WordEntry { Word = "chasm", Type = 1, Value = 32 }},
-            {"chest", new WordEntry { Word = "chest", Type = 1, Value = 55 }},
-            
-            // Movement words
-            {"north", new WordEntry { Word = "north", Type = 1, Value = 1 }},
-            {"n", new WordEntry { Word = "n", Type = 1, Value = 1 }},
-            {"south", new WordEntry { Word = "south", Type = 1, Value = 2 }},
-            {"s", new WordEntry { Word = "s", Type = 1, Value = 2 }},
-            {"east", new WordEntry { Word = "east", Type = 1, Value = 3 }},
-            {"e", new WordEntry { Word = "e", Type = 1, Value = 3 }},
-            {"west", new WordEntry { Word = "west", Type = 1, Value = 4 }},
-            {"w", new WordEntry { Word = "w", Type = 1, Value = 4 }},
-            {"up", new WordEntry { Word = "up", Type = 1, Value = 5 }},
-            {"u", new WordEntry { Word = "u", Type = 1, Value = 5 }},
-            {"down", new WordEntry { Word = "down", Type = 1, Value = 6 }},
-            {"d", new WordEntry { Word = "d", Type = 1, Value = 6 }},
-            {"northeast", new WordEntry { Word = "northeast", Type = 1, Value = 7 }},
-            {"ne", new WordEntry { Word = "ne", Type = 1, Value = 7 }},
-            {"northwest", new WordEntry { Word = "northwest", Type = 1, Value = 8 }},
-            {"nw", new WordEntry { Word = "nw", Type = 1, Value = 8 }},
-            {"southeast", new WordEntry { Word = "southeast", Type = 1, Value = 9 }},
-            {"se", new WordEntry { Word = "se", Type = 1, Value = 9 }},
-            {"southwest", new WordEntry { Word = "southwest", Type = 1, Value = 10 }},
-            {"sw", new WordEntry { Word = "sw", Type = 1, Value = 10 }},
-            
-            // Common verbs
-            {"get", new WordEntry { Word = "get", Type = 2, Value = 1 }},
-            {"take", new WordEntry { Word = "take", Type = 2, Value = 1 }},
-            {"drop", new WordEntry { Word = "drop", Type = 2, Value = 2 }},
-            {"put", new WordEntry { Word = "put", Type = 2, Value = 2 }},
-            {"open", new WordEntry { Word = "open", Type = 2, Value = 4 }},
-            {"close", new WordEntry { Word = "close", Type = 2, Value = 5 }},
-            {"on", new WordEntry { Word = "on", Type = 2, Value = 6 }},
-            {"off", new WordEntry { Word = "off", Type = 2, Value = 7 }},
-            {"wave", new WordEntry { Word = "wave", Type = 2, Value = 8 }},
-            {"kill", new WordEntry { Word = "kill", Type = 2, Value = 12 }},
-            {"pour", new WordEntry { Word = "pour", Type = 2, Value = 13 }},
-            {"eat", new WordEntry { Word = "eat", Type = 2, Value = 14 }},
-            {"drink", new WordEntry { Word = "drink", Type = 2, Value = 15 }},
-            {"rub", new WordEntry { Word = "rub", Type = 2, Value = 16 }},
-            {"throw", new WordEntry { Word = "throw", Type = 2, Value = 17 }},
-            {"quit", new WordEntry { Word = "quit", Type = 2, Value = 18 }},
-            {"find", new WordEntry { Word = "find", Type = 2, Value = 19 }},
-            {"inventory", new WordEntry { Word = "inventory", Type = 2, Value = 20 }},
-            {"inv", new WordEntry { Word = "inv", Type = 2, Value = 20 }},
-            {"feed", new WordEntry { Word = "feed", Type = 2, Value = 21 }},
-            {"fill", new WordEntry { Word = "fill", Type = 2, Value = 22 }},
-            {"blastverb", new WordEntry { Word = "blastverb", Type = 2, Value = 23 }},
-            {"score", new WordEntry { Word = "score", Type = 2, Value = 24 }},
-            {"fee", new WordEntry { Word = "fee", Type = 2, Value = 25 }},
-            {"fie", new WordEntry { Word = "fie", Type = 2, Value = 25 }},
-            {"foe", new WordEntry { Word = "foe", Type = 2, Value = 25 }},
-            {"foo", new WordEntry { Word = "foo", Type = 2, Value = 25 }},
-            {"fum", new WordEntry { Word = "fum", Type = 2, Value = 25 }},
-            {"briefverb", new WordEntry { Word = "briefverb", Type = 2, Value = 26 }},
-            {"read", new WordEntry { Word = "read", Type = 2, Value = 27 }},
-            {"breakverb", new WordEntry { Word = "breakverb", Type = 2, Value = 28 }},
-            {"wake", new WordEntry { Word = "wake", Type = 2, Value = 29 }},
-            {"save", new WordEntry { Word = "save", Type = 2, Value = 30 }},
-            {"restore", new WordEntry { Word = "restore", Type = 2, Value = 31 }},
-            {"suspend", new WordEntry { Word = "suspend", Type = 2, Value = 30 }},
-            {"hours", new WordEntry { Word = "hours", Type = 2, Value = 32 }},
-            {"lock", new WordEntry { Word = "lock", Type = 2, Value = 33 }},
-            {"unlock", new WordEntry { Word = "unlock", Type = 2, Value = 34 }},
-            
-            // Magic words
-            {"xyzzy", new WordEntry { Word = "xyzzy", Type = 2, Value = 62 }},
-            {"plugh", new WordEntry { Word = "plugh", Type = 2, Value = 65 }},
-            {"plover", new WordEntry { Word = "plover", Type = 2, Value = 71 }},
-            
-            // Help and info
-            {"help", new WordEntry { Word = "help", Type = 2, Value = 51 }},
-            {"info", new WordEntry { Word = "info", Type = 2, Value = 142 }},
-            {"look", new WordEntry { Word = "look", Type = 2, Value = 57 }},
-            {"l", new WordEntry { Word = "l", Type = 2, Value = 57 }},
-            
-            // Common words that map to multiple purposes
-            {"go", new WordEntry { Word = "go", Type = 2, Value = 1 }}, // Verb for "go direction"
-            {"enter", new WordEntry { Word = "enter", Type = 2, Value = 1 }},
-            {"exit", new WordEntry { Word = "exit", Type = 2, Value = 1 }},
-            
-            // Object versions of common words
-            {"keys", new WordEntry { Word = "keys", Type = 3, Value = 1 }},
-            {"lamp", new WordEntry { Word = "lamp", Type = 3, Value = 2 }},
-            {"lantern", new WordEntry { Word = "lantern", Type = 3, Value = 2 }},
-            {"grate", new WordEntry { Word = "grate", Type = 3, Value = 3 }},
-            {"cage", new WordEntry { Word = "cage", Type = 3, Value = 4 }},
-            {"rod", new WordEntry { Word = "rod", Type = 3, Value = 5 }},
-            {"steps", new WordEntry { Word = "steps", Type = 3, Value = 7 }},
-            {"bird", new WordEntry { Word = "bird", Type = 3, Value = 8 }},
-            {"door", new WordEntry { Word = "door", Type = 3, Value = 9 }},
-            {"pillow", new WordEntry { Word = "pillow", Type = 3, Value = 10 }},
-            {"snake", new WordEntry { Word = "snake", Type = 3, Value = 11 }},
-            {"fissure", new WordEntry { Word = "fissure", Type = 3, Value = 12 }},
-            {"tablet", new WordEntry { Word = "tablet", Type = 3, Value = 13 }},
-            {"clam", new WordEntry { Word = "clam", Type = 3, Value = 14 }},
-            {"oyster", new WordEntry { Word = "oyster", Type = 3, Value = 15 }},
-            {"magazine", new WordEntry { Word = "magazine", Type = 3, Value = 16 }},
-            {"dwarf", new WordEntry { Word = "dwarf", Type = 3, Value = 17 }},
-            {"knife", new WordEntry { Word = "knife", Type = 3, Value = 18 }},
-            {"food", new WordEntry { Word = "food", Type = 3, Value = 19 }},
-            {"bottle", new WordEntry { Word = "bottle", Type = 3, Value = 20 }},
-            {"water", new WordEntry { Word = "water", Type = 3, Value = 21 }},
-            {"oil", new WordEntry { Word = "oil", Type = 3, Value = 22 }},
-            {"mirror", new WordEntry { Word = "mirror", Type = 3, Value = 23 }},
-            {"plant", new WordEntry { Word = "plant", Type = 3, Value = 24 }},
-            
-            // Yes/No responses
-            {"yes", new WordEntry { Word = "yes", Type = 0, Value = 1 }},
-            {"y", new WordEntry { Word = "y", Type = 0, Value = 1 }},
-            {"no", new WordEntry { Word = "no", Type = 0, Value = 0 }}
-        };
+        public static readonly Dictionary<string, WordEntry> Words = new();
 
-        /// <summary>
-        /// Word types enumeration.
-        /// </summary>
-        public static class WordTypes
+        private static readonly List<WordEntry> WordList = [];
+
+        static Vocabulary()
         {
-            public const int YesNo = 0;
-            public const int Motion = 1;
-            public const int Verb = 2;
-            public const int Object = 3;
+            InitializeWords();
+        }
+
+        private static void InitializeWords()
+        {
+            AddWord("?", 3, 51);
+            AddWord("above", 0, 29);
+            AddWord("abra", 3, 50);
+            AddWord("abracadabra", 3, 50);
+            AddWord("across", 0, 42);
+            AddWord("ascend", 0, 29);
+            AddWord("attack", 2, 12);
+            AddWord("awkward", 0, 26);
+            AddWord("axe", 1, 28);
+            AddWord("back", 0, 8);
+            AddWord("barren", 0, 40);
+            AddWord("bars", 1, 52);
+            AddWord("batteries", 1, 39);
+            AddWord("battery", 1, 39);
+            AddWord("beans", 1, 24);
+            AddWord("bear", 1, 35);
+            AddWord("bed", 0, 16);
+            AddWord("bedquilt", 0, 70);
+            AddWord("bird", 1, 8);
+            AddWord("blast", 2, 23);
+            AddWord("blowup", 2, 23);
+            AddWord("bottle", 1, 20);
+            AddWord("box", 1, 55);
+            AddWord("break", 2, 28);
+            AddWord("brief", 2, 26);
+            AddWord("broken", 0, 54);
+            AddWord("building", 0, 12);
+            AddWord("cage", 1, 4);
+            AddWord("calm", 2, 10);
+            AddWord("canyon", 0, 25);
+            AddWord("capture", 2, 1);
+            AddWord("carpet", 1, 40);
+            AddWord("carry", 2, 1);
+            AddWord("catch", 2, 1);
+            AddWord("cave", 0, 67);
+            AddWord("cavern", 0, 73);
+            AddWord("chain", 1, 64);
+            AddWord("chant", 2, 3);
+            AddWord("chasm", 1, 32);
+            AddWord("chest", 1, 55);
+            AddWord("clam", 1, 14);
+            AddWord("climb", 0, 56);
+            AddWord("close", 2, 6);
+            AddWord("cobblestone", 0, 18);
+            AddWord("coins", 1, 54);
+            AddWord("continue", 2, 11);
+            AddWord("crack", 0, 33);
+            AddWord("crap", 3, 79);
+            AddWord("crawl", 0, 17);
+            AddWord("cross", 0, 69);
+            AddWord("d", 0, 30);
+            AddWord("damn", 3, 79);
+            AddWord("damnit", 3, 79);
+            AddWord("dark", 0, 22);
+            AddWord("debris", 0, 51);
+            AddWord("depression", 0, 63);
+            AddWord("descend", 0, 30);
+            AddWord("describe", 0, 57);
+            AddWord("detonate", 2, 23);
+            AddWord("devour", 2, 14);
+            AddWord("diamonds", 1, 51);
+            AddWord("dig", 3, 66);
+            AddWord("discard", 2, 2);
+            AddWord("disturb", 2, 29);
+            AddWord("dome", 0, 35);
+            AddWord("door", 1, 9);
+            AddWord("down", 0, 30);
+            AddWord("downstream", 0, 4);
+            AddWord("downward", 0, 30);
+            AddWord("dragon", 1, 31);
+            AddWord("drawing", 1, 29);
+            AddWord("drink", 2, 15);
+            AddWord("drop", 2, 2);
+            AddWord("dump", 2, 2);
+            AddWord("dwarf", 1, 17);
+            AddWord("dwarves", 1, 17);
+            AddWord("e", 0, 43);
+            AddWord("east", 0, 43);
+            AddWord("eat", 2, 14);
+            AddWord("egg", 1, 56);
+            AddWord("eggs", 1, 56);
+            AddWord("emerald", 1, 59);
+            AddWord("enter", 0, 3);
+            AddWord("entrance", 0, 64);
+            AddWord("examine", 0, 57);
+            AddWord("excavate", 3, 66);
+            AddWord("exit", 0, 11);
+            AddWord("explore", 2, 11);
+            AddWord("extinguish", 2, 8);
+            AddWord("fee", 2, 33);
+            AddWord("feed", 2, 21);
+            AddWord("fie", 2, 34);
+            AddWord("fight", 2, 12);
+            AddWord("figure", 1, 27);
+            AddWord("fill", 2, 22);
+            AddWord("find", 2, 19);
+            AddWord("fissure", 1, 12);
+            AddWord("floor", 0, 58);
+            AddWord("foe", 2, 35);
+            AddWord("follow", 2, 11);
+            AddWord("foo", 2, 36);
+            AddWord("food", 1, 19);
+            AddWord("forest", 0, 6);
+            AddWord("fork", 0, 77);
+            AddWord("forward", 0, 7);
+            AddWord("free", 2, 2);
+            AddWord("fuck", 3, 79);
+            AddWord("fum", 2, 37);
+            AddWord("get", 2, 1);
+            AddWord("geyser", 1, 37);
+            AddWord("giant", 0, 27);
+            AddWord("go", 2, 11);
+            AddWord("gold", 1, 50);
+            AddWord("goto", 2, 11);
+            AddWord("grate", 1, 3);
+            AddWord("gully", 0, 13);
+            AddWord("h2o", 1, 21);
+            AddWord("hall", 0, 38);
+            AddWord("headlamp", 1, 2);
+            AddWord("help", 3, 51);
+            AddWord("hill", 0, 2);
+            AddWord("hit", 2, 12);
+            AddWord("hocus", 3, 50);
+            AddWord("hole", 0, 52);
+            AddWord("hours", 2, 31);
+            AddWord("house", 0, 12);
+            AddWord("i", 2, 20);
+            AddWord("ignite", 2, 23);
+            AddWord("in", 0, 19);
+            AddWord("info", 3, 142);
+            AddWord("information", 3, 142);
+            AddWord("inside", 0, 19);
+            AddWord("inventory", 2, 20);
+            AddWord("inward", 0, 19);
+            AddWord("issue", 1, 16);
+            AddWord("jar", 1, 20);
+            AddWord("jewel", 1, 53);
+            AddWord("jewelry", 1, 53);
+            AddWord("jewels", 1, 53);
+            AddWord("jump", 0, 39);
+            AddWord("keep", 2, 1);
+            AddWord("key", 1, 1);
+            AddWord("keys", 1, 1);
+            AddWord("kill", 2, 12);
+            AddWord("knife", 1, 18);
+            AddWord("knives", 1, 18);
+            AddWord("l", 0, 57);
+            AddWord("lamp", 1, 2);
+            AddWord("lantern", 1, 2);
+            AddWord("leave", 0, 11);
+            AddWord("left", 0, 36);
+            AddWord("light", 2, 7);
+            AddWord("lock", 2, 6);
+            AddWord("log", 2, 32);
+            AddWord("look", 0, 57);
+            AddWord("lost", 3, 68);
+            AddWord("low", 0, 24);
+            AddWord("machine", 1, 38);
+            AddWord("magazine", 1, 16);
+            AddWord("main", 0, 76);
+            AddWord("message", 1, 36);
+            AddWord("ming", 1, 58);
+            AddWord("mirror", 1, 23);
+            AddWord("mist", 3, 69);
+            AddWord("moss", 1, 40);
+            AddWord("mumble", 2, 3);
+            AddWord("n", 0, 45);
+            AddWord("ne", 0, 47);
+            AddWord("nest", 1, 56);
+            AddWord("north", 0, 45);
+            AddWord("nothing", 2, 5);
+            AddWord("nowhere", 0, 21);
+            AddWord("nugget", 1, 50);
+            AddWord("null", 0, 21);
+            AddWord("nw", 0, 50);
+            AddWord("off", 2, 8);
+            AddWord("office", 0, 76);
+            AddWord("oil", 1, 22);
+            AddWord("on", 2, 7);
+            AddWord("onward", 0, 7);
+            AddWord("open", 2, 4);
+            AddWord("opensesame", 3, 50);
+            AddWord("oriental", 0, 72);
+            AddWord("out", 0, 11);
+            AddWord("outdoors", 0, 32);
+            AddWord("outside", 0, 11);
+            AddWord("over", 0, 41);
+            AddWord("oyster", 1, 15);
+            AddWord("passage", 0, 23);
+            AddWord("pause", 2, 30);
+            AddWord("pearl", 1, 61);
+            AddWord("persian", 1, 62);
+            AddWord("peruse", 2, 27);
+            AddWord("pillow", 1, 10);
+            AddWord("pirate", 1, 30);
+            AddWord("pit", 0, 31);
+            AddWord("placate", 2, 10);
+            AddWord("plant", 1, 24);
+            AddWord("platinum", 1, 60);
+            AddWord("plover", 0, 71);
+            AddWord("plugh", 0, 65);
+            AddWord("pocus", 3, 50);
+            AddWord("pottery", 1, 58);
+            AddWord("pour", 2, 13);
+            AddWord("proceed", 2, 11);
+            AddWord("pyramid", 1, 60);
+            AddWord("q", 2, 18);
+            AddWord("quit", 2, 18);
+            AddWord("rations", 1, 19);
+            AddWord("read", 2, 27);
+            AddWord("release", 2, 2);
+            AddWord("reservoir", 0, 75);
+            AddWord("retreat", 0, 8);
+            AddWord("return", 0, 8);
+            AddWord("right", 0, 37);
+            AddWord("road", 0, 2);
+            AddWord("rock", 0, 15);
+            AddWord("rod", 1, 5);
+            AddWord("room", 0, 59);
+            AddWord("rub", 2, 16);
+            AddWord("rug", 1, 62);
+            AddWord("run", 2, 11);
+            AddWord("s", 0, 46);
+            AddWord("save", 2, 30);
+            AddWord("say", 2, 3);
+            AddWord("score", 2, 24);
+            AddWord("se", 0, 48);
+            AddWord("secret", 0, 66);
+            AddWord("sesame", 3, 50);
+            AddWord("shadow", 1, 27);
+            AddWord("shake", 2, 9);
+            AddWord("shard", 1, 58);
+            AddWord("shatter", 2, 28);
+            AddWord("shazam", 3, 50);
+            AddWord("shell", 0, 74);
+            AddWord("shit", 3, 79);
+            AddWord("silver", 1, 52);
+            AddWord("sing", 2, 3);
+            AddWord("slab", 0, 61);
+            AddWord("slit", 0, 60);
+            AddWord("smash", 2, 28);
+            AddWord("snake", 1, 11);
+            AddWord("south", 0, 46);
+            AddWord("spelunker", 1, 16);
+            AddWord("spice", 1, 63);
+            AddWord("spices", 1, 63);
+            AddWord("stairs", 0, 10);
+            AddWord("stalactite", 1, 26);
+            AddWord("steal", 2, 1);
+            AddWord("steps", 1, 7);
+            AddWord("steps", 0, 34);
+            AddWord("stop", 3, 139);
+            AddWord("stream", 0, 14);
+            AddWord("strike", 2, 12);
+            AddWord("surface", 0, 20);
+            AddWord("suspend", 2, 30);
+            AddWord("sw", 0, 49);
+            AddWord("swim", 3, 147);
+            AddWord("swing", 2, 9);
+            AddWord("tablet", 1, 13);
+            AddWord("take", 2, 1);
+            AddWord("tame", 2, 10);
+            AddWord("throw", 2, 17);
+            AddWord("toss", 2, 17);
+            AddWord("tote", 2, 1);
+            AddWord("touch", 0, 57);
+            AddWord("travel", 2, 11);
+            AddWord("treasure", 1, 55);
+            AddWord("tree", 3, 64);
+            AddWord("trees", 3, 64);
+            AddWord("trident", 1, 57);
+            AddWord("troll", 1, 33);
+            AddWord("tunnel", 0, 23);
+            AddWord("turn", 2, 11);
+            AddWord("u", 0, 29);
+            AddWord("unlock", 2, 4);
+            AddWord("up", 0, 29);
+            AddWord("upstream", 0, 5);
+            AddWord("upward", 0, 29);
+            AddWord("utter", 2, 3);
+            AddWord("valley", 0, 9);
+            AddWord("vase", 1, 58);
+            AddWord("velvet", 1, 10);
+            AddWord("vending", 1, 38);
+            AddWord("view", 0, 28);
+            AddWord("volcano", 1, 37);
+            AddWord("w", 0, 44);
+            AddWord("wake", 2, 29);
+            AddWord("walk", 2, 11);
+            AddWord("wall", 0, 53);
+            AddWord("water", 1, 21);
+            AddWord("wave", 2, 9);
+            AddWord("west", 0, 44);
+            AddWord("xyzzy", 0, 62);
+            AddWord("y2", 0, 55);
+        }
+
+        private static void AddWord(string word, int type, int value)
+        {
+            WordEntry entry = new() { Word = word, Type = type, Value = value };
+            WordList.Add(entry);
+            Words[word] = entry;
         }
 
         /// <summary>
-        /// Analyzes a word and returns its type and value.
+        /// Word types from ENGLISH.C: 0=motion, 1=object, 2=verb, 3=special message.
         /// </summary>
-        /// <param name="word">The word to analyze</param>
-        /// <param name="type">Output: the word type</param>
-        /// <param name="value">Output: the word value</param>
-        /// <returns>True if the word was found, false otherwise</returns>
+        public static class WordTypes
+        {
+            public const int Motion = 0;
+            public const int Object = 1;
+            public const int Verb = 2;
+            public const int Special = 3;
+        }
+
         public static bool AnalyzeWord(string word, out int type, out int value)
         {
             type = -1;
             value = -1;
-            
+
             if (string.IsNullOrWhiteSpace(word))
                 return false;
-                
+
             string normalizedWord = word.ToLowerInvariant().Trim();
-            
-            if (Words.TryGetValue(normalizedWord, out WordEntry? entry))
+            if (!Words.TryGetValue(normalizedWord, out WordEntry? entry))
+                return false;
+
+            type = entry.Type;
+            value = entry.Value;
+            return true;
+        }
+
+        public static IEnumerable<string> GetMotionAndVerbWords()
+        {
+            foreach (WordEntry entry in WordList)
             {
-                type = entry.Type;
-                value = entry.Value;
-                return true;
+                if (entry.Type == WordTypes.Motion || entry.Type == WordTypes.Verb)
+                    yield return entry.Word;
             }
-            
-            return false;
         }
     }

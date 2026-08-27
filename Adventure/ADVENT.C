@@ -101,6 +101,8 @@ int main(int argc, char** argv)
  */
 void initplay(void)
 {
+    int i;
+
     /*
         icond[MAXLOC]:
             Initial status flags for each location in the game. Used to initialize the 'cond' array, which tracks conditions such as darkness, visited status, and other special properties for each location.
@@ -171,10 +173,12 @@ void initplay(void)
     memcpy(cond, icond, (sizeof(short int)) * MAXLOC);
 
     /* initialize object locations */
-    memcpy(place, iplace, (sizeof(short int)) * MAXOBJ);
+    for (i = 0; i < MAXOBJ; ++i)
+        place[i] = iplace[i];
 
     /* initialize second (fixed) locations */
-    memcpy(fixed, ifixed, (sizeof(short int)) * MAXOBJ);
+    for (i = 0; i < MAXOBJ; ++i)
+        fixed[i] = ifixed[i];
 
     /* initialize default verb messages */
     memcpy(actmsg, iactmsg, (sizeof(short int)) * 33);

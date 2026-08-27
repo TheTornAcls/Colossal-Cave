@@ -24,20 +24,35 @@ internal class Program
 
             try
             {
-                AdventureGame game = new ();
+                AdventureGame game = UseReferenceRandom(args)
+                    ? AdventureGame.CreateForReferenceParity()
+                    : new AdventureGame();
                 game.StartNewGame();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"An error occurred: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                Console.WriteLine("Press any key to exit...");
-                Console.ReadKey();
+                PauseBeforeExit();
             }
 
             Console.WriteLine();
             Console.WriteLine("Thanks for playing!");
+            PauseBeforeExit();
+        }
+
+        private static void PauseBeforeExit()
+        {
+            if (Console.IsInputRedirected)
+                return;
+
             Console.WriteLine("Press any key to exit...");
-            Console.ReadKey();
+            Console.ReadKey(intercept: true);
+        }
+
+        private static bool UseReferenceRandom(string[] args)
+        {
+            return args.Any(arg => string.Equals(arg, "--reference-random", StringComparison.OrdinalIgnoreCase)) ||
+                string.Equals(Environment.GetEnvironmentVariable("ADVENTURE_REFERENCE_RANDOM"), "1", StringComparison.Ordinal);
         }
     }

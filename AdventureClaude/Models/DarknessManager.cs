@@ -23,9 +23,9 @@ public static class DarknessManager
         // 1. Location doesn't have LIGHT flag, AND
         // 2. Either lamp is off (prop[LAMP] == 0) OR lamp is not present here
         
-        bool locationHasLight = (gameState.LocationConditions[gameState.Location] & GameConstants.Light) != 0;
+        bool locationHasLight = gameState.LocationHasFlag(gameState.Location, GameConstants.Light);
         bool lampIsOn = gameState.ObjectProperties[GameConstants.Lamp] == 1;
-        bool lampIsHere = gameState.IsObjectHere(GameConstants.Lamp);
+        bool lampIsHere = gameState.Here(GameConstants.Lamp);
         
         // If location has natural light, it's not dark
         if (locationHasLight)
@@ -53,7 +53,7 @@ public static class DarknessManager
         // Check for battery depletion (0 turns remaining)
         if (gameState.Limit == 0)
         {
-            gameState.ObjectProperties[GameConstants.Lamp] = 0; // Turn lamp off
+            gameState.SetObjectProperty(GameConstants.Lamp, 0);
             return Data.GameMessages.GetMessage(184); // "Your lamp has run out of power."
         }
 
@@ -64,15 +64,15 @@ public static class DarknessManager
             
             // Check if batteries are available for replacement
             bool batteriesExist = gameState.ObjectLocations[GameConstants.Batteries] != 0;
-            bool batteriesHere = gameState.IsObjectHere(GameConstants.Batteries);
-            bool lampIsHere = gameState.IsObjectHere(GameConstants.Lamp);
+            bool batteriesHere = gameState.Here(GameConstants.Batteries);
+            bool lampIsHere = gameState.Here(GameConstants.Lamp);
             
             // Automatic battery replacement if batteries are at this location
             if (batteriesHere && lampIsHere)
             {
                 gameState.Limit += 2500; // Add 2500 turns from fresh batteries
                 gameState.LampWarning = 0; // Reset warning flag
-                gameState.ObjectLocations[GameConstants.Batteries] = 0; // Remove batteries from game
+                gameState.Destroy(GameConstants.Batteries);
                 return Data.GameMessages.GetMessage(188); // "Your lamp is getting dim.. I'm taking the liberty of replacing the batteries."
             }
             
@@ -107,8 +107,7 @@ public static class DarknessManager
             return false;
 
         // 35% chance of falling into pit
-        int roll = random.Next(100);
-        return roll < 35;
+        return GameState.Pct(random, 35);
     }
 
     /// <summary>
@@ -131,6 +130,6 @@ public static class DarknessManager
     public static bool IsForced(GameState gameState, int location)
     {
         // Original C: return((cond[atloc] & FORCED) != 0);
-        return (gameState.LocationConditions[location] & GameConstants.Forced) != 0;
+        return gameState.Forced(location);
     }
 }
