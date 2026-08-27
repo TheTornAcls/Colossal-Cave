@@ -247,6 +247,23 @@ internal static class Program
                     "Score:                  26",
                     "You are obviously a rank amateur. Better luck next time.",
                 ]),
+            new TestCase(
+                "Parity deeper_fissure_jump_reincarnate_yes",
+                InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down", "west", "west", "west", "west", "west", "down", "west", "jump", "y", "look", "inventory", "quit", "y"),
+                [
+                    "You are on the east bank of a fissure slicing clear across the hall.",
+                    "You didn't make it.",
+                    "Oh dear, you seem to have gotten yourself killed.",
+                    "reincarnate you?",
+                    "All right.  But don't blame me if something goes wr......",
+                    "--- POOF !! ---",
+                    "You are engulfed in a cloud of orange smoke.",
+                    "You are inside a building, a well house for a large spring.",
+                    "You're not carrying anything.",
+                    "Survival:               20",
+                    "Score:                  22",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
         ];
 
         int failures = 0;
