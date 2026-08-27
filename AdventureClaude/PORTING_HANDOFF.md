@@ -74,6 +74,8 @@ The C# port now supports both native C# randomness for normal gameplay and `Mode
 
 `Models\GameState.cs` has started moving away from one flat C-style bag of globals. It now exposes named debugger-friendly groups (`Position`, `World`, `Objects`, `Cave`, `TreasureProgress`, `Dwarves`, `Hints`, `Command`, and `Debug`) while keeping the old property names as compatibility pass-throughs. This keeps current gameplay code stable and gives future refactors a safer migration path.
 
+The first `AdventureGame` call-site migration slice is complete. Startup flags, parsed command storage/dispatch, basic motion handling, travel selection, failed-move messaging, the pre-input lifecycle save/location checks, and the closing-exit guard now use the named `GameState` groups directly. Object-heavy verb logic still mostly uses the compatibility pass-throughs and should be migrated in smaller follow-up slices.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
