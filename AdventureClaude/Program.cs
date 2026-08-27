@@ -24,7 +24,9 @@ internal class Program
 
             try
             {
-                AdventureGame game = new ();
+                AdventureGame game = UseReferenceRandom(args)
+                    ? AdventureGame.CreateForReferenceParity()
+                    : new AdventureGame();
                 game.StartNewGame();
             }
             catch (Exception ex)
@@ -46,5 +48,11 @@ internal class Program
 
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey(intercept: true);
+        }
+
+        private static bool UseReferenceRandom(string[] args)
+        {
+            return args.Any(arg => string.Equals(arg, "--reference-random", StringComparison.OrdinalIgnoreCase)) ||
+                string.Equals(Environment.GetEnvironmentVariable("ADVENTURE_REFERENCE_RANDOM"), "1", StringComparison.Ordinal);
         }
     }
