@@ -78,6 +78,8 @@ The first `AdventureGame` call-site migration slice is complete. Startup flags, 
 
 The dwarf/pirate lifecycle slice is complete. `ApplyDwarfBlock`, `RunDwarves`, `DoPirate`, and `PirateStealsTreasure` now use the named `Position`, `Dwarves`, `Objects`, and `TreasureProgress` groups directly while keeping object movement through the existing `GameState` helpers so carrying/holding bookkeeping remains centralized.
 
+The location-change and cave timer lifecycle slice is complete. `ApplyLocationChange`, `ApplyClosedInventoryState`, `RunSpecialTimer`, and `CloseCave` now use the named `Position`, `World`, `Objects`, `Cave`, `TreasureProgress`, `Dwarves`, and `Command` groups directly while preserving the existing movement and object bookkeeping helpers.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
