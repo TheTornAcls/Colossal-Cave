@@ -70,7 +70,7 @@ These deeper routes were checked against both the rebuilt C executable and the C
 
 The transcript test project also includes focused state regressions for cave closing / closed-state behavior. These exercise the C# port's closing timers, blocked exits during closing, final repository setup, and closed-inventory encoded property decoding. This was added as a narrow in-process regression because a natural public transcript route to discover every treasure and run out both closing clocks is much longer than the current parity suite.
 
-The C# port now uses `Models\CReferenceRandom.cs` to reproduce the MSVC C runtime `rand()` sequence used by the rebuilt C reference. This keeps random-dependent dwarf, pirate, travel, and darkness behavior deterministic across C and C# parity runs.
+The C# port now supports both native C# randomness for normal gameplay and `Models\CReferenceRandom.cs` for parity/regression runs. The transcript harness launches the game with `--reference-random`, which reproduces the MSVC C runtime `rand()` sequence used by the rebuilt C reference. You can also set `ADVENTURE_REFERENCE_RANDOM=1` for deterministic reference-random runs.
 
 ## Recent C# Wording Fixes
 
@@ -132,7 +132,6 @@ Rebuild C reference, if Visual Studio command-line tools are available:
    - rerun `dotnet run --project tests\TranscriptTests\TranscriptTests.csproj`
 
 3. Once behavior is better locked down:
-   - refactor randomness behind an abstraction so parity/regression runs can keep using `CReferenceRandom`, while normal gameplay can use native C# `Random`
    - refactor `GameState` into clearer named state structures/properties
    - refactor `DataBase` / data lookup code for maintainability
    - add focused unit tests for parser/vocabulary, object placement, scoring, dwarf/pirate state, and turn lifecycle
