@@ -50,16 +50,16 @@ public class AdventureGame
             if (IsYesResponse(response))
             {
                 ShowInstructions();
-                gameState.Limit = 1000;
-                gameState.HintTaken++;
+                gameState.Cave.LampLimit = 1000;
+                gameState.TreasureProgress.HintsAccepted++;
             }
             else
             {
-                gameState.Limit = 330;
+                gameState.Cave.LampLimit = 330;
             }
 
             // Main game loop
-            while (!gameState.SaveFlag)
+            while (!gameState.TreasureProgress.SaveRequested)
             {
                 Turn();
             }
@@ -86,14 +86,14 @@ public class AdventureGame
                 if (inputParser.ParseInput(input, gameState, out verb, out objectId, out motion))
                     break;
 
-                if (gameState.SaveFlag)
+                if (gameState.TreasureProgress.SaveRequested)
                     return;
             }
 
             // Store parsed values in game state
-            gameState.Verb = verb;
-            gameState.Object = objectId;
-            gameState.Motion = motion;
+            gameState.Command.Verb = verb;
+            gameState.Command.Object = objectId;
+            gameState.Command.Motion = motion;
 
             // Process the command
             ProcessCommand();
@@ -104,26 +104,28 @@ public class AdventureGame
         /// </summary>
         private void ProcessCommand()
         {
+            ParsedCommandState command = gameState.Command;
+
             // Handle motion commands
-            if (gameState.Motion > 0)
+            if (command.Motion > 0)
             {
                 DoMove();
                 return;
             }
 
-            if (gameState.Verb == GameConstants.Say)
+            if (command.Verb == GameConstants.Say)
             {
                 TransitiveVerb();
                 return;
             }
 
-            if (gameState.Object > 0)
+            if (command.Object > 0)
             {
                 DoObject();
                 return;
             }
 
-            if (gameState.Verb > 0)
+            if (command.Verb > 0)
                 IntransitiveVerb();
         }
 
@@ -132,7 +134,10 @@ public class AdventureGame
         /// </summary>
         private void DoMove()
         {
-            switch (gameState.Motion)
+            GamePositionState position = gameState.Position;
+            ParsedCommandState command = gameState.Command;
+
+            switch (command.Motion)
             {
                 case GameConstants.NullMotion:
                     break;
@@ -140,25 +145,25 @@ public class AdventureGame
                     GoBack();
                     break;
                 case GameConstants.Look:
-                    if (gameState.Detail == 0)
+                    if (position.Detail == 0)
                     {
                         Console.WriteLine(GameMessages.GetMessage(15));
-                        gameState.Detail |= 1;
+                        position.Detail |= 1;
                     }
 
-                    gameState.WizardDark = false;
-                    gameState.VisitedLocations[gameState.Location] =
-                        (short)((gameState.VisitedLocations[gameState.Location] + 3) & ~3);
-                    gameState.TestBr = 0;
-                    gameState.NewLocation = gameState.Location;
-                    gameState.Location = 0;
+                    gameState.Cave.WizardDark = false;
+                    gameState.World.VisitedLocations[position.Location] =
+                        (short)((gameState.World.VisitedLocations[position.Location] + 3) & ~3);
+                    gameState.TreasureProgress.DescriptionDetailMask = 0;
+                    position.NewLocation = position.Location;
+                    position.Location = 0;
                     break;
                 case GameConstants.Cave:
-                    Console.WriteLine(GameMessages.GetMessage(gameState.Location < 8 ? 57 : 58));
+                    Console.WriteLine(GameMessages.GetMessage(position.Location < 8 ? 57 : 58));
                     break;
                 default:
-                    gameState.OldLocation2 = gameState.OldLocation;
-                    gameState.OldLocation = gameState.Location;
+                    position.OldLocation2 = position.OldLocation;
+                    position.OldLocation = position.Location;
                     DoTravel();
                     break;
             }
@@ -169,27 +174,30 @@ public class AdventureGame
         /// </summary>
         private void GoBack()
         {
-            int want = gameState.Forced(gameState.OldLocation)
-                ? gameState.OldLocation2
-                : gameState.OldLocation;
+            GamePositionState position = gameState.Position;
+            ParsedCommandState command = gameState.Command;
 
-            gameState.OldLocation2 = gameState.OldLocation;
-            gameState.OldLocation = gameState.Location;
+            int want = gameState.Forced(position.OldLocation)
+                ? position.OldLocation2
+                : position.OldLocation;
 
-            if (want == gameState.Location)
+            position.OldLocation2 = position.OldLocation;
+            position.OldLocation = position.Location;
+
+            if (want == position.Location)
             {
                 Console.WriteLine(GameMessages.GetMessage(91));
                 return;
             }
 
-            List<TravelEntry> travel = TravelData.GetTravelOptions(gameState.Location);
+            List<TravelEntry> travel = TravelData.GetTravelOptions(position.Location);
             TravelEntry? fallback = null;
 
             foreach (TravelEntry entry in travel)
             {
                 if (entry.Condition == 0 && entry.Destination == want)
                 {
-                    gameState.Motion = entry.Verb;
+                    command.Motion = entry.Verb;
                     DoTravel();
                     return;
                 }
@@ -217,7 +225,7 @@ public class AdventureGame
 
             if (fallback != null)
             {
-                gameState.Motion = fallback.Verb;
+                command.Motion = fallback.Verb;
                 DoTravel();
             }
             else
@@ -231,11 +239,14 @@ public class AdventureGame
         /// </summary>
         private void DoTravel()
         {
-            List<TravelEntry> travel = TravelData.GetTravelOptions(gameState.Location);
-            gameState.NewLocation = gameState.Location;
+            GamePositionState position = gameState.Position;
+            ParsedCommandState command = gameState.Command;
+
+            List<TravelEntry> travel = TravelData.GetTravelOptions(position.Location);
+            position.NewLocation = position.Location;
             bool hit = false;
             bool moved = false;
-            int selectedDestination = gameState.Location;
+            int selectedDestination = position.Location;
             int roll = GameState.RRand(random, 0, 99);
 
             foreach (TravelEntry entry in travel)
@@ -244,7 +255,7 @@ public class AdventureGame
                 int verb = entry.Verb;
                 int condition = entry.Condition;
 
-                if (verb != 1 && verb != gameState.Motion && !hit)
+                if (verb != 1 && verb != command.Motion && !hit)
                     continue;
 
                 hit = true;
@@ -270,9 +281,9 @@ public class AdventureGame
             }
             else
             {
-                gameState.NewLocation = selectedDestination;
-                if (gameState.NewLocation == gameState.Location)
-                    gameState.Location = 0;
+                position.NewLocation = selectedDestination;
+                if (position.NewLocation == position.Location)
+                    position.Location = 0;
             }
         }
 
@@ -296,20 +307,22 @@ public class AdventureGame
         /// </summary>
         private void BadMove()
         {
+            ParsedCommandState command = gameState.Command;
+
             int message = 12;
-            if (gameState.Motion >= 43 && gameState.Motion <= 50)
+            if (command.Motion >= 43 && command.Motion <= 50)
                 message = 9;
-            if (gameState.Motion == 29 || gameState.Motion == 30)
+            if (command.Motion == 29 || command.Motion == 30)
                 message = 9;
-            if (gameState.Motion == 7 || gameState.Motion == 36 || gameState.Motion == 37)
+            if (command.Motion == 7 || command.Motion == 36 || command.Motion == 37)
                 message = 10;
-            if (gameState.Motion == 11 || gameState.Motion == 19)
+            if (command.Motion == 11 || command.Motion == 19)
                 message = 11;
-            if (gameState.Verb == GameConstants.Find || gameState.Verb == GameConstants.Inventory)
+            if (command.Verb == GameConstants.Find || command.Verb == GameConstants.Inventory)
                 message = 59;
-            if (gameState.Motion == 62 || gameState.Motion == 65)
+            if (command.Motion == 62 || command.Motion == 65)
                 message = 42;
-            if (gameState.Motion == 17)
+            if (command.Motion == 17)
                 message = 80;
 
             Console.WriteLine(GameMessages.GetMessage(message));
@@ -387,31 +400,34 @@ public class AdventureGame
             RunDwarves();
             ApplyLocationChange();
 
-            if (gameState.SaveFlag || gameState.Location == 0)
+            if (gameState.TreasureProgress.SaveRequested || gameState.Position.Location == 0)
                 return false;
 
             ApplyClosedInventoryState();
-            gameState.WizardDark = DarknessManager.IsDark(gameState);
-            if (gameState.KnifeLocation > 0 && gameState.KnifeLocation != gameState.Location)
-                gameState.KnifeLocation = 0;
+            gameState.Cave.WizardDark = DarknessManager.IsDark(gameState);
+            if (gameState.Objects.KnifeLocation > 0 && gameState.Objects.KnifeLocation != gameState.Position.Location)
+                gameState.Objects.KnifeLocation = 0;
 
             if (RunSpecialTimer())
                 return false;
 
             TryLocationHint();
-            return !gameState.SaveFlag;
+            return !gameState.TreasureProgress.SaveRequested;
         }
 
         private void ApplyClosingExitGuard()
         {
-            if (gameState.NewLocation >= 9 || gameState.NewLocation == 0 || !gameState.Closing)
+            GamePositionState position = gameState.Position;
+            CaveTimingState cave = gameState.Cave;
+
+            if (position.NewLocation >= 9 || position.NewLocation == 0 || !cave.Closing)
                 return;
 
             Speak(130);
-            gameState.NewLocation = gameState.Location;
-            if (!gameState.Panic)
-                gameState.Clock2 = 15;
-            gameState.Panic = true;
+            position.NewLocation = position.Location;
+            if (!cave.Panic)
+                cave.Clock2 = 15;
+            cave.Panic = true;
         }
 
         private void ApplyDwarfBlock()
