@@ -72,6 +72,8 @@ The transcript test project also includes focused state regressions for cave clo
 
 The C# port now supports both native C# randomness for normal gameplay and `Models\CReferenceRandom.cs` for parity/regression runs. The transcript harness launches the game with `--reference-random`, which reproduces the MSVC C runtime `rand()` sequence used by the rebuilt C reference. You can also set `ADVENTURE_REFERENCE_RANDOM=1` for deterministic reference-random runs.
 
+`Models\GameState.cs` has started moving away from one flat C-style bag of globals. It now exposes named debugger-friendly groups (`Position`, `World`, `Objects`, `Cave`, `TreasureProgress`, `Dwarves`, `Hints`, `Command`, and `Debug`) while keeping the old property names as compatibility pass-throughs. This keeps current gameplay code stable and gives future refactors a safer migration path.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
@@ -132,7 +134,7 @@ Rebuild C reference, if Visual Studio command-line tools are available:
    - rerun `dotnet run --project tests\TranscriptTests\TranscriptTests.csproj`
 
 3. Once behavior is better locked down:
-   - refactor `GameState` into clearer named state structures/properties
+   - continue the `GameState` refactor by migrating `AdventureGame` call sites toward the named state groups and replacing raw object/location arrays with clearer helpers where it improves readability
    - refactor `DataBase` / data lookup code for maintainability
    - add focused unit tests for parser/vocabulary, object placement, scoring, dwarf/pirate state, and turn lifecycle
 
