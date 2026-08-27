@@ -432,18 +432,21 @@ public class AdventureGame
 
         private void ApplyDwarfBlock()
         {
-            if (gameState.NewLocation == gameState.Location ||
-                gameState.Forced(gameState.Location) ||
-                gameState.LocationHasFlag(gameState.Location, GameConstants.NoPirat))
+            GamePositionState position = gameState.Position;
+            DwarfPirateState dwarves = gameState.Dwarves;
+
+            if (position.NewLocation == position.Location ||
+                gameState.Forced(position.Location) ||
+                gameState.LocationHasFlag(position.Location, GameConstants.NoPirat))
             {
                 return;
             }
 
             for (int i = 1; i < GameConstants.MaxDwarves - 1; i++)
             {
-                if (gameState.OldDwarfLocations[i] == gameState.NewLocation && gameState.DwarfSeen[i])
+                if (dwarves.PreviousLocations[i] == position.NewLocation && dwarves.Seen[i])
                 {
-                    gameState.NewLocation = gameState.Location;
+                    position.NewLocation = position.Location;
                     Speak(2);
                     return;
                 }
@@ -452,41 +455,45 @@ public class AdventureGame
 
         private void RunDwarves()
         {
-            if (gameState.NewLocation == 0 ||
-                gameState.Forced(gameState.NewLocation) ||
-                gameState.LocationHasFlag(gameState.NewLocation, GameConstants.NoPirat))
+            GamePositionState position = gameState.Position;
+            DwarfPirateState dwarves = gameState.Dwarves;
+            ObjectPlacementState objects = gameState.Objects;
+
+            if (position.NewLocation == 0 ||
+                gameState.Forced(position.NewLocation) ||
+                gameState.LocationHasFlag(position.NewLocation, GameConstants.NoPirat))
             {
                 return;
             }
 
-            if (gameState.DwarfFlag == 0)
+            if (dwarves.ActivationLevel == 0)
             {
-                if (gameState.NewLocation > 15)
-                    gameState.DwarfFlag++;
+                if (position.NewLocation > 15)
+                    dwarves.ActivationLevel++;
                 return;
             }
 
-            if (gameState.DwarfFlag == 1)
+            if (dwarves.ActivationLevel == 1)
             {
-                if (gameState.NewLocation < 15 || GameState.Pct(random, 95))
+                if (position.NewLocation < 15 || GameState.Pct(random, 95))
                     return;
 
-                gameState.DwarfFlag++;
+                dwarves.ActivationLevel++;
                 for (int i = 1; i < 3; i++)
                 {
                     if (GameState.Pct(random, 50))
-                        gameState.DwarfLocations[GameState.RRand(random, 1, 5)] = 0;
+                        dwarves.Locations[GameState.RRand(random, 1, 5)] = 0;
                 }
 
                 for (int i = 1; i < GameConstants.MaxDwarves - 1; i++)
                 {
-                    if (gameState.DwarfLocations[i] == gameState.NewLocation)
-                        gameState.DwarfLocations[i] = gameState.DwarfAlternateLocation;
-                    gameState.OldDwarfLocations[i] = gameState.DwarfLocations[i];
+                    if (dwarves.Locations[i] == position.NewLocation)
+                        dwarves.Locations[i] = dwarves.AlternateLocation;
+                    dwarves.PreviousLocations[i] = dwarves.Locations[i];
                 }
 
                 Speak(3);
-                gameState.Drop(GameConstants.Axe, gameState.NewLocation);
+                gameState.Drop(GameConstants.Axe, position.NewLocation);
                 return;
             }
 
@@ -496,32 +503,32 @@ public class AdventureGame
 
             for (int i = 1; i < GameConstants.MaxDwarves; i++)
             {
-                if (gameState.DwarfLocations[i] == 0)
+                if (dwarves.Locations[i] == 0)
                     continue;
 
-                int candidateLocation = gameState.OldDwarfLocations[i];
+                int candidateLocation = dwarves.PreviousLocations[i];
                 for (int attempt = 1; attempt < 20; attempt++)
                 {
                     candidateLocation = GameState.RRand(random, 15, 120);
-                    if (candidateLocation != gameState.OldDwarfLocations[i] &&
-                        candidateLocation != gameState.DwarfLocations[i])
+                    if (candidateLocation != dwarves.PreviousLocations[i] &&
+                        candidateLocation != dwarves.Locations[i])
                     {
                         break;
                     }
                 }
 
-                gameState.OldDwarfLocations[i] = gameState.DwarfLocations[i];
-                gameState.DwarfLocations[i] = candidateLocation;
+                dwarves.PreviousLocations[i] = dwarves.Locations[i];
+                dwarves.Locations[i] = candidateLocation;
 
-                gameState.DwarfSeen[i] =
-                    (gameState.DwarfSeen[i] && gameState.NewLocation >= 15) ||
-                    gameState.DwarfLocations[i] == gameState.NewLocation ||
-                    gameState.OldDwarfLocations[i] == gameState.NewLocation;
+                dwarves.Seen[i] =
+                    (dwarves.Seen[i] && position.NewLocation >= 15) ||
+                    dwarves.Locations[i] == position.NewLocation ||
+                    dwarves.PreviousLocations[i] == position.NewLocation;
 
-                if (!gameState.DwarfSeen[i])
+                if (!dwarves.Seen[i])
                     continue;
 
-                gameState.DwarfLocations[i] = gameState.NewLocation;
+                dwarves.Locations[i] = position.NewLocation;
                 if (i == GameConstants.MaxDwarves - 1)
                 {
                     DoPirate();
@@ -529,12 +536,12 @@ public class AdventureGame
                 }
 
                 dwarfCount++;
-                if (gameState.OldDwarfLocations[i] == gameState.DwarfLocations[i])
+                if (dwarves.PreviousLocations[i] == dwarves.Locations[i])
                 {
                     attacks++;
-                    if (gameState.KnifeLocation >= 0)
-                        gameState.KnifeLocation = gameState.NewLocation;
-                    if (GameState.RRand(random, 0, 999) < 95 * (gameState.DwarfFlag - 2))
+                    if (objects.KnifeLocation >= 0)
+                        objects.KnifeLocation = position.NewLocation;
+                    if (GameState.RRand(random, 0, 999) < 95 * (dwarves.ActivationLevel - 2))
                         hits++;
                 }
             }
@@ -550,8 +557,8 @@ public class AdventureGame
             if (attacks == 0)
                 return;
 
-            if (gameState.DwarfFlag == 2)
-                gameState.DwarfFlag++;
+            if (dwarves.ActivationLevel == 2)
+                dwarves.ActivationLevel++;
 
             int messageBase;
             if (attacks > 1)
@@ -576,14 +583,19 @@ public class AdventureGame
                 Console.WriteLine($"{hits} of them get you !!!");
             }
 
-            gameState.OldLocation2 = gameState.NewLocation;
+            position.OldLocation2 = position.NewLocation;
             HandleDeath();
         }
 
         private void DoPirate()
         {
-            if (gameState.NewLocation == gameState.ChestLocation ||
-                gameState.ObjectProperties[GameConstants.Chest] >= 0)
+            GamePositionState position = gameState.Position;
+            DwarfPirateState dwarves = gameState.Dwarves;
+            ObjectPlacementState objects = gameState.Objects;
+            TreasureProgressState progress = gameState.TreasureProgress;
+
+            if (position.NewLocation == objects.ChestLocation ||
+                objects.Properties[GameConstants.Chest] >= 0)
             {
                 return;
             }
@@ -592,8 +604,8 @@ public class AdventureGame
             for (int treasure = GameConstants.Nugget; treasure <= GameConstants.MaxTreasures; treasure++)
             {
                 if (treasure == GameConstants.Pyramid &&
-                    (gameState.NewLocation == gameState.ObjectLocations[GameConstants.Pyramid] ||
-                    gameState.NewLocation == gameState.ObjectLocations[GameConstants.Emerald]))
+                    (position.NewLocation == objects.Locations[GameConstants.Pyramid] ||
+                    position.NewLocation == objects.Locations[GameConstants.Emerald]))
                 {
                     continue;
                 }
@@ -608,23 +620,23 @@ public class AdventureGame
                     nearbyTreasures++;
             }
 
-            if (gameState.Tally == gameState.Tally2 + 1 &&
+            if (progress.UndiscoveredTreasureCount == progress.TreasuresLostToEndgame + 1 &&
                 nearbyTreasures == 0 &&
-                gameState.ObjectLocations[GameConstants.Chest] == 0 &&
+                objects.Locations[GameConstants.Chest] == 0 &&
                 gameState.Here(GameConstants.Lamp) &&
-                gameState.ObjectProperties[GameConstants.Lamp] == 1)
+                objects.Properties[GameConstants.Lamp] == 1)
             {
                 Speak(186);
-                gameState.MoveObject(GameConstants.Chest, gameState.ChestLocation);
-                gameState.MoveObject(GameConstants.Message, gameState.ChestLocation2);
-                gameState.DwarfLocations[GameConstants.MaxDwarves - 1] = gameState.ChestLocation;
-                gameState.OldDwarfLocations[GameConstants.MaxDwarves - 1] = gameState.ChestLocation;
-                gameState.DwarfSeen[GameConstants.MaxDwarves - 1] = false;
+                gameState.MoveObject(GameConstants.Chest, objects.ChestLocation);
+                gameState.MoveObject(GameConstants.Message, objects.ChestLocation2);
+                dwarves.Locations[GameConstants.MaxDwarves - 1] = objects.ChestLocation;
+                dwarves.PreviousLocations[GameConstants.MaxDwarves - 1] = objects.ChestLocation;
+                dwarves.Seen[GameConstants.MaxDwarves - 1] = false;
                 return;
             }
 
-            if (gameState.OldDwarfLocations[GameConstants.MaxDwarves - 1] !=
-                gameState.DwarfLocations[GameConstants.MaxDwarves - 1] &&
+            if (dwarves.PreviousLocations[GameConstants.MaxDwarves - 1] !=
+                dwarves.Locations[GameConstants.MaxDwarves - 1] &&
                 GameState.Pct(random, 20))
             {
                 Speak(127);
@@ -633,29 +645,33 @@ public class AdventureGame
 
         private void PirateStealsTreasure()
         {
+            GamePositionState position = gameState.Position;
+            DwarfPirateState dwarves = gameState.Dwarves;
+            ObjectPlacementState objects = gameState.Objects;
+
             Speak(128);
-            if (gameState.ObjectLocations[GameConstants.Message] == 0)
-                gameState.MoveObject(GameConstants.Chest, gameState.ChestLocation);
-            gameState.MoveObject(GameConstants.Message, gameState.ChestLocation2);
+            if (objects.Locations[GameConstants.Message] == 0)
+                gameState.MoveObject(GameConstants.Chest, objects.ChestLocation);
+            gameState.MoveObject(GameConstants.Message, objects.ChestLocation2);
 
             for (int treasure = GameConstants.Nugget; treasure <= GameConstants.MaxTreasures; treasure++)
             {
                 if (treasure == GameConstants.Pyramid &&
-                    (gameState.NewLocation == gameState.ObjectLocations[GameConstants.Pyramid] ||
-                    gameState.NewLocation == gameState.ObjectLocations[GameConstants.Emerald]))
+                    (position.NewLocation == objects.Locations[GameConstants.Pyramid] ||
+                    position.NewLocation == objects.Locations[GameConstants.Emerald]))
                 {
                     continue;
                 }
 
-                if (gameState.At(treasure) && gameState.FixedObjectLocations[treasure] == 0)
-                    gameState.Carry(treasure, gameState.NewLocation);
+                if (gameState.At(treasure) && objects.FixedLocations[treasure] == 0)
+                    gameState.Carry(treasure, position.NewLocation);
                 if (gameState.Toting(treasure))
-                    gameState.Drop(treasure, gameState.ChestLocation);
+                    gameState.Drop(treasure, objects.ChestLocation);
             }
 
-            gameState.DwarfLocations[GameConstants.MaxDwarves - 1] = gameState.ChestLocation;
-            gameState.OldDwarfLocations[GameConstants.MaxDwarves - 1] = gameState.ChestLocation;
-            gameState.DwarfSeen[GameConstants.MaxDwarves - 1] = false;
+            dwarves.Locations[GameConstants.MaxDwarves - 1] = objects.ChestLocation;
+            dwarves.PreviousLocations[GameConstants.MaxDwarves - 1] = objects.ChestLocation;
+            dwarves.Seen[GameConstants.MaxDwarves - 1] = false;
         }
 
         private void ApplyLocationChange()
