@@ -33,7 +33,7 @@ dotnet run --project tests\TranscriptTests\TranscriptTests.csproj
 Most recent result:
 
 ```text
-21/21 transcript tests passed.
+22/22 transcript tests passed.
 ```
 
 The suite now includes 10 starter parity routes:
@@ -49,7 +49,7 @@ The suite now includes 10 starter parity routes:
 - `inventory_empty`
 - `unknown_words`
 
-It also includes 11 deeper parity routes:
+It also includes 12 deeper parity routes:
 
 - `deeper_cave_entry_lamp_on`
 - `deeper_cobble_debris_xyzzy`
@@ -62,6 +62,7 @@ It also includes 11 deeper parity routes:
 - `deeper_nugget_inventory_score`
 - `deeper_dwarf_pirate_warning`
 - `deeper_fissure_jump_death_no`
+- `deeper_fissure_jump_reincarnate_yes`
 
 These deeper routes were checked against both the rebuilt C executable and the C# port before being added to the regression suite.
 
@@ -119,7 +120,6 @@ Rebuild C reference, if Visual Studio command-line tools are available:
 
 1. Continue adding/fixing deeper parity routes for systems not yet fully exercised:
    - full pirate/chest theft behavior
-   - resurrection after accepting reincarnation
    - cave closing and closed-state behavior
 
 2. For each new route:
