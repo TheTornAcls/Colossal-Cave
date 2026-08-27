@@ -346,7 +346,7 @@ internal static class Program
         ProcessStartInfo startInfo = new()
         {
             FileName = "dotnet",
-            Arguments = $"run --project \"{gameProjectPath}\" --no-launch-profile",
+            Arguments = $"run --project \"{gameProjectPath}\" --no-launch-profile -- --reference-random",
             RedirectStandardInput = true,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
