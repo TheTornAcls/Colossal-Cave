@@ -5,7 +5,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using AdventureClaude.Game;
+using AdventureClaude.Models;
 
 internal static class Program
 {
@@ -290,7 +293,7 @@ internal static class Program
                 ]),
         ];
 
-        int failures = 0;
+        int transcriptFailures = 0;
         foreach (TestCase test in tests)
         {
             TestResult result = RunTranscript(gameProjectPath, test);
@@ -300,7 +303,7 @@ internal static class Program
                 continue;
             }
 
-            failures++;
+            transcriptFailures++;
             Console.WriteLine($"FAIL {test.Name}");
             Console.WriteLine(result.ErrorMessage);
             Console.WriteLine("---- output ----");
@@ -308,9 +311,34 @@ internal static class Program
             Console.WriteLine("---- end output ----");
         }
 
+        StateRegressionCase[] stateTests =
+        [
+            new StateRegressionCase("Closing timer starts cave closing", ClosingTimerStartsCaveClosing),
+            new StateRegressionCase("Closing exit guard blocks surface exits", ClosingExitGuardBlocksSurfaceExits),
+            new StateRegressionCase("Closed timer moves objects to repository", ClosedTimerMovesObjectsToRepository),
+            new StateRegressionCase("Closed inventory decodes carried objects", ClosedInventoryDecodesCarriedObjects),
+        ];
+
+        int stateFailures = 0;
+        foreach (StateRegressionCase test in stateTests)
+        {
+            try
+            {
+                test.Run();
+                Console.WriteLine($"PASS {test.Name}");
+            }
+            catch (Exception ex)
+            {
+                stateFailures++;
+                Console.WriteLine($"FAIL {test.Name}");
+                Console.WriteLine(ex.Message);
+            }
+        }
+
         Console.WriteLine();
-        Console.WriteLine($"{tests.Length - failures}/{tests.Length} transcript tests passed.");
-        return failures == 0 ? 0 : 1;
+        Console.WriteLine($"{tests.Length - transcriptFailures}/{tests.Length} transcript tests passed.");
+        Console.WriteLine($"{stateTests.Length - stateFailures}/{stateTests.Length} state regression tests passed.");
+        return transcriptFailures == 0 && stateFailures == 0 ? 0 : 1;
     }
 
     private static TestResult RunTranscript(string gameProjectPath, TestCase test)
@@ -383,7 +411,190 @@ internal static class Program
         return value.Replace("\r\n", "\n").Replace('\r', '\n');
     }
 
+    private static void ClosingTimerStartsCaveClosing()
+    {
+        AdventureGame game = CreateInitializedGame(out GameState state);
+        state.Tally = 0;
+        state.Location = 15;
+        state.NewLocation = 15;
+        state.Clock1 = 1;
+        state.Clock2 = 50;
+        state.DwarfSeen[1] = true;
+
+        string output = CaptureConsoleOutput(() =>
+        {
+            bool closedNow = InvokePrivate<bool>(game, "RunSpecialTimer");
+            AssertFalse(closedNow, "Closing start should not finish the game turn.");
+        });
+
+        AssertContains(output, "Cave closing soon.");
+        AssertEqual(-1, state.Clock1, "Clock1");
+        AssertTrue(state.Closing, "Closing flag");
+        AssertFalse(state.DwarfSeen.Skip(1).Any(seen => seen), "DwarfSeen flags should be reset.");
+        AssertEqual(0, state.ObjectProperties[GameConstants.Grate], "Grate property");
+        AssertEqual(0, state.ObjectProperties[GameConstants.Fissure], "Fissure property");
+        AssertEqual(0, state.ObjectLocations[GameConstants.Troll], "Troll location");
+        AssertEqual(0, state.FixedObjectLocations[GameConstants.Troll], "Troll fixed location");
+        AssertEqual(117, state.ObjectLocations[GameConstants.Troll2], "Troll2 location");
+        AssertEqual(122, state.FixedObjectLocations[GameConstants.Troll2], "Troll2 fixed location");
+        AssertEqual(0, state.ObjectProperties[GameConstants.Chain], "Chain property");
+        AssertEqual(0, state.FixedObjectLocations[GameConstants.Chain], "Chain fixed location");
+        AssertEqual(0, state.ObjectProperties[GameConstants.Axe], "Axe property");
+        AssertEqual(0, state.FixedObjectLocations[GameConstants.Axe], "Axe fixed location");
+    }
+
+    private static void ClosingExitGuardBlocksSurfaceExits()
+    {
+        AdventureGame game = CreateInitializedGame(out GameState state);
+        state.Closing = true;
+        state.Location = 15;
+        state.NewLocation = 8;
+        state.Clock2 = 50;
+
+        string output = CaptureConsoleOutput(() => InvokePrivate(game, "ApplyClosingExitGuard"));
+
+        AssertContains(output, "This exit is\nclosed.  Please leave via main office.");
+        AssertEqual(15, state.NewLocation, "NewLocation");
+        AssertEqual(15, state.Clock2, "Clock2");
+        AssertTrue(state.Panic, "Panic flag");
+    }
+
+    private static void ClosedTimerMovesObjectsToRepository()
+    {
+        AdventureGame game = CreateInitializedGame(out GameState state);
+        state.Location = 15;
+        state.NewLocation = 15;
+        state.Clock1 = -1;
+        state.Clock2 = 1;
+        state.Carry(GameConstants.Nugget, state.ObjectLocations[GameConstants.Nugget]);
+
+        string output = CaptureConsoleOutput(() =>
+        {
+            bool closedNow = InvokePrivate<bool>(game, "RunSpecialTimer");
+            AssertTrue(closedNow, "Closed timer should stop the current turn.");
+        });
+
+        AssertContains(output, "The cave is now closed.");
+        AssertTrue(state.Closed, "Closed flag");
+        AssertEqual(0, state.Location, "Location");
+        AssertEqual(115, state.OldLocation, "OldLocation");
+        AssertEqual(115, state.NewLocation, "NewLocation");
+        AssertEqual(115, state.ObjectLocations[GameConstants.Bottle], "Bottle location");
+        AssertEqual(-2, state.ObjectProperties[GameConstants.Bottle], "Bottle property");
+        AssertEqual(115, state.ObjectLocations[GameConstants.Plant], "Plant location");
+        AssertEqual(-1, state.ObjectProperties[GameConstants.Plant], "Plant property");
+        AssertEqual(115, state.ObjectLocations[GameConstants.Oyster], "Oyster location");
+        AssertEqual(-1, state.ObjectProperties[GameConstants.Oyster], "Oyster property");
+        AssertEqual(115, state.ObjectLocations[GameConstants.Lamp], "Lamp location");
+        AssertEqual(-1, state.ObjectProperties[GameConstants.Lamp], "Lamp property");
+        AssertEqual(115, state.ObjectLocations[GameConstants.Rod], "Rod location");
+        AssertEqual(-1, state.ObjectProperties[GameConstants.Rod], "Rod property");
+        AssertEqual(115, state.ObjectLocations[GameConstants.Dwarf], "Dwarf location");
+        AssertEqual(-1, state.ObjectProperties[GameConstants.Dwarf], "Dwarf property");
+        AssertEqual(116, state.ObjectLocations[GameConstants.Grate], "Grate location");
+        AssertEqual(116, state.ObjectLocations[GameConstants.Snake], "Snake location");
+        AssertEqual(-2, state.ObjectProperties[GameConstants.Snake], "Snake property");
+        AssertEqual(116, state.ObjectLocations[GameConstants.Bird], "Bird location");
+        AssertEqual(-2, state.ObjectProperties[GameConstants.Bird], "Bird property");
+        AssertEqual(116, state.ObjectLocations[GameConstants.Cage], "Cage location");
+        AssertEqual(116, state.ObjectLocations[GameConstants.Rod2], "Rod2 location");
+        AssertEqual(116, state.ObjectLocations[GameConstants.Pillow], "Pillow location");
+        AssertEqual(115, state.ObjectLocations[GameConstants.Mirror], "Mirror location");
+        AssertEqual(116, state.FixedObjectLocations[GameConstants.Mirror], "Mirror fixed location");
+        AssertEqual(0, state.ObjectLocations[GameConstants.Nugget], "Carried nugget should be destroyed.");
+        AssertEqual(0, state.Holding, "Holding");
+    }
+
+    private static void ClosedInventoryDecodesCarriedObjects()
+    {
+        AdventureGame game = CreateInitializedGame(out GameState state);
+        state.Closed = true;
+        state.Carry(GameConstants.Oyster, state.ObjectLocations[GameConstants.Oyster]);
+        state.ObjectProperties[GameConstants.Oyster] = -1;
+        state.Carry(GameConstants.Nugget, state.ObjectLocations[GameConstants.Nugget]);
+        state.ObjectProperties[GameConstants.Nugget] = -1;
+
+        string output = CaptureConsoleOutput(() => InvokePrivate(game, "ApplyClosedInventoryState"));
+
+        AssertContains(output, "Interesting.  There seems to be something written on the underside of the\noyster.");
+        AssertEqual(0, state.ObjectProperties[GameConstants.Oyster], "Oyster property");
+        AssertEqual(0, state.ObjectProperties[GameConstants.Nugget], "Nugget property");
+    }
+
+    private static AdventureGame CreateInitializedGame(out GameState state)
+    {
+        AdventureGame game = new();
+        state = GetGameState(game);
+        state.InitializeGame();
+        return game;
+    }
+
+    private static GameState GetGameState(AdventureGame game)
+    {
+        FieldInfo? field = typeof(AdventureGame).GetField("gameState", BindingFlags.Instance | BindingFlags.NonPublic);
+        return field?.GetValue(game) as GameState
+            ?? throw new InvalidOperationException("Could not read AdventureGame.gameState.");
+    }
+
+    private static void InvokePrivate(AdventureGame game, string methodName)
+    {
+        InvokePrivate<object?>(game, methodName);
+    }
+
+    private static T InvokePrivate<T>(AdventureGame game, string methodName)
+    {
+        MethodInfo? method = typeof(AdventureGame).GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
+        if (method == null)
+            throw new InvalidOperationException($"Could not find AdventureGame.{methodName}.");
+
+        object? result = method.Invoke(game, null);
+        return result is T typedResult ? typedResult : default!;
+    }
+
+    private static string CaptureConsoleOutput(Action action)
+    {
+        TextWriter originalOut = Console.Out;
+        using StringWriter writer = new();
+        Console.SetOut(writer);
+        try
+        {
+            action();
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
+
+        return Normalize(writer.ToString());
+    }
+
+    private static void AssertContains(string value, string expected)
+    {
+        if (!Normalize(value).Contains(Normalize(expected), StringComparison.Ordinal))
+            throw new InvalidOperationException($"Expected output to contain: {expected}");
+    }
+
+    private static void AssertEqual<T>(T expected, T actual, string name)
+    {
+        if (!EqualityComparer<T>.Default.Equals(expected, actual))
+            throw new InvalidOperationException($"Expected {name} to be {expected}, got {actual}.");
+    }
+
+    private static void AssertTrue(bool condition, string message)
+    {
+        if (!condition)
+            throw new InvalidOperationException(message);
+    }
+
+    private static void AssertFalse(bool condition, string message)
+    {
+        if (condition)
+            throw new InvalidOperationException(message);
+    }
+
     private sealed record TestCase(string Name, string Input, IReadOnlyList<string> ExpectedSnippets);
+
+    private sealed record StateRegressionCase(string Name, Action Run);
 
     private sealed record TestResult(bool Passed, string Output, string ErrorMessage)
     {
