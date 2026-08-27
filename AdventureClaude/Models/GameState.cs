@@ -64,73 +64,74 @@ public class GameState
 
         private static readonly int[] InitialDwarfLocations = [0, 19, 27, 33, 44, 64, 114];
 
-        // Location-related variables
-        public int Turns { get; set; } = 0;
-        public int Location { get; set; } = GameConstants.StartLocation;
-        public int OldLocation { get; set; } = GameConstants.StartLocation;
-        public int OldLocation2 { get; set; } = GameConstants.StartLocation;
-        public int NewLocation { get; set; } = GameConstants.StartLocation;
+        public GamePositionState Position { get; } = new();
+        public WorldMapState World { get; } = new();
+        public ObjectPlacementState Objects { get; } = new();
+        public CaveTimingState Cave { get; } = new();
+        public TreasureProgressState TreasureProgress { get; } = new();
+        public DwarfPirateState Dwarves { get; } = new();
+        public HintTrackingState Hints { get; } = new();
+        public ParsedCommandState Command { get; } = new();
+        public DebugOptions Debug { get; } = new();
 
-        // Arrays for location and object status
-        public short[] LocationConditions { get; set; } = new short[GameConstants.LocationArraySize];
-        public int[] ObjectLocations { get; set; } = new int[GameConstants.ObjectArraySize];
-        public int[] FixedObjectLocations { get; set; } = new int[GameConstants.ObjectArraySize];
-        public short[] VisitedLocations { get; set; } = new short[GameConstants.LocationArraySize];
-        public short[] ObjectProperties { get; set; } = new short[GameConstants.ObjectArraySize];
+        // Compatibility properties keep the existing port call sites stable while the
+        // state is grouped into debugger-friendly domains.
+        public int Turns { get => Position.Turns; set => Position.Turns = value; }
+        public int Location { get => Position.Location; set => Position.Location = value; }
+        public int OldLocation { get => Position.OldLocation; set => Position.OldLocation = value; }
+        public int OldLocation2 { get => Position.OldLocation2; set => Position.OldLocation2 = value; }
+        public int NewLocation { get => Position.NewLocation; set => Position.NewLocation = value; }
+        public int Detail { get => Position.Detail; set => Position.Detail = value; }
 
-        // Game progress variables
-        public int Tally { get; set; } = 0;
-        public int Tally2 { get; set; } = 0;
-        public bool WizardDark { get; set; } = false;
-        public bool Closed { get; set; } = false;
-        public bool Closing { get; set; } = false;
-        public int Holding { get; set; } = 0;
-        public int Detail { get; set; } = 0;
-        public int Limit { get; set; } = 330;
-        public int KnifeLocation { get; set; } = 0;
-        public int ChestLocation { get; set; } = 0;
-        public int ChestLocation2 { get; set; } = 0;
+        public short[] LocationConditions { get => World.LocationConditions; set => World.LocationConditions = value; }
+        public short[] VisitedLocations { get => World.VisitedLocations; set => World.VisitedLocations = value; }
+        public List<TravelOption> CurrentTravelOptions { get => World.CurrentTravelOptions; set => World.CurrentTravelOptions = value; }
 
-        // Dwarf-related variables
-        public int[] DwarfLocations { get; set; } = new int[GameConstants.DwarfArraySize];
-        public int[] OldDwarfLocations { get; set; } = new int[GameConstants.DwarfArraySize];
-        public int DwarfKill { get; set; } = 0;
-        public bool[] DwarfSeen { get; set; } = new bool[GameConstants.DwarfArraySize];
+        public int[] ObjectLocations { get => Objects.Locations; set => Objects.Locations = value; }
+        public int[] FixedObjectLocations { get => Objects.FixedLocations; set => Objects.FixedLocations = value; }
+        public short[] ObjectProperties { get => Objects.Properties; set => Objects.Properties = value; }
+        public short[] ActionMessages { get => Objects.ActionMessages; set => Objects.ActionMessages = value; }
+        public int Holding { get => Objects.Holding; set => Objects.Holding = value; }
+        public int KnifeLocation { get => Objects.KnifeLocation; set => Objects.KnifeLocation = value; }
+        public int ChestLocation { get => Objects.ChestLocation; set => Objects.ChestLocation = value; }
+        public int ChestLocation2 { get => Objects.ChestLocation2; set => Objects.ChestLocation2 = value; }
 
-        // Time and event variables
-        public int Clock1 { get; set; } = 0;
-        public int Clock2 { get; set; } = 0;
-        public bool Panic { get; set; } = false;
-        public int Bonus { get; set; } = 0;
-        public int NumDie { get; set; } = 0;
-        public int DwarfAlternateLocation { get; set; } = 0;
-        public int LampWarning { get; set; } = 0;
-        public int FooBar { get; set; } = 0;
+        public bool WizardDark { get => Cave.WizardDark; set => Cave.WizardDark = value; }
+        public bool Closed { get => Cave.Closed; set => Cave.Closed = value; }
+        public bool Closing { get => Cave.Closing; set => Cave.Closing = value; }
+        public int Limit { get => Cave.LampLimit; set => Cave.LampLimit = value; }
+        public int Clock1 { get => Cave.Clock1; set => Cave.Clock1 = value; }
+        public int Clock2 { get => Cave.Clock2; set => Cave.Clock2 = value; }
+        public bool Panic { get => Cave.Panic; set => Cave.Panic = value; }
+        public int LampWarning { get => Cave.LampWarning; set => Cave.LampWarning = value; }
 
-        // Game flags
-        public int DwarfFlag { get; set; } = 0;
-        public bool GaveUp { get; set; } = false;
-        public bool SaveFlag { get; set; } = false;
-        public int HintTaken { get; set; } = 0;
-        public int HintAvailable { get; set; } = 0;
-        public int[] HintLocations { get; set; } = new int[GameConstants.HintArraySize];
-        public int TestBr { get; set; } = 0;
+        public int Tally { get => TreasureProgress.UndiscoveredTreasureCount; set => TreasureProgress.UndiscoveredTreasureCount = value; }
+        public int Tally2 { get => TreasureProgress.TreasuresLostToEndgame; set => TreasureProgress.TreasuresLostToEndgame = value; }
+        public int Bonus { get => TreasureProgress.Bonus; set => TreasureProgress.Bonus = value; }
+        public int NumDie { get => TreasureProgress.DeathCount; set => TreasureProgress.DeathCount = value; }
+        public bool GaveUp { get => TreasureProgress.GaveUp; set => TreasureProgress.GaveUp = value; }
+        public bool SaveFlag { get => TreasureProgress.SaveRequested; set => TreasureProgress.SaveRequested = value; }
+        public int HintTaken { get => TreasureProgress.HintsAccepted; set => TreasureProgress.HintsAccepted = value; }
+        public int FooBar { get => TreasureProgress.FooBar; set => TreasureProgress.FooBar = value; }
+        public int TestBr { get => TreasureProgress.DescriptionDetailMask; set => TreasureProgress.DescriptionDetailMask = value; }
 
-        // Action messages
-        public short[] ActionMessages { get; set; } = new short[GameConstants.ActionMessageSize];
+        public int[] DwarfLocations { get => Dwarves.Locations; set => Dwarves.Locations = value; }
+        public int[] OldDwarfLocations { get => Dwarves.PreviousLocations; set => Dwarves.PreviousLocations = value; }
+        public int DwarfKill { get => Dwarves.KillCount; set => Dwarves.KillCount = value; }
+        public bool[] DwarfSeen { get => Dwarves.Seen; set => Dwarves.Seen = value; }
+        public int DwarfAlternateLocation { get => Dwarves.AlternateLocation; set => Dwarves.AlternateLocation = value; }
+        public int DwarfFlag { get => Dwarves.ActivationLevel; set => Dwarves.ActivationLevel = value; }
 
-        // Current travel options
-        public List<TravelOption> CurrentTravelOptions { get; set; } = new List<TravelOption>();
+        public int HintAvailable { get => Hints.AvailableMask; set => Hints.AvailableMask = value; }
+        public int[] HintLocations { get => Hints.LocationCounters; set => Hints.LocationCounters = value; }
 
-        // English parsing variables
-        public int Verb { get; set; } = 0;
-        public int Object { get; set; } = 0;
-        public int Motion { get; set; } = 0;
-        public string Word1 { get; set; } = string.Empty;
-        public string Word2 { get; set; } = string.Empty;
+        public int Verb { get => Command.Verb; set => Command.Verb = value; }
+        public int Object { get => Command.Object; set => Command.Object = value; }
+        public int Motion { get => Command.Motion; set => Command.Motion = value; }
+        public string Word1 { get => Command.Word1; set => Command.Word1 = value; }
+        public string Word2 { get => Command.Word2; set => Command.Word2 = value; }
 
-        // Debug flag
-        public int DebugFlag { get; set; } = 0;
+        public int DebugFlag { get => Debug.Flag; set => Debug.Flag = value; }
 
         /// <summary>
         /// Initializes the game state to starting values.
@@ -541,3 +542,87 @@ public class GameState
             }
         }
     }
+
+public sealed class GamePositionState
+{
+    public int Turns { get; set; }
+    public int Location { get; set; } = GameConstants.StartLocation;
+    public int OldLocation { get; set; } = GameConstants.StartLocation;
+    public int OldLocation2 { get; set; } = GameConstants.StartLocation;
+    public int NewLocation { get; set; } = GameConstants.StartLocation;
+    public int Detail { get; set; }
+}
+
+public sealed class WorldMapState
+{
+    public short[] LocationConditions { get; set; } = new short[GameConstants.LocationArraySize];
+    public short[] VisitedLocations { get; set; } = new short[GameConstants.LocationArraySize];
+    public List<TravelOption> CurrentTravelOptions { get; set; } = new();
+}
+
+public sealed class ObjectPlacementState
+{
+    public int[] Locations { get; set; } = new int[GameConstants.ObjectArraySize];
+    public int[] FixedLocations { get; set; } = new int[GameConstants.ObjectArraySize];
+    public short[] Properties { get; set; } = new short[GameConstants.ObjectArraySize];
+    public short[] ActionMessages { get; set; } = new short[GameConstants.ActionMessageSize];
+    public int Holding { get; set; }
+    public int KnifeLocation { get; set; }
+    public int ChestLocation { get; set; }
+    public int ChestLocation2 { get; set; }
+}
+
+public sealed class CaveTimingState
+{
+    public bool WizardDark { get; set; }
+    public bool Closed { get; set; }
+    public bool Closing { get; set; }
+    public int LampLimit { get; set; } = 330;
+    public int Clock1 { get; set; }
+    public int Clock2 { get; set; }
+    public bool Panic { get; set; }
+    public int LampWarning { get; set; }
+}
+
+public sealed class TreasureProgressState
+{
+    public int UndiscoveredTreasureCount { get; set; }
+    public int TreasuresLostToEndgame { get; set; }
+    public int Bonus { get; set; }
+    public int DeathCount { get; set; }
+    public bool GaveUp { get; set; }
+    public bool SaveRequested { get; set; }
+    public int HintsAccepted { get; set; }
+    public int FooBar { get; set; }
+    public int DescriptionDetailMask { get; set; }
+}
+
+public sealed class DwarfPirateState
+{
+    public int[] Locations { get; set; } = new int[GameConstants.DwarfArraySize];
+    public int[] PreviousLocations { get; set; } = new int[GameConstants.DwarfArraySize];
+    public int KillCount { get; set; }
+    public bool[] Seen { get; set; } = new bool[GameConstants.DwarfArraySize];
+    public int AlternateLocation { get; set; }
+    public int ActivationLevel { get; set; }
+}
+
+public sealed class HintTrackingState
+{
+    public int AvailableMask { get; set; }
+    public int[] LocationCounters { get; set; } = new int[GameConstants.HintArraySize];
+}
+
+public sealed class ParsedCommandState
+{
+    public int Verb { get; set; }
+    public int Object { get; set; }
+    public int Motion { get; set; }
+    public string Word1 { get; set; } = string.Empty;
+    public string Word2 { get; set; } = string.Empty;
+}
+
+public sealed class DebugOptions
+{
+    public int Flag { get; set; }
+}
