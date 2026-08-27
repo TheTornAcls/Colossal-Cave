@@ -237,6 +237,30 @@ internal static class Program
                     "You are obviously a rank amateur. Better luck next time.",
                 ]),
             new TestCase(
+                "Parity deeper_pirate_steals_nugget_inventory",
+                InputLines(
+                    [
+                        "n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down",
+                        "west", "west", "west", "west", "west", "down", "south", "take nugget", "north",
+                        "west", "east", "west", "east", "west", "east", "west", "east", "west", "east",
+                        "take axe",
+                        "west", "east", "throw axe", "west", "east", "throw axe", "west", "east", "throw axe",
+                        "west", "east", "throw axe", "west", "east", "throw axe", "west", "east", "throw axe",
+                        "inventory", "quit", "y",
+                    ]),
+                [
+                    "There is a large sparkling nugget of gold here!",
+                    "Out from the shadows behind you pounces a bearded pirate!",
+                    "I'll just take all this booty and hide it away with me chest deep",
+                    "He snatches your treasure and vanishes into the gloom.",
+                    "You are currently holding the following:",
+                    "Set of keys.",
+                    "Brass lantern",
+                    "Treasures:               2",
+                    "Score:                  34",
+                    "You are obviously a rank amateur. Better luck next time.",
+                ]),
+            new TestCase(
                 "Parity deeper_fissure_jump_death_no",
                 InputLines("n", "enter", "take lamp", "take keys", "light lamp", "out", "depression", "unlock grate", "down", "west", "west", "west", "west", "west", "down", "west", "jump", "n"),
                 [
