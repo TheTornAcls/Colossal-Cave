@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using AdventureClaude.Game;
 using AdventureClaude.Models;
 
@@ -291,6 +292,39 @@ internal static class Program
                     "Score:                  22",
                     "You are obviously a rank amateur. Better luck next time.",
                 ]),
+            new TestCase(
+                "Parity deeper_plover_dark_room_pyramid",
+                InputLines(
+                    [
+                        "n", "enter", "take lamp", "take keys", "take bottle", "take food", "light lamp",
+                        "out", "depression", "unlock grate", "down",
+                        "west", "take cage", "west", "take rod", "west", "west", "drop rod", "take bird",
+                        "west", "down", "south", "look", "north", "north", "release bird",
+                        "south", "look", "north", "north", "look", "south", "west", "look", "east",
+                        "north", "north", "plugh", "xyzzy", "west", "west", "take rod", "west", "up",
+                        "down", "west", "wave rod", "cross", "look", "cross", "east",
+                        "north", "north", "north", "south", "down", "west", "down", "west", "west",
+                        "east", "west", "oriental", "look", "up", "west",
+                        "drop keys", "drop bottle", "drop food", "drop cage", "drop rod", "drop lamp",
+                        "east", "look", "ne", "take pyramid", "south", "drop pyramid", "look",
+                        "score", "quit", "y",
+                    ]),
+                [
+                    "The little bird attacks the green snake",
+                    "There is precious jewelry here!",
+                    "There are bars of silver here!",
+                    "There are many coins here!",
+                    "A crystal bridge now spans the fissure.",
+                    "There are diamonds here!",
+                    "There is a delicate, precious, Ming vase here!",
+                    "There is an emerald here the size of a plover's egg!",
+                    "It is now pitch dark.  If you proceed you will likely fall into a pit.",
+                    "There is a platinum pyramid here, 8 inches on a side!",
+                    "Treasures:              16",
+                    "Score:                  77",
+                    "Score:                  73",
+                    "Your score qualifies you as a novice-class adventurer.",
+                ]),
         ];
 
         int transcriptFailures = 0;
@@ -365,15 +399,31 @@ internal static class Program
 
         using Process process = new() { StartInfo = startInfo };
         process.Start();
+        Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+        Task<string> errorTask = process.StandardError.ReadToEndAsync();
+
         process.StandardInput.Write(test.Input);
         process.StandardInput.Close();
 
-        string output = process.StandardOutput.ReadToEnd();
-        string error = process.StandardError.ReadToEnd();
         if (!process.WaitForExit(milliseconds: 30000))
         {
             process.Kill(entireProcessTree: true);
-            return TestResult.Fail(output, "Game process timed out.");
+            process.WaitForExit(milliseconds: 5000);
+            string timedOutOutput = outputTask.GetAwaiter().GetResult();
+            string timedOutError = errorTask.GetAwaiter().GetResult();
+            string timedOutCombinedOutput = Normalize(timedOutOutput + timedOutError);
+            if (timedOutCombinedOutput.Length > 8000)
+                timedOutCombinedOutput = timedOutCombinedOutput[..8000] + Environment.NewLine + "... output truncated after timeout ...";
+
+            return TestResult.Fail(timedOutCombinedOutput, "Game process timed out.");
+        }
+
+        string output = outputTask.GetAwaiter().GetResult();
+        string error = errorTask.GetAwaiter().GetResult();
+        if (output.Length + error.Length > 200000)
+        {
+            string truncatedOutput = Normalize((output + error)[..200000]) + Environment.NewLine + "... output truncated ...";
+            return TestResult.Fail(truncatedOutput, "Game process produced unexpectedly large output.");
         }
 
         string combinedOutput = Normalize(output + error);
