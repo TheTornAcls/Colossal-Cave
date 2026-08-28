@@ -146,7 +146,7 @@ public class GameState
             ObjectProperties = new short[GameConstants.ObjectArraySize];
             for (int i = GameConstants.Nugget; i < GameConstants.MaxObjects; i++)
             {
-                ObjectProperties[i] = -1;
+                Objects.SetProperty(i, -1);
             }
 
             DwarfLocations = CopyDwarfLocations();
@@ -234,7 +234,7 @@ public class GameState
         /// </summary>
         public bool Toting(int item)
         {
-            return ObjectLocations[item] == -1;
+            return Objects.IsCarried(item);
         }
 
         /// <summary>
@@ -242,7 +242,7 @@ public class GameState
         /// </summary>
         public bool Here(int item)
         {
-            return ObjectLocations[item] == Location || Toting(item);
+            return Objects.IsAtLocation(item, Location) || Toting(item);
         }
 
         /// <summary>
@@ -250,7 +250,7 @@ public class GameState
         /// </summary>
         public bool At(int item)
         {
-            return ObjectLocations[item] == Location || FixedObjectLocations[item] == Location;
+            return Objects.IsAt(item, Location);
         }
 
         /// <summary>
@@ -282,10 +282,10 @@ public class GameState
             if (obj >= GameConstants.MaxObjects)
                 return;
 
-            if (ObjectLocations[obj] == -1)
+            if (Objects.IsCarried(obj))
                 return;
 
-            ObjectLocations[obj] = -1;
+            Objects.SetLocation(obj, -1);
             Holding++;
         }
 
@@ -296,14 +296,14 @@ public class GameState
         {
             if (obj < GameConstants.MaxObjects)
             {
-                if (ObjectLocations[obj] == -1)
+                if (Objects.IsCarried(obj))
                     Holding--;
 
-                ObjectLocations[obj] = where;
+                Objects.SetLocation(obj, where);
             }
             else
             {
-                FixedObjectLocations[obj - GameConstants.MaxObjects] = where;
+                Objects.SetFixedLocation(obj - GameConstants.MaxObjects, where);
             }
         }
 
@@ -313,8 +313,8 @@ public class GameState
         public void MoveObject(int obj, int where)
         {
             int from = obj < GameConstants.MaxObjects
-                ? ObjectLocations[obj]
-                : FixedObjectLocations[obj - GameConstants.MaxObjects];
+                ? Objects.LocationOf(obj)
+                : Objects.FixedLocationOf(obj - GameConstants.MaxObjects);
 
             if (from > 0 && from <= 300)
                 Carry(obj, from);
@@ -350,7 +350,7 @@ public class GameState
         /// </summary>
         public int Liq()
         {
-            int bottleProperty = ObjectProperties[GameConstants.Bottle];
+            int bottleProperty = Objects.PropertyOf(GameConstants.Bottle);
             int validatedProperty = -1 - bottleProperty;
             return Liq2(bottleProperty > validatedProperty ? bottleProperty : validatedProperty);
         }
@@ -400,17 +400,17 @@ public class GameState
 
         public int GetActionMessageId(int verb)
         {
-            return verb >= 0 && verb < ActionMessages.Length ? ActionMessages[verb] : 0;
+            return Objects.ActionMessageFor(verb);
         }
 
         public void SetObjectLocation(int objectId, int location)
         {
-            ObjectLocations[objectId] = location;
+            Objects.SetLocation(objectId, location);
         }
 
         public void SetObjectProperty(int objectId, int property)
         {
-            ObjectProperties[objectId] = (short)property;
+            Objects.SetProperty(objectId, property);
         }
 
         /// <summary>
@@ -430,7 +430,7 @@ public class GameState
         /// <returns>True if the object is at the current location</returns>
         public bool IsObjectHere(int objectId)
         {
-            return Here(objectId) || FixedObjectLocations[objectId] == Location;
+            return Here(objectId) || Objects.IsFixedAtLocation(objectId, Location);
         }
 
         /// <summary>
@@ -535,7 +535,7 @@ public class GameState
                 case 4:
                 case 5:
                 case 7:
-                    return ObjectProperties[objectId] != conditionType - 3;
+                    return Objects.PropertyOf(objectId) != conditionType - 3;
 
                 default:
                     return false;
@@ -570,6 +570,71 @@ public sealed class ObjectPlacementState
     public int KnifeLocation { get; set; }
     public int ChestLocation { get; set; }
     public int ChestLocation2 { get; set; }
+
+    public int LocationOf(int objectId)
+    {
+        return Locations[objectId];
+    }
+
+    public void SetLocation(int objectId, int location)
+    {
+        Locations[objectId] = location;
+    }
+
+    public int FixedLocationOf(int objectId)
+    {
+        return FixedLocations[objectId];
+    }
+
+    public void SetFixedLocation(int objectId, int location)
+    {
+        FixedLocations[objectId] = location;
+    }
+
+    public short PropertyOf(int objectId)
+    {
+        return Properties[objectId];
+    }
+
+    public void SetProperty(int objectId, int property)
+    {
+        Properties[objectId] = (short)property;
+    }
+
+    public int ActionMessageFor(int verb)
+    {
+        return verb >= 0 && verb < ActionMessages.Length ? ActionMessages[verb] : 0;
+    }
+
+    public bool IsCarried(int objectId)
+    {
+        return LocationOf(objectId) == -1;
+    }
+
+    public bool IsAtLocation(int objectId, int location)
+    {
+        return LocationOf(objectId) == location;
+    }
+
+    public bool IsFixedAtLocation(int objectId, int location)
+    {
+        return FixedLocationOf(objectId) == location;
+    }
+
+    public bool IsAt(int objectId, int location)
+    {
+        return IsAtLocation(objectId, location) || IsFixedAtLocation(objectId, location);
+    }
+
+    public bool HasFixedLocation(int objectId)
+    {
+        return FixedLocationOf(objectId) != 0;
+    }
+
+    public bool IsPropertyNegative(int objectId)
+    {
+        return PropertyOf(objectId) < 0;
+    }
 }
 
 public sealed class CaveTimingState
