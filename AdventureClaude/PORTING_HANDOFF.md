@@ -94,6 +94,8 @@ The first focused engine extraction is complete. `Game\TravelEngine.cs` now owns
 
 The second focused engine extraction is complete. `Game\TurnLifecycleEngine.cs` now owns the per-turn lifecycle around player input: cave-closing exit guards, location-change application, forced-move cascades, closed-inventory decoding, special timers, lamp warnings, and final closed-cave repository setup. `AdventureGame` keeps small private wrappers for reflection-based regression tests while delegating the behavior to `TurnLifecycleEngine`.
 
+The third focused engine extraction is complete. `Game\DwarfPirateEngine.cs` now owns dwarf blocking, dwarf activation/movement/attacks, pirate lurking, pirate chest placement, and pirate treasure theft. `AdventureGame` keeps small private wrappers for reflection-based regression tests while `TurnLifecycleEngine` calls the new engine directly.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
@@ -145,8 +147,7 @@ Rebuild C reference, if Visual Studio command-line tools are available:
 ## Next Steps
 
 1. Continue extracting focused engine/service classes from `AdventureGame`, one behavior-preserving slice at a time:
-   - next recommended slice: `DwarfPirateEngine` for dwarf movement/attacks and pirate theft/lurking behavior
-   - then `VerbHandlers` for object-heavy verb logic, possibly as one class first before splitting by concern
+   - next recommended slice: `VerbHandlers` for object-heavy verb logic, possibly as one class first before splitting by concern
    - then `ScoringService` for score/rating/bonus calculation and normal end handling
 
 2. After the extraction slices, reduce or remove old `GameState` compatibility pass-through properties where they are no longer needed, so new code consistently uses the named state groups.
