@@ -82,6 +82,8 @@ The location-change and cave timer lifecycle slice is complete. `ApplyLocationCh
 
 The hint and score/endgame bookkeeping slice is complete. `TryLocationHint`, `TryHint`, quit/suspend/brief bookkeeping, oyster hint reading, blast bonus selection, `NormalEnd`, `PrintScore`, `ShowLocationDescription`, `ShowObjectsHere`, `UpdateGameState`, and `HandleDeath` now use the named `Hints`, `TreasureProgress`, `Position`, `World`, `Objects`, and `Cave` groups directly. Remaining compatibility-property uses are mostly in object-heavy verb handlers and should move in the next `AdventureGame` refactor slice.
 
+The object-heavy `AdventureGame` handler migration is complete. Object dispatch, intransitive object selection, take/drop/open/lock, magic words, read setup, lamp actions, wave, kill, pour, eat/drink, throw, find, fill, feed, read/blast/break/wake, prompt helpers, and the object-heavy special movement branches now use the named `Command`, `Position`, `World`, `Objects`, `Cave`, `TreasureProgress`, and `Dwarves` groups directly. A targeted scan no longer finds legacy compatibility-property usage in `Game\AdventureGame.cs`.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
