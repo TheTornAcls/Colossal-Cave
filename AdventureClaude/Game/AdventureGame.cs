@@ -893,62 +893,67 @@ public class AdventureGame
 
         private void TryLocationHint()
         {
-            if ((gameState.LocationConditions[gameState.Location] & gameState.HintAvailable) == 0)
+            GamePositionState position = gameState.Position;
+            WorldMapState world = gameState.World;
+            ObjectPlacementState objects = gameState.Objects;
+            HintTrackingState hints = gameState.Hints;
+
+            if ((world.LocationConditions[position.Location] & hints.AvailableMask) == 0)
             {
-                Array.Clear(gameState.HintLocations);
+                Array.Clear(hints.LocationCounters);
                 return;
             }
 
-            switch (gameState.LocationConditions[gameState.Location] & GameConstants.Hint)
+            switch (world.LocationConditions[position.Location] & GameConstants.Hint)
             {
                 case GameConstants.HintF:
-                    gameState.HintLocations[GameConstants.HintAreaF]++;
-                    if (gameState.HintLocations[GameConstants.HintAreaF] > 20 && gameState.VisitedLocations[8] == 0)
+                    hints.LocationCounters[GameConstants.HintAreaF]++;
+                    if (hints.LocationCounters[GameConstants.HintAreaF] > 20 && world.VisitedLocations[8] == 0)
                         TryHint(56, GameConstants.HintF, GameConstants.HintAreaF);
                     break;
                 case GameConstants.HintC:
-                    gameState.HintLocations[GameConstants.HintAreaC]++;
-                    if (gameState.HintLocations[GameConstants.HintAreaC] > 3 &&
-                        gameState.ObjectProperties[GameConstants.Grate] == 0 &&
+                    hints.LocationCounters[GameConstants.HintAreaC]++;
+                    if (hints.LocationCounters[GameConstants.HintAreaC] > 3 &&
+                        objects.Properties[GameConstants.Grate] == 0 &&
                         !gameState.Toting(GameConstants.Keys))
                     {
                         TryHint(62, GameConstants.HintC, GameConstants.HintAreaC);
                     }
                     break;
                 case GameConstants.HintB:
-                    gameState.HintLocations[GameConstants.HintAreaB]++;
-                    if (gameState.HintLocations[GameConstants.HintAreaB] > 4 &&
-                        gameState.ObjectLocations[GameConstants.Bird] == gameState.Location &&
+                    hints.LocationCounters[GameConstants.HintAreaB]++;
+                    if (hints.LocationCounters[GameConstants.HintAreaB] > 4 &&
+                        objects.Locations[GameConstants.Bird] == position.Location &&
                         gameState.Toting(GameConstants.Rod))
                     {
                         TryHint(18, GameConstants.HintB, GameConstants.HintAreaB);
                     }
                     break;
                 case GameConstants.HintS:
-                    gameState.HintLocations[GameConstants.HintAreaS]++;
-                    if (gameState.HintLocations[GameConstants.HintAreaS] > 5 &&
-                        gameState.ObjectLocations[GameConstants.Snake] == gameState.Location &&
+                    hints.LocationCounters[GameConstants.HintAreaS]++;
+                    if (hints.LocationCounters[GameConstants.HintAreaS] > 5 &&
+                        objects.Locations[GameConstants.Snake] == position.Location &&
                         !gameState.Toting(GameConstants.Bird))
                     {
                         TryHint(20, GameConstants.HintS, GameConstants.HintAreaS);
                     }
                     break;
                 case GameConstants.HintM:
-                    gameState.HintLocations[GameConstants.HintAreaM]++;
-                    if (gameState.HintLocations[GameConstants.HintAreaM] > 15)
+                    hints.LocationCounters[GameConstants.HintAreaM]++;
+                    if (hints.LocationCounters[GameConstants.HintAreaM] > 15)
                         TryHint(176, GameConstants.HintM, GameConstants.HintAreaM);
                     break;
                 case GameConstants.HintP:
-                    gameState.HintLocations[GameConstants.HintAreaP]++;
-                    if (gameState.HintLocations[GameConstants.HintAreaP] > 5 &&
-                        gameState.ObjectLocations[GameConstants.Emerald] != 100)
+                    hints.LocationCounters[GameConstants.HintAreaP]++;
+                    if (hints.LocationCounters[GameConstants.HintAreaP] > 5 &&
+                        objects.Locations[GameConstants.Emerald] != 100)
                     {
                         TryHint(178, GameConstants.HintP, GameConstants.HintAreaP);
                     }
                     break;
                 case GameConstants.HintW:
-                    gameState.HintLocations[GameConstants.HintAreaW]++;
-                    if (gameState.HintLocations[GameConstants.HintAreaW] > 15)
+                    hints.LocationCounters[GameConstants.HintAreaW]++;
+                    if (hints.LocationCounters[GameConstants.HintAreaW] > 15)
                         TryHint(180, GameConstants.HintW, GameConstants.HintAreaW);
                     break;
             }
@@ -956,15 +961,18 @@ public class AdventureGame
 
         private void TryHint(int promptMessage, int mask, int hintArea)
         {
+            HintTrackingState hints = gameState.Hints;
+            TreasureProgressState progress = gameState.TreasureProgress;
+
             Console.WriteLine();
             if (AskYesNo(promptMessage, 0, 54) &&
                 AskYesNo(87, promptMessage + 1, 54))
             {
-                gameState.HintTaken++;
-                gameState.HintAvailable &= ~mask;
+                progress.HintsAccepted++;
+                hints.AvailableMask &= ~mask;
             }
 
-            gameState.HintLocations[hintArea] = 0;
+            hints.LocationCounters[hintArea] = 0;
         }
 
         private void DoObject()
@@ -1201,7 +1209,7 @@ public class AdventureGame
                     IVFoo();
                     break;
                 case GameConstants.Suspend:
-                    gameState.SaveFlag = true;
+                    gameState.TreasureProgress.SaveRequested = true;
                     break;
                 case GameConstants.Read:
                     IVRead();
@@ -1210,7 +1218,7 @@ public class AdventureGame
                     ShowInventory();
                     break;
                 case GameConstants.Brief:
-                    gameState.Detail |= 2;
+                    gameState.Position.Detail |= 2;
                     ActSpeak(gameState.Verb);
                     break;
                 case GameConstants.Help:
@@ -1347,8 +1355,8 @@ public class AdventureGame
 
         private void IVQuit()
         {
-            gameState.GaveUp = AskYesNo(22, 0, 54);
-            if (gameState.GaveUp)
+            gameState.TreasureProgress.GaveUp = AskYesNo(22, 0, 54);
+            if (gameState.TreasureProgress.GaveUp)
                 NormalEnd();
         }
 
@@ -2143,6 +2151,10 @@ public class AdventureGame
 
         private void VRead()
         {
+            CaveTimingState cave = gameState.Cave;
+            HintTrackingState hints = gameState.Hints;
+            TreasureProgressState progress = gameState.TreasureProgress;
+
             if (DarknessManager.IsDark(gameState))
             {
                 SpeakObjectNotHere(gameState.Object);
@@ -2161,18 +2173,18 @@ public class AdventureGame
                     Speak(191);
                     break;
                 case GameConstants.Oyster:
-                    if (!gameState.Toting(GameConstants.Oyster) || !gameState.Closed)
+                    if (!gameState.Toting(GameConstants.Oyster) || !cave.Closed)
                     {
                         ActSpeak(gameState.Verb);
                         break;
                     }
 
-                    if ((gameState.HintAvailable & GameConstants.HintO) != 0)
+                    if ((hints.AvailableMask & GameConstants.HintO) != 0)
                     {
                         if (AskYesNo(192, 193, 54))
                         {
-                            gameState.HintTaken++;
-                            gameState.HintAvailable &= ~GameConstants.HintO;
+                            progress.HintsAccepted++;
+                            hints.AvailableMask &= ~GameConstants.HintO;
                         }
                     }
                     else
@@ -2188,19 +2200,23 @@ public class AdventureGame
 
         private void VBlast()
         {
-            if (gameState.ObjectProperties[GameConstants.Rod2] < 0 || !gameState.Closed)
+            ObjectPlacementState objects = gameState.Objects;
+            CaveTimingState cave = gameState.Cave;
+            TreasureProgressState progress = gameState.TreasureProgress;
+
+            if (objects.Properties[GameConstants.Rod2] < 0 || !cave.Closed)
             {
                 ActSpeak(gameState.Verb);
                 return;
             }
 
-            gameState.Bonus = 133;
-            if (gameState.Location == 115)
-                gameState.Bonus = 134;
+            progress.Bonus = 133;
+            if (gameState.Position.Location == 115)
+                progress.Bonus = 134;
             if (gameState.Here(GameConstants.Rod2))
-                gameState.Bonus = 135;
+                progress.Bonus = 135;
 
-            Speak(gameState.Bonus);
+            Speak(progress.Bonus);
             NormalEnd();
         }
 
@@ -2360,6 +2376,7 @@ public class AdventureGame
         private void NormalEnd()
         {
             int total = PrintScore();
+            TreasureProgressState progress = gameState.TreasureProgress;
             int[] limits = [35, 100, 200, 250, 300, 330, 350, 1000];
             int ratingIndex = 0;
             while (ratingIndex < limits.Length && limits[ratingIndex] <= total)
@@ -2374,58 +2391,63 @@ public class AdventureGame
             if (next > 0)
                 Console.WriteLine($"To achieve the next higher rating, you need {next} more point{(next == 1 ? string.Empty : "s")}.");
 
-            gameState.SaveFlag = true;
+            progress.SaveRequested = true;
         }
 
         private int PrintScore()
         {
+            WorldMapState world = gameState.World;
+            ObjectPlacementState objects = gameState.Objects;
+            CaveTimingState cave = gameState.Cave;
+            TreasureProgressState progress = gameState.TreasureProgress;
+
             int score = 0;
             int treasures = 0;
 
             for (int item = GameConstants.Nugget; item <= GameConstants.MaxTreasures; item++)
             {
                 int itemScore = item == GameConstants.Chest ? 14 : item > GameConstants.Chest ? 16 : 12;
-                if (gameState.ObjectProperties[item] >= 0)
+                if (objects.Properties[item] >= 0)
                     treasures += 2;
-                if (gameState.ObjectLocations[item] == GameConstants.WellHouse && gameState.ObjectProperties[item] == 0)
+                if (objects.Locations[item] == GameConstants.WellHouse && objects.Properties[item] == 0)
                     treasures += itemScore - 2;
             }
 
             PrintScoreLine("Treasures:", treasures);
             score += treasures;
 
-            int survival = (GameConstants.MaxDeaths - gameState.NumDie) * 10;
+            int survival = (GameConstants.MaxDeaths - progress.DeathCount) * 10;
             if (survival != 0)
                 PrintScoreLine("Survival:", survival);
             score += survival;
 
-            if (!gameState.GaveUp)
+            if (!progress.GaveUp)
                 score += 4;
 
-            int gettingIn = gameState.VisitedLocations[19] != 0 ? 25 : 0;
+            int gettingIn = world.VisitedLocations[19] != 0 ? 25 : 0;
             if (gettingIn != 0)
                 PrintScoreLine("Getting well in:", gettingIn);
             score += gettingIn;
 
-            int masters = gameState.Closing ? 25 : 0;
+            int masters = cave.Closing ? 25 : 0;
             if (masters != 0)
                 PrintScoreLine("Masters section:", masters);
             score += masters;
 
-            if (gameState.Closed)
+            if (cave.Closed)
             {
-                int bonus = gameState.Bonus == 0 ? 10 :
-                    gameState.Bonus == 135 ? 25 :
-                    gameState.Bonus == 134 ? 30 :
-                    gameState.Bonus == 133 ? 45 : 0;
+                int bonus = progress.Bonus == 0 ? 10 :
+                    progress.Bonus == 135 ? 25 :
+                    progress.Bonus == 134 ? 30 :
+                    progress.Bonus == 133 ? 45 : 0;
                 PrintScoreLine("Bonus:", bonus);
                 score += bonus;
             }
 
-            if (gameState.ObjectLocations[GameConstants.Magazine] == 108)
+            if (objects.Locations[GameConstants.Magazine] == 108)
                 score += 1;
 
-            int hints = -15 * gameState.HintTaken;
+            int hints = -15 * progress.HintsAccepted;
             if (hints != 0)
             {
                 PrintScoreLine("Hints & instructions:", hints);
@@ -2477,6 +2499,11 @@ public class AdventureGame
         /// </summary>
         private void ShowLocationDescription(bool forceLong = false)
         {
+            GamePositionState position = gameState.Position;
+            WorldMapState world = gameState.World;
+            CaveTimingState cave = gameState.Cave;
+            TreasureProgressState progress = gameState.TreasureProgress;
+
             if (gameState.Toting(GameConstants.Bear))
                 Speak(141);
 
@@ -2487,28 +2514,28 @@ public class AdventureGame
             else
             {
                 bool useShortDescription = !forceLong &&
-                    ((gameState.VisitedLocations[gameState.Location] & 3) != 0 ||
-                    ((gameState.Detail & gameState.TestBr) != 0 && gameState.VisitedLocations[gameState.Location] != 0));
+                    ((world.VisitedLocations[position.Location] & 3) != 0 ||
+                    ((position.Detail & progress.DescriptionDetailMask) != 0 && world.VisitedLocations[position.Location] != 0));
 
                 if (!useShortDescription &&
-                    LocationDescriptions.LongDescriptions.TryGetValue(gameState.Location, out string? longDesc))
+                    LocationDescriptions.LongDescriptions.TryGetValue(position.Location, out string? longDesc))
                 {
                     Console.WriteLine(longDesc);
                 }
-                else if (LocationDescriptions.ShortDescriptions.TryGetValue(gameState.Location, out string? shortDesc))
+                else if (LocationDescriptions.ShortDescriptions.TryGetValue(position.Location, out string? shortDesc))
                 {
                     Console.WriteLine(shortDesc);
                 }
                 else
                 {
-                    Console.WriteLine($"You are in location {gameState.Location}.");
+                    Console.WriteLine($"You are in location {position.Location}.");
                 }
 
                 if (!DarknessManager.IsDark(gameState))
                     ShowObjectsHere();
             }
 
-            if (gameState.Location == 33 && GameState.Pct(random, 25) && !gameState.Closing)
+            if (position.Location == 33 && GameState.Pct(random, 25) && !cave.Closing)
                 Speak(8);
         }
 
@@ -2517,6 +2544,11 @@ public class AdventureGame
         /// </summary>
         private void ShowObjectsHere()
         {
+            GamePositionState position = gameState.Position;
+            ObjectPlacementState objects = gameState.Objects;
+            CaveTimingState cave = gameState.Cave;
+            TreasureProgressState progress = gameState.TreasureProgress;
+
             bool printedAny = false;
 
             for (int objectId = 1; objectId < GameConstants.MaxObjects; objectId++)
@@ -2527,23 +2559,23 @@ public class AdventureGame
                 if (objectId == GameConstants.Steps && gameState.Toting(GameConstants.Nugget))
                     continue;
 
-                if (gameState.ObjectProperties[objectId] < 0)
+                if (objects.Properties[objectId] < 0)
                 {
-                    if (gameState.Closed)
+                    if (cave.Closed)
                         continue;
 
                     gameState.SetObjectProperty(objectId, 0);
                     if (objectId == GameConstants.Rug || objectId == GameConstants.Chain)
-                        gameState.SetObjectProperty(objectId, gameState.ObjectProperties[objectId] + 1);
-                    gameState.Tally--;
+                        gameState.SetObjectProperty(objectId, objects.Properties[objectId] + 1);
+                    progress.UndiscoveredTreasureCount--;
                 }
 
                 int state = objectId == GameConstants.Steps &&
-                    gameState.Location == gameState.FixedObjectLocations[GameConstants.Steps]
+                    position.Location == objects.FixedLocations[GameConstants.Steps]
                     ? 1
-                    : gameState.ObjectProperties[objectId];
+                    : objects.Properties[objectId];
 
-                if (!printedAny && (gameState.Detail & 2) == 0)
+                if (!printedAny && (position.Detail & 2) == 0)
                 {
                     Console.WriteLine();
                     printedAny = true;
@@ -2552,8 +2584,12 @@ public class AdventureGame
                 PrintObjectMessage(objectId, state);
             }
 
-            if (gameState.Tally == gameState.Tally2 && gameState.Tally != 0 && gameState.Limit > 35)
-                gameState.Limit = 35;
+            if (progress.UndiscoveredTreasureCount == progress.TreasuresLostToEndgame &&
+                progress.UndiscoveredTreasureCount != 0 &&
+                cave.LampLimit > 35)
+            {
+                cave.LampLimit = 35;
+            }
         }
 
         /// <summary>
@@ -2569,8 +2605,12 @@ public class AdventureGame
         /// </summary>
         private void UpdateGameState()
         {
-            gameState.FooBar = gameState.FooBar > 0 ? -gameState.FooBar : 0;
-            gameState.TestBr = 2;
+            GamePositionState position = gameState.Position;
+            CaveTimingState cave = gameState.Cave;
+            TreasureProgressState progress = gameState.TreasureProgress;
+
+            progress.FooBar = progress.FooBar > 0 ? -progress.FooBar : 0;
+            progress.DescriptionDetailMask = 2;
 
             // Check lamp battery status and decrement if lamp is on
             string? batteryMessage = DarknessManager.CheckBatteryStatus(gameState);
@@ -2580,10 +2620,10 @@ public class AdventureGame
             }
 
             // Check for game end conditions
-            if (gameState.Turns >= gameState.Limit)
+            if (position.Turns >= cave.LampLimit)
             {
                 Console.WriteLine("You have exceeded the turn limit.");
-                gameState.SaveFlag = true;
+                progress.SaveRequested = true;
             }
         }
 
@@ -2604,12 +2644,16 @@ public class AdventureGame
         /// </summary>
         private void HandleDeath()
         {
-            if (!gameState.Closing)
-            {
-                bool reincarnate = AskYesNo(81 + gameState.NumDie * 2, 82 + gameState.NumDie * 2, 54);
-                gameState.NumDie++;
+            GamePositionState position = gameState.Position;
+            CaveTimingState cave = gameState.Cave;
+            TreasureProgressState progress = gameState.TreasureProgress;
 
-                if (gameState.NumDie >= GameConstants.MaxDeaths || !reincarnate)
+            if (!cave.Closing)
+            {
+                bool reincarnate = AskYesNo(81 + progress.DeathCount * 2, 82 + progress.DeathCount * 2, 54);
+                progress.DeathCount++;
+
+                if (progress.DeathCount >= GameConstants.MaxDeaths || !reincarnate)
                 {
                     NormalEnd();
                     return;
@@ -2623,17 +2667,17 @@ public class AdventureGame
                 for (int item = GameConstants.MaxObjects; item >= 1; item--)
                 {
                     if (gameState.Toting(item))
-                        gameState.Drop(item, item == GameConstants.Lamp ? GameConstants.EndOfRoad : gameState.OldLocation2);
+                        gameState.Drop(item, item == GameConstants.Lamp ? GameConstants.EndOfRoad : position.OldLocation2);
                 }
 
-                gameState.NewLocation = GameConstants.WellHouse;
-                gameState.OldLocation = gameState.Location;
-                gameState.Location = 0;
+                position.NewLocation = GameConstants.WellHouse;
+                position.OldLocation = position.Location;
+                position.Location = 0;
                 return;
             }
 
             Speak(131);
-            gameState.NumDie++;
+            progress.DeathCount++;
             NormalEnd();
         }
     }
