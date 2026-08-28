@@ -550,12 +550,12 @@ internal static class Program
     private static void ClosingTimerStartsCaveClosing()
     {
         AdventureGame game = CreateInitializedGame(out GameState state);
-        state.Tally = 0;
-        state.Location = 15;
-        state.NewLocation = 15;
-        state.Clock1 = 1;
-        state.Clock2 = 50;
-        state.DwarfSeen[1] = true;
+        state.TreasureProgress.UndiscoveredTreasureCount = 0;
+        state.Position.Location = 15;
+        state.Position.NewLocation = 15;
+        state.Cave.Clock1 = 1;
+        state.Cave.Clock2 = 50;
+        state.Dwarves.Seen[1] = true;
 
         string output = CaptureConsoleOutput(() =>
         {
@@ -564,9 +564,9 @@ internal static class Program
         });
 
         AssertContains(output, "Cave closing soon.");
-        AssertEqual(-1, state.Clock1, "Clock1");
-        AssertTrue(state.Closing, "Closing flag");
-        AssertFalse(state.DwarfSeen.Skip(1).Any(seen => seen), "DwarfSeen flags should be reset.");
+        AssertEqual(-1, state.Cave.Clock1, "Clock1");
+        AssertTrue(state.Cave.Closing, "Closing flag");
+        AssertFalse(state.Dwarves.Seen.Skip(1).Any(seen => seen), "DwarfSeen flags should be reset.");
         AssertEqual(0, state.Objects.PropertyOf(GameConstants.Grate), "Grate property");
         AssertEqual(0, state.Objects.PropertyOf(GameConstants.Fissure), "Fissure property");
         AssertEqual(0, state.Objects.LocationOf(GameConstants.Troll), "Troll location");
@@ -582,26 +582,26 @@ internal static class Program
     private static void ClosingExitGuardBlocksSurfaceExits()
     {
         AdventureGame game = CreateInitializedGame(out GameState state);
-        state.Closing = true;
-        state.Location = 15;
-        state.NewLocation = 8;
-        state.Clock2 = 50;
+        state.Cave.Closing = true;
+        state.Position.Location = 15;
+        state.Position.NewLocation = 8;
+        state.Cave.Clock2 = 50;
 
         string output = CaptureConsoleOutput(() => InvokePrivate(game, "ApplyClosingExitGuard"));
 
         AssertContains(output, "This exit is\nclosed.  Please leave via main office.");
-        AssertEqual(15, state.NewLocation, "NewLocation");
-        AssertEqual(15, state.Clock2, "Clock2");
-        AssertTrue(state.Panic, "Panic flag");
+        AssertEqual(15, state.Position.NewLocation, "NewLocation");
+        AssertEqual(15, state.Cave.Clock2, "Clock2");
+        AssertTrue(state.Cave.Panic, "Panic flag");
     }
 
     private static void ClosedTimerMovesObjectsToRepository()
     {
         AdventureGame game = CreateInitializedGame(out GameState state);
-        state.Location = 15;
-        state.NewLocation = 15;
-        state.Clock1 = -1;
-        state.Clock2 = 1;
+        state.Position.Location = 15;
+        state.Position.NewLocation = 15;
+        state.Cave.Clock1 = -1;
+        state.Cave.Clock2 = 1;
         state.Carry(GameConstants.Nugget, state.Objects.LocationOf(GameConstants.Nugget));
 
         string output = CaptureConsoleOutput(() =>
@@ -611,10 +611,10 @@ internal static class Program
         });
 
         AssertContains(output, "The cave is now closed.");
-        AssertTrue(state.Closed, "Closed flag");
-        AssertEqual(0, state.Location, "Location");
-        AssertEqual(115, state.OldLocation, "OldLocation");
-        AssertEqual(115, state.NewLocation, "NewLocation");
+        AssertTrue(state.Cave.Closed, "Closed flag");
+        AssertEqual(0, state.Position.Location, "Location");
+        AssertEqual(115, state.Position.OldLocation, "OldLocation");
+        AssertEqual(115, state.Position.NewLocation, "NewLocation");
         AssertEqual(115, state.Objects.LocationOf(GameConstants.Bottle), "Bottle location");
         AssertEqual(-2, state.Objects.PropertyOf(GameConstants.Bottle), "Bottle property");
         AssertEqual(115, state.Objects.LocationOf(GameConstants.Plant), "Plant location");
@@ -638,13 +638,13 @@ internal static class Program
         AssertEqual(115, state.Objects.LocationOf(GameConstants.Mirror), "Mirror location");
         AssertEqual(116, state.Objects.FixedLocationOf(GameConstants.Mirror), "Mirror fixed location");
         AssertEqual(0, state.Objects.LocationOf(GameConstants.Nugget), "Carried nugget should be destroyed.");
-        AssertEqual(0, state.Holding, "Holding");
+        AssertEqual(0, state.Objects.Holding, "Holding");
     }
 
     private static void ClosedInventoryDecodesCarriedObjects()
     {
         AdventureGame game = CreateInitializedGame(out GameState state);
-        state.Closed = true;
+        state.Cave.Closed = true;
         state.Carry(GameConstants.Oyster, state.Objects.LocationOf(GameConstants.Oyster));
         state.Objects.SetProperty(GameConstants.Oyster, -1);
         state.Carry(GameConstants.Nugget, state.Objects.LocationOf(GameConstants.Nugget));
