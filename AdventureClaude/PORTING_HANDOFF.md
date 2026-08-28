@@ -33,7 +33,7 @@ dotnet run --project tests\TranscriptTests\TranscriptTests.csproj
 Most recent result:
 
 ```text
-23/23 transcript tests passed.
+24/24 transcript tests passed.
 11/11 in-process tests passed.
 ```
 
@@ -50,7 +50,7 @@ The suite now includes 10 starter parity routes:
 - `inventory_empty`
 - `unknown_words`
 
-It also includes 13 deeper parity routes:
+It also includes 14 deeper parity routes:
 
 - `deeper_cave_entry_lamp_on`
 - `deeper_cobble_debris_xyzzy`
@@ -65,6 +65,7 @@ It also includes 13 deeper parity routes:
 - `deeper_pirate_steals_nugget_inventory`
 - `deeper_fissure_jump_death_no`
 - `deeper_fissure_jump_reincarnate_yes`
+- `deeper_plover_dark_room_pyramid`
 
 These deeper routes were checked against both the rebuilt C executable and the C# port before being added to the regression suite.
 
@@ -101,6 +102,8 @@ The fourth focused engine extraction is complete. `Game\VerbHandlers.cs` now own
 The fifth focused service extraction is complete. `Game\ScoringService.cs` now owns score calculation, rating output, closed-cave bonus calculation, and normal end bookkeeping. `AdventureGame` keeps thin private wrappers for reflection-based score/endgame tests and delegates scoring callbacks to `ScoringService`.
 
 The `GameState` compatibility pass-through cleanup is complete. `Models\GameState.cs`, `Models\DarknessManager.cs`, `Game\InputParser.cs`, and the focused closing regressions now use the named state groups directly instead of aliases such as `Location`, `Clock1`, `Tally`, `Holding`, `Word1`, or `DwarfSeen`.
+
+The next deeper natural transcript route is complete. `deeper_plover_dark_room_pyramid` was checked against the rebuilt C executable and added to `tests\TranscriptTests\Program.cs`; it covers bird-vs-snake progression, Hall of the Mountain King side treasures, fissure bridge/diamonds, Oriental Room vase, Plover Room emerald, Dark Room pyramid handling, and score output after eight treasure discoveries. The transcript harness now uses asynchronous stdout/stderr reads with timeout truncation so bad redirected-input routes fail cleanly instead of flooding output.
 
 ## Recent C# Wording Fixes
 
@@ -152,8 +155,8 @@ Rebuild C reference, if Visual Studio command-line tools are available:
 
 ## Next Steps
 
-1. Continue adding/fixing deeper parity routes for systems not yet fully exercised, if more behavior gaps are found:
-   - optionally add a full natural public C-vs-C# transcript route for cave closing and closed-state behavior if/when we want all-treasure endgame transcript coverage beyond the focused route-style state regression
+1. Continue the full natural public C-vs-C# cave-closing route by extending the all-treasure walkthrough beyond `deeper_plover_dark_room_pyramid`:
+   - remaining natural route coverage should include Giant Room eggs, trident/waterfall, pearl/clam, dragon/rug, volcano spices, bear/chain, pirate chest, and then waiting out cave closing/closed-state behavior from normal commands
 
 2. For each new route or refactor slice:
    - run C vs C# parity first
