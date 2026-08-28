@@ -24,7 +24,7 @@ public static class DarknessManager
         // 2. Either lamp is off (prop[LAMP] == 0) OR lamp is not present here
         
         bool locationHasLight = gameState.LocationHasFlag(gameState.Location, GameConstants.Light);
-        bool lampIsOn = gameState.ObjectProperties[GameConstants.Lamp] == 1;
+        bool lampIsOn = gameState.Objects.PropertyOf(GameConstants.Lamp) == 1;
         bool lampIsHere = gameState.Here(GameConstants.Lamp);
         
         // If location has natural light, it's not dark
@@ -44,7 +44,7 @@ public static class DarknessManager
     public static string? CheckBatteryStatus(GameState gameState)
     {
         // Only process if lamp is on
-        if (gameState.ObjectProperties[GameConstants.Lamp] != 1)
+        if (gameState.Objects.PropertyOf(GameConstants.Lamp) != 1)
             return null;
 
         // Decrement battery life
@@ -63,7 +63,7 @@ public static class DarknessManager
             gameState.LampWarning = 1; // Set flag to prevent repeated warnings
             
             // Check if batteries are available for replacement
-            bool batteriesExist = gameState.ObjectLocations[GameConstants.Batteries] != 0;
+            bool batteriesExist = gameState.Objects.LocationOf(GameConstants.Batteries) != 0;
             bool batteriesHere = gameState.Here(GameConstants.Batteries);
             bool lampIsHere = gameState.Here(GameConstants.Lamp);
             
@@ -81,7 +81,7 @@ public static class DarknessManager
             {
                 return Data.GameMessages.GetMessage(183); // "Your lamp is getting dim.. You'd best start wrapping this up..."
             }
-            else if (gameState.ObjectProperties[GameConstants.Batteries] != 0)
+            else if (gameState.Objects.PropertyOf(GameConstants.Batteries) != 0)
             {
                 return Data.GameMessages.GetMessage(189); // "Your lamp is getting dim, and you're out of spare batteries..."
             }
