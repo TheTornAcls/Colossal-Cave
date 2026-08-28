@@ -54,7 +54,7 @@ public static class DarknessManager
         if (gameState.Limit == 0)
         {
             gameState.SetObjectProperty(GameConstants.Lamp, 0);
-            return Data.GameMessages.GetMessage(184); // "Your lamp has run out of power."
+            return Data.AdventureData.Message(184); // "Your lamp has run out of power."
         }
 
         // Check for battery warning (≤30 turns remaining)
@@ -73,21 +73,21 @@ public static class DarknessManager
                 gameState.Limit += 2500; // Add 2500 turns from fresh batteries
                 gameState.LampWarning = 0; // Reset warning flag
                 gameState.Destroy(GameConstants.Batteries);
-                return Data.GameMessages.GetMessage(188); // "Your lamp is getting dim.. I'm taking the liberty of replacing the batteries."
+                return Data.AdventureData.Message(188); // "Your lamp is getting dim.. I'm taking the liberty of replacing the batteries."
             }
             
             // Warning messages based on battery availability
             if (!batteriesExist)
             {
-                return Data.GameMessages.GetMessage(183); // "Your lamp is getting dim.. You'd best start wrapping this up..."
+                return Data.AdventureData.Message(183); // "Your lamp is getting dim.. You'd best start wrapping this up..."
             }
             else if (gameState.Objects.PropertyOf(GameConstants.Batteries) != 0)
             {
-                return Data.GameMessages.GetMessage(189); // "Your lamp is getting dim, and you're out of spare batteries..."
+                return Data.AdventureData.Message(189); // "Your lamp is getting dim, and you're out of spare batteries..."
             }
             else
             {
-                return Data.GameMessages.GetMessage(187); // "Your lamp is getting dim. You'd best go back for those batteries."
+                return Data.AdventureData.Message(187); // "Your lamp is getting dim. You'd best go back for those batteries."
             }
         }
 
