@@ -147,7 +147,7 @@ public class AdventureGame
                 case GameConstants.Look:
                     if (position.Detail == 0)
                     {
-                        Console.WriteLine(GameMessages.GetMessage(15));
+                        Console.WriteLine(AdventureData.Message(15));
                         position.Detail |= 1;
                     }
 
@@ -159,7 +159,7 @@ public class AdventureGame
                     position.Location = 0;
                     break;
                 case GameConstants.Cave:
-                    Console.WriteLine(GameMessages.GetMessage(position.Location < 8 ? 57 : 58));
+                    Console.WriteLine(AdventureData.Message(position.Location < 8 ? 57 : 58));
                     break;
                 default:
                     position.OldLocation2 = position.OldLocation;
@@ -186,11 +186,11 @@ public class AdventureGame
 
             if (want == position.Location)
             {
-                Console.WriteLine(GameMessages.GetMessage(91));
+                Console.WriteLine(AdventureData.Message(91));
                 return;
             }
 
-            List<TravelEntry> travel = TravelData.GetTravelOptions(position.Location);
+            List<TravelEntry> travel = AdventureData.GetTravelOptions(position.Location);
             TravelEntry? fallback = null;
 
             foreach (TravelEntry entry in travel)
@@ -209,7 +209,7 @@ public class AdventureGame
                 int destination = entry.Destination;
                 if (destination <= GameConstants.MaxLocations)
                 {
-                    List<TravelEntry> destinationTravel = TravelData.GetTravelOptions(destination);
+                    List<TravelEntry> destinationTravel = AdventureData.GetTravelOptions(destination);
                     if (gameState.Forced(destination) &&
                         destinationTravel.Count > 0 &&
                         destinationTravel[0].Destination == want)
@@ -230,7 +230,7 @@ public class AdventureGame
             }
             else
             {
-                Console.WriteLine(GameMessages.GetMessage(140));
+                Console.WriteLine(AdventureData.Message(140));
             }
         }
 
@@ -242,7 +242,7 @@ public class AdventureGame
             GamePositionState position = gameState.Position;
             ParsedCommandState command = gameState.Command;
 
-            List<TravelEntry> travel = TravelData.GetTravelOptions(position.Location);
+            List<TravelEntry> travel = AdventureData.GetTravelOptions(position.Location);
             position.NewLocation = position.Location;
             bool hit = false;
             bool moved = false;
@@ -273,7 +273,7 @@ public class AdventureGame
             }
             else if (selectedDestination > 500)
             {
-                Console.WriteLine(GameMessages.GetMessage(selectedDestination - 500));
+                Console.WriteLine(AdventureData.Message(selectedDestination - 500));
             }
             else if (selectedDestination > 300)
             {
@@ -327,7 +327,7 @@ public class AdventureGame
             if (command.Motion == 17)
                 message = 80;
 
-            Console.WriteLine(GameMessages.GetMessage(message));
+            Console.WriteLine(AdventureData.Message(message));
         }
 
         /// <summary>
@@ -349,12 +349,12 @@ public class AdventureGame
                     }
                     else
                     {
-                        Console.WriteLine(GameMessages.GetMessage(117));
+                        Console.WriteLine(AdventureData.Message(117));
                     }
                     break;
                 case 2:
                     gameState.Drop(GameConstants.Emerald, position.Location);
-                    Console.WriteLine(GameMessages.GetMessage(54));
+                    Console.WriteLine(AdventureData.Message(54));
                     break;
                 case 3:
                     if (objects.PropertyOf(GameConstants.Troll) == 1)
@@ -377,7 +377,7 @@ public class AdventureGame
                         if (!gameState.Toting(GameConstants.Bear))
                             return;
 
-                        Console.WriteLine(GameMessages.GetMessage(162));
+                        Console.WriteLine(AdventureData.Message(162));
                         gameState.SetObjectProperty(GameConstants.Chasm, 1);
                         gameState.SetObjectProperty(GameConstants.Troll, 2);
                         gameState.Drop(GameConstants.Bear, position.NewLocation);
@@ -720,7 +720,7 @@ public class AdventureGame
 
                 if (cave.WizardDark && DarknessManager.IsDark(gameState) && GameState.Pct(random, 35))
                 {
-                    Console.WriteLine(GameMessages.GetMessage(23));
+                    Console.WriteLine(AdventureData.Message(23));
                     position.OldLocation2 = position.Location;
                     HandleDeath();
                     return;
@@ -734,15 +734,10 @@ public class AdventureGame
 
         private void PrintObjectMessage(int objectId, int state)
         {
-            if (!GameObjects.Objects.TryGetValue(objectId, out GameObjectData? objectData))
+            if (!AdventureData.TryGetObjectRoomDescription(objectId, state, out string message))
                 return;
 
-            if (state < 0 || state >= objectData.States.Count)
-                return;
-
-            string message = objectData.States[state].RoomDescription;
-            if (!string.IsNullOrEmpty(message))
-                Console.WriteLine(message);
+            Console.WriteLine(message);
         }
 
         private void ApplyClosedInventoryState()
@@ -2405,7 +2400,7 @@ public class AdventureGame
                 return;
             }
 
-            Console.WriteLine(GameMessages.GetMessage(messageId));
+            Console.WriteLine(AdventureData.Message(messageId));
         }
 
         private void SpeakObjectNotHere(int objectId)
@@ -2426,7 +2421,7 @@ public class AdventureGame
         private bool IsVerbWord(string word)
         {
             return !string.IsNullOrWhiteSpace(word) &&
-                Vocabulary.AnalyzeWord(word, out int type, out _) &&
+                AdventureData.AnalyzeWord(word, out int type, out _) &&
                 type == Vocabulary.WordTypes.Verb;
         }
 
@@ -2439,15 +2434,13 @@ public class AdventureGame
             if (IsObjectWord(command.Word2, objectId))
                 return command.Word2;
 
-            return GameObjects.Objects.TryGetValue(objectId, out GameObjectData? objectData)
-                ? objectData.Name.ToLowerInvariant()
-                : $"object #{objectId}";
+            return AdventureData.ObjectNameOrDefault(objectId).ToLowerInvariant();
         }
 
         private static bool IsObjectWord(string word, int objectId)
         {
             return !string.IsNullOrWhiteSpace(word) &&
-                Vocabulary.AnalyzeWord(word, out int type, out int value) &&
+                AdventureData.AnalyzeWord(word, out int type, out int value) &&
                 type == Vocabulary.WordTypes.Object &&
                 value == objectId;
         }
@@ -2605,7 +2598,7 @@ public class AdventureGame
             Console.WriteLine("You are currently holding the following:");
             foreach (int objectId in carriedObjects)
             {
-                if (GameObjects.Objects.TryGetValue(objectId, out GameObjectData? objectData))
+                if (AdventureData.TryGetObject(objectId, out GameObjectData? objectData))
                 {
                     Console.WriteLine($"  {objectData.Name}");
                 }
@@ -2640,11 +2633,11 @@ public class AdventureGame
                     ((position.Detail & progress.DescriptionDetailMask) != 0 && world.VisitedLocations[position.Location] != 0));
 
                 if (!useShortDescription &&
-                    LocationDescriptions.LongDescriptions.TryGetValue(position.Location, out string? longDesc))
+                    AdventureData.TryGetLongLocationDescription(position.Location, out string longDesc))
                 {
                     Console.WriteLine(longDesc);
                 }
-                else if (LocationDescriptions.ShortDescriptions.TryGetValue(position.Location, out string? shortDesc))
+                else if (AdventureData.TryGetShortLocationDescription(position.Location, out string shortDesc))
                 {
                     Console.WriteLine(shortDesc);
                 }
@@ -2719,7 +2712,7 @@ public class AdventureGame
         /// </summary>
         private void ShowInstructions()
         {
-            Console.WriteLine(GameMessages.GetMessage(1));
+            Console.WriteLine(AdventureData.Message(1));
         }
 
         /// <summary>
