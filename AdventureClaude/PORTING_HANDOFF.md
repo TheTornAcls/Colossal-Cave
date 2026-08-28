@@ -80,6 +80,8 @@ The dwarf/pirate lifecycle slice is complete. `ApplyDwarfBlock`, `RunDwarves`, `
 
 The location-change and cave timer lifecycle slice is complete. `ApplyLocationChange`, `ApplyClosedInventoryState`, `RunSpecialTimer`, and `CloseCave` now use the named `Position`, `World`, `Objects`, `Cave`, `TreasureProgress`, `Dwarves`, and `Command` groups directly while preserving the existing movement and object bookkeeping helpers.
 
+The hint and score/endgame bookkeeping slice is complete. `TryLocationHint`, `TryHint`, quit/suspend/brief bookkeeping, oyster hint reading, blast bonus selection, `NormalEnd`, `PrintScore`, `ShowLocationDescription`, `ShowObjectsHere`, `UpdateGameState`, and `HandleDeath` now use the named `Hints`, `TreasureProgress`, `Position`, `World`, `Objects`, and `Cave` groups directly. Remaining compatibility-property uses are mostly in object-heavy verb handlers and should move in the next `AdventureGame` refactor slice.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
