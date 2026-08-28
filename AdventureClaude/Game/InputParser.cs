@@ -45,8 +45,8 @@ public class InputParser
             string word2 = words.Length > 1 ? words[1] : string.Empty;
             if (gameState != null)
             {
-                gameState.Word1 = word1;
-                gameState.Word2 = word2;
+                gameState.Command.Word1 = word1;
+                gameState.Command.Word2 = word2;
             }
 
             if (string.IsNullOrEmpty(word1))
