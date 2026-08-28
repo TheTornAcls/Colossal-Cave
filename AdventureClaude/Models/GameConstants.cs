@@ -158,4 +158,5 @@ public class TravelOption
         public const int StartLocation = 1;
         public const int WellHouse = 3;
         public const int EndOfRoad = 1;
+        public const int DepressionLocation = 8;
     }
