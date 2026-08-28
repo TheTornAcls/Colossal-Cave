@@ -84,6 +84,8 @@ The hint and score/endgame bookkeeping slice is complete. `TryLocationHint`, `Tr
 
 The object-heavy `AdventureGame` handler migration is complete. Object dispatch, intransitive object selection, take/drop/open/lock, magic words, read setup, lamp actions, wave, kill, pour, eat/drink, throw, find, fill, feed, read/blast/break/wake, prompt helpers, and the object-heavy special movement branches now use the named `Command`, `Position`, `World`, `Objects`, `Cave`, `TreasureProgress`, and `Dwarves` groups directly. A targeted scan no longer finds legacy compatibility-property usage in `Game\AdventureGame.cs`.
 
+Clearer object/location helper APIs have been added to `ObjectPlacementState`: `LocationOf`, `SetLocation`, `FixedLocationOf`, `SetFixedLocation`, `PropertyOf`, `SetProperty`, `ActionMessageFor`, `IsCarried`, `IsAtLocation`, `IsFixedAtLocation`, `IsAt`, `HasFixedLocation`, and `IsPropertyNegative`. `GameState`, `AdventureGame`, `DarknessManager`, and the closing state regressions now use these helpers instead of direct object array indexing outside `ObjectPlacementState`.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
@@ -144,7 +146,6 @@ Rebuild C reference, if Visual Studio command-line tools are available:
    - rerun `dotnet run --project tests\TranscriptTests\TranscriptTests.csproj`
 
 3. Once behavior is better locked down:
-   - continue the `GameState` refactor by migrating `AdventureGame` call sites toward the named state groups and replacing raw object/location arrays with clearer helpers where it improves readability
    - refactor `DataBase` / data lookup code for maintainability
    - add focused unit tests for parser/vocabulary, object placement, scoring, dwarf/pirate state, and turn lifecycle
 
