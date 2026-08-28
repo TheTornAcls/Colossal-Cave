@@ -299,7 +299,7 @@ public class AdventureGame
                 0 => condition == 0 || roll < condition,
                 1 => referencedObject == 0 || gameState.Toting(referencedObject),
                 2 => gameState.Toting(referencedObject) || gameState.At(referencedObject),
-                3 or 4 or 5 or 7 => objects.Properties[referencedObject] != conditionType - 3,
+                3 or 4 or 5 or 7 => objects.PropertyOf(referencedObject) != conditionType - 3,
                 _ => false,
             };
         }
@@ -357,7 +357,7 @@ public class AdventureGame
                     Console.WriteLine(GameMessages.GetMessage(54));
                     break;
                 case 3:
-                    if (objects.Properties[GameConstants.Troll] == 1)
+                    if (objects.PropertyOf(GameConstants.Troll) == 1)
                     {
                         PrintObjectMessage(GameConstants.Troll, 1);
                         gameState.SetObjectProperty(GameConstants.Troll, 0);
@@ -371,8 +371,8 @@ public class AdventureGame
                     else
                     {
                         position.NewLocation = position.Location == 117 ? 122 : 117;
-                        if (objects.Properties[GameConstants.Troll] == 0)
-                            gameState.SetObjectProperty(GameConstants.Troll, objects.Properties[GameConstants.Troll] + 1);
+                        if (objects.PropertyOf(GameConstants.Troll) == 0)
+                            gameState.SetObjectProperty(GameConstants.Troll, objects.PropertyOf(GameConstants.Troll) + 1);
 
                         if (!gameState.Toting(GameConstants.Bear))
                             return;
@@ -381,9 +381,9 @@ public class AdventureGame
                         gameState.SetObjectProperty(GameConstants.Chasm, 1);
                         gameState.SetObjectProperty(GameConstants.Troll, 2);
                         gameState.Drop(GameConstants.Bear, position.NewLocation);
-                        objects.FixedLocations[GameConstants.Bear] = -1;
+                        objects.SetFixedLocation(GameConstants.Bear, -1);
                         gameState.SetObjectProperty(GameConstants.Bear, 3);
-                        if (objects.Properties[GameConstants.Spices] < 0)
+                        if (objects.IsPropertyNegative(GameConstants.Spices))
                             progress.TreasuresLostToEndgame++;
                         position.OldLocation2 = position.NewLocation;
                         HandleDeath();
@@ -601,7 +601,7 @@ public class AdventureGame
             TreasureProgressState progress = gameState.TreasureProgress;
 
             if (position.NewLocation == objects.ChestLocation ||
-                objects.Properties[GameConstants.Chest] >= 0)
+                objects.PropertyOf(GameConstants.Chest) >= 0)
             {
                 return;
             }
@@ -610,8 +610,8 @@ public class AdventureGame
             for (int treasure = GameConstants.Nugget; treasure <= GameConstants.MaxTreasures; treasure++)
             {
                 if (treasure == GameConstants.Pyramid &&
-                    (position.NewLocation == objects.Locations[GameConstants.Pyramid] ||
-                    position.NewLocation == objects.Locations[GameConstants.Emerald]))
+                    (position.NewLocation == objects.LocationOf(GameConstants.Pyramid) ||
+                    position.NewLocation == objects.LocationOf(GameConstants.Emerald)))
                 {
                     continue;
                 }
@@ -628,9 +628,9 @@ public class AdventureGame
 
             if (progress.UndiscoveredTreasureCount == progress.TreasuresLostToEndgame + 1 &&
                 nearbyTreasures == 0 &&
-                objects.Locations[GameConstants.Chest] == 0 &&
+                objects.LocationOf(GameConstants.Chest) == 0 &&
                 gameState.Here(GameConstants.Lamp) &&
-                objects.Properties[GameConstants.Lamp] == 1)
+                objects.PropertyOf(GameConstants.Lamp) == 1)
             {
                 Speak(186);
                 gameState.MoveObject(GameConstants.Chest, objects.ChestLocation);
@@ -656,20 +656,20 @@ public class AdventureGame
             ObjectPlacementState objects = gameState.Objects;
 
             Speak(128);
-            if (objects.Locations[GameConstants.Message] == 0)
+            if (objects.LocationOf(GameConstants.Message) == 0)
                 gameState.MoveObject(GameConstants.Chest, objects.ChestLocation);
             gameState.MoveObject(GameConstants.Message, objects.ChestLocation2);
 
             for (int treasure = GameConstants.Nugget; treasure <= GameConstants.MaxTreasures; treasure++)
             {
                 if (treasure == GameConstants.Pyramid &&
-                    (position.NewLocation == objects.Locations[GameConstants.Pyramid] ||
-                    position.NewLocation == objects.Locations[GameConstants.Emerald]))
+                    (position.NewLocation == objects.LocationOf(GameConstants.Pyramid) ||
+                    position.NewLocation == objects.LocationOf(GameConstants.Emerald)))
                 {
                     continue;
                 }
 
-                if (gameState.At(treasure) && objects.FixedLocations[treasure] == 0)
+                if (gameState.At(treasure) && objects.FixedLocationOf(treasure) == 0)
                     gameState.Carry(treasure, position.NewLocation);
                 if (gameState.Toting(treasure))
                     gameState.Drop(treasure, objects.ChestLocation);
@@ -752,13 +752,13 @@ public class AdventureGame
             if (!gameState.Cave.Closed)
                 return;
 
-            if (objects.Properties[GameConstants.Oyster] < 0 && gameState.Toting(GameConstants.Oyster))
+            if (objects.IsPropertyNegative(GameConstants.Oyster) && gameState.Toting(GameConstants.Oyster))
                 PrintObjectMessage(GameConstants.Oyster, 1);
 
             for (int item = 1; item <= GameConstants.MaxObjects; item++)
             {
-                if (gameState.Toting(item) && objects.Properties[item] < 0)
-                    gameState.SetObjectProperty(item, -1 - objects.Properties[item]);
+                if (gameState.Toting(item) && objects.IsPropertyNegative(item))
+                    gameState.SetObjectProperty(item, -1 - objects.PropertyOf(item));
             }
         }
 
@@ -788,12 +788,12 @@ public class AdventureGame
                 gameState.MoveObject(GameConstants.Troll2, 117);
                 gameState.MoveObject(GameConstants.Troll2 + GameConstants.MaxObjects, 122);
                 GameState.Juggle(GameConstants.Chasm);
-                if (objects.Properties[GameConstants.Bear] != 3)
+                if (objects.PropertyOf(GameConstants.Bear) != 3)
                     gameState.Destroy(GameConstants.Bear);
                 gameState.SetObjectProperty(GameConstants.Chain, 0);
-                objects.FixedLocations[GameConstants.Chain] = 0;
+                objects.SetFixedLocation(GameConstants.Chain, 0);
                 gameState.SetObjectProperty(GameConstants.Axe, 0);
-                objects.FixedLocations[GameConstants.Axe] = 0;
+                objects.SetFixedLocation(GameConstants.Axe, 0);
                 Speak(129);
                 cave.Clock1 = -1;
                 cave.Closing = true;
@@ -809,12 +809,12 @@ public class AdventureGame
                 return true;
             }
 
-            if (objects.Properties[GameConstants.Lamp] == 1)
+            if (objects.PropertyOf(GameConstants.Lamp) == 1)
                 cave.LampLimit--;
 
             if (cave.LampLimit <= 30 &&
                 gameState.Here(GameConstants.Batteries) &&
-                objects.Properties[GameConstants.Batteries] == 0 &&
+                objects.PropertyOf(GameConstants.Batteries) == 0 &&
                 gameState.Here(GameConstants.Lamp))
             {
                 Speak(188);
@@ -850,9 +850,9 @@ public class AdventureGame
 
                 cave.LampWarning = 1;
                 int message = 187;
-                if (objects.Locations[GameConstants.Batteries] == 0)
+                if (objects.LocationOf(GameConstants.Batteries) == 0)
                     message = 183;
-                if (objects.Properties[GameConstants.Batteries] == 1)
+                if (objects.PropertyOf(GameConstants.Batteries) == 1)
                     message = 189;
                 Speak(message);
             }
@@ -884,7 +884,7 @@ public class AdventureGame
             gameState.SetObjectProperty(GameConstants.Rod2, gameState.Put(GameConstants.Rod2, 116, 0));
             gameState.SetObjectProperty(GameConstants.Pillow, gameState.Put(GameConstants.Pillow, 116, 0));
             gameState.SetObjectProperty(GameConstants.Mirror, gameState.Put(GameConstants.Mirror, 115, 0));
-            objects.FixedLocations[GameConstants.Mirror] = 116;
+            objects.SetFixedLocation(GameConstants.Mirror, 116);
 
             for (int item = 1; item <= GameConstants.MaxObjects; item++)
             {
@@ -920,7 +920,7 @@ public class AdventureGame
                 case GameConstants.HintC:
                     hints.LocationCounters[GameConstants.HintAreaC]++;
                     if (hints.LocationCounters[GameConstants.HintAreaC] > 3 &&
-                        objects.Properties[GameConstants.Grate] == 0 &&
+                        objects.PropertyOf(GameConstants.Grate) == 0 &&
                         !gameState.Toting(GameConstants.Keys))
                     {
                         TryHint(62, GameConstants.HintC, GameConstants.HintAreaC);
@@ -929,7 +929,7 @@ public class AdventureGame
                 case GameConstants.HintB:
                     hints.LocationCounters[GameConstants.HintAreaB]++;
                     if (hints.LocationCounters[GameConstants.HintAreaB] > 4 &&
-                        objects.Locations[GameConstants.Bird] == position.Location &&
+                        objects.LocationOf(GameConstants.Bird) == position.Location &&
                         gameState.Toting(GameConstants.Rod))
                     {
                         TryHint(18, GameConstants.HintB, GameConstants.HintAreaB);
@@ -938,7 +938,7 @@ public class AdventureGame
                 case GameConstants.HintS:
                     hints.LocationCounters[GameConstants.HintAreaS]++;
                     if (hints.LocationCounters[GameConstants.HintAreaS] > 5 &&
-                        objects.Locations[GameConstants.Snake] == position.Location &&
+                        objects.LocationOf(GameConstants.Snake) == position.Location &&
                         !gameState.Toting(GameConstants.Bird))
                     {
                         TryHint(20, GameConstants.HintS, GameConstants.HintAreaS);
@@ -952,7 +952,7 @@ public class AdventureGame
                 case GameConstants.HintP:
                     hints.LocationCounters[GameConstants.HintAreaP]++;
                     if (hints.LocationCounters[GameConstants.HintAreaP] > 5 &&
-                        objects.Locations[GameConstants.Emerald] != 100)
+                        objects.LocationOf(GameConstants.Emerald) != 100)
                     {
                         TryHint(178, GameConstants.HintP, GameConstants.HintAreaP);
                     }
@@ -990,7 +990,7 @@ public class AdventureGame
 
             int objectId = command.Object;
 
-            if (objects.FixedLocations[objectId] == position.Location || gameState.Here(objectId))
+            if (objects.FixedLocationOf(objectId) == position.Location || gameState.Here(objectId))
             {
                 TransitiveObject();
                 return;
@@ -1026,7 +1026,7 @@ public class AdventureGame
             }
             else if (objectId == GameConstants.Plant &&
                 gameState.At(GameConstants.Plant2) &&
-                objects.Properties[GameConstants.Plant2] == 0)
+                objects.PropertyOf(GameConstants.Plant2) == 0)
             {
                 command.Object = GameConstants.Plant2;
                 TransitiveObject();
@@ -1257,7 +1257,7 @@ public class AdventureGame
             int candidate = 0;
             for (int item = 1; item < GameConstants.MaxObjects; item++)
             {
-                if (objects.Locations[item] != position.Location)
+                if (objects.LocationOf(item) != position.Location)
                     continue;
 
                 if (candidate != 0)
@@ -1325,9 +1325,9 @@ public class AdventureGame
             if (gameState.DCheck() != 0 && dwarves.ActivationLevel >= 2)
                 candidate = GameConstants.Dwarf;
             AddCandidate(GameConstants.Snake, gameState.Here(GameConstants.Snake), ref candidate, ref ambiguous);
-            AddCandidate(GameConstants.Dragon, gameState.At(GameConstants.Dragon) && objects.Properties[GameConstants.Dragon] == 0, ref candidate, ref ambiguous);
+            AddCandidate(GameConstants.Dragon, gameState.At(GameConstants.Dragon) && objects.PropertyOf(GameConstants.Dragon) == 0, ref candidate, ref ambiguous);
             AddCandidate(GameConstants.Troll, gameState.At(GameConstants.Troll), ref candidate, ref ambiguous);
-            AddCandidate(GameConstants.Bear, gameState.Here(GameConstants.Bear) && objects.Properties[GameConstants.Bear] == 0, ref candidate, ref ambiguous);
+            AddCandidate(GameConstants.Bear, gameState.Here(GameConstants.Bear) && objects.PropertyOf(GameConstants.Bear) == 0, ref candidate, ref ambiguous);
 
             if (ambiguous)
             {
@@ -1429,16 +1429,16 @@ public class AdventureGame
                 return;
 
             progress.FooBar = 0;
-            if (objects.Locations[GameConstants.Eggs] == 92 ||
+            if (objects.LocationOf(GameConstants.Eggs) == 92 ||
                 (gameState.Toting(GameConstants.Eggs) && position.Location == 92))
             {
                 Speak(message);
                 return;
             }
 
-            if (objects.Locations[GameConstants.Eggs] == 0 &&
-                objects.Locations[GameConstants.Troll] == 0 &&
-                objects.Properties[GameConstants.Troll] == 0)
+            if (objects.LocationOf(GameConstants.Eggs) == 0 &&
+                objects.LocationOf(GameConstants.Troll) == 0 &&
+                objects.PropertyOf(GameConstants.Troll) == 0)
             {
                 gameState.SetObjectProperty(GameConstants.Troll, 1);
             }
@@ -1490,13 +1490,13 @@ public class AdventureGame
             }
 
             int message = 25;
-            if (objectId == GameConstants.Plant && objects.Properties[GameConstants.Plant] <= 0)
+            if (objectId == GameConstants.Plant && objects.PropertyOf(GameConstants.Plant) <= 0)
                 message = 115;
-            if (objectId == GameConstants.Bear && objects.Properties[GameConstants.Bear] == 1)
+            if (objectId == GameConstants.Bear && objects.PropertyOf(GameConstants.Bear) == 1)
                 message = 169;
-            if (objectId == GameConstants.Chain && objects.Properties[GameConstants.Bear] != 0)
+            if (objectId == GameConstants.Chain && objects.PropertyOf(GameConstants.Bear) != 0)
                 message = 170;
-            if (objects.FixedLocations[objectId] != 0)
+            if (objects.HasFixedLocation(objectId))
             {
                 Speak(message);
                 return;
@@ -1507,13 +1507,13 @@ public class AdventureGame
                 if (!gameState.Here(GameConstants.Bottle) || gameState.Liq() != objectId)
                 {
                     command.Object = GameConstants.Bottle;
-                    if (gameState.Toting(GameConstants.Bottle) && objects.Properties[GameConstants.Bottle] == 1)
+                    if (gameState.Toting(GameConstants.Bottle) && objects.PropertyOf(GameConstants.Bottle) == 1)
                     {
                         VFill();
                         return;
                     }
 
-                    if (objects.Properties[GameConstants.Bottle] != 1)
+                    if (objects.PropertyOf(GameConstants.Bottle) != 1)
                         message = 105;
                     if (!gameState.Toting(GameConstants.Bottle))
                         message = 104;
@@ -1531,7 +1531,7 @@ public class AdventureGame
                 return;
             }
 
-            if (objectId == GameConstants.Bird && objects.Properties[GameConstants.Bird] == 0)
+            if (objectId == GameConstants.Bird && objects.PropertyOf(GameConstants.Bird) == 0)
             {
                 if (gameState.Toting(GameConstants.Rod))
                 {
@@ -1549,7 +1549,7 @@ public class AdventureGame
             }
 
             if ((objectId == GameConstants.Bird || objectId == GameConstants.Cage) &&
-                objects.Properties[GameConstants.Bird] != 0)
+                objects.PropertyOf(GameConstants.Bird) != 0)
             {
                 gameState.Carry(GameConstants.Bird + GameConstants.Cage - objectId, position.Location);
             }
@@ -1602,12 +1602,12 @@ public class AdventureGame
             }
             else if (objectId == GameConstants.Bird &&
                 gameState.At(GameConstants.Dragon) &&
-                objects.Properties[GameConstants.Dragon] == 0)
+                objects.PropertyOf(GameConstants.Dragon) == 0)
             {
                 Speak(154);
                 gameState.Destroy(GameConstants.Bird);
                 gameState.SetObjectProperty(GameConstants.Bird, 0);
-                if (objects.Locations[GameConstants.Snake] != 0)
+                if (objects.LocationOf(GameConstants.Snake) != 0)
                     progress.TreasuresLostToEndgame++;
                 return;
             }
@@ -1633,7 +1633,7 @@ public class AdventureGame
                     gameState.SetObjectProperty(GameConstants.Vase, vaseProperty);
                     PrintObjectMessage(GameConstants.Vase, vaseProperty + 1);
                     if (vaseProperty != 0)
-                        objects.FixedLocations[GameConstants.Vase] = -1;
+                        objects.SetFixedLocation(GameConstants.Vase, -1);
                 }
 
                 message = 0;
@@ -1648,7 +1648,7 @@ public class AdventureGame
 
             if (objectId == GameConstants.Bottle && liquid != 0)
                 gameState.SetObjectLocation(liquid, 0);
-            if (objectId == GameConstants.Cage && objects.Properties[GameConstants.Bird] != 0)
+            if (objectId == GameConstants.Cage && objects.PropertyOf(GameConstants.Bird) != 0)
                 gameState.Drop(GameConstants.Bird, position.Location);
             if (objectId == GameConstants.Bird)
                 gameState.SetObjectProperty(GameConstants.Bird, 0);
@@ -1685,7 +1685,7 @@ public class AdventureGame
                     }
                     break;
                 case GameConstants.Door:
-                    message = objects.Properties[GameConstants.Door] == 1 ? 54 : 111;
+                    message = objects.PropertyOf(GameConstants.Door) == 1 ? 54 : 111;
                     break;
                 case GameConstants.Cage:
                     message = 32;
@@ -1718,7 +1718,7 @@ public class AdventureGame
 
             if (command.Verb == GameConstants.Lock)
             {
-                if (objects.Properties[GameConstants.Chain] != 0)
+                if (objects.PropertyOf(GameConstants.Chain) != 0)
                     return 34;
                 if (position.Location != 130)
                     return 173;
@@ -1726,20 +1726,20 @@ public class AdventureGame
                 gameState.SetObjectProperty(GameConstants.Chain, 2);
                 if (gameState.Toting(GameConstants.Chain))
                     gameState.Drop(GameConstants.Chain, position.Location);
-                objects.FixedLocations[GameConstants.Chain] = -1;
+                objects.SetFixedLocation(GameConstants.Chain, -1);
                 return 172;
             }
 
-            if (objects.Properties[GameConstants.Bear] == 400)
+            if (objects.PropertyOf(GameConstants.Bear) == 400)
                 return 41;
-            if (objects.Properties[GameConstants.Chain] == 0)
+            if (objects.PropertyOf(GameConstants.Chain) == 0)
                 return 37;
 
             gameState.SetObjectProperty(GameConstants.Chain, 0);
-            objects.FixedLocations[GameConstants.Chain] = 0;
-            if (objects.Properties[GameConstants.Bear] != 3)
+            objects.SetFixedLocation(GameConstants.Chain, 0);
+            if (objects.PropertyOf(GameConstants.Bear) != 3)
                 gameState.SetObjectProperty(GameConstants.Bear, 2);
-            objects.FixedLocations[GameConstants.Bear] = 2 - objects.Properties[GameConstants.Bear];
+            objects.SetFixedLocation(GameConstants.Bear, 2 - objects.PropertyOf(GameConstants.Bear));
             return 171;
         }
 
@@ -1763,9 +1763,9 @@ public class AdventureGame
                 return 130;
             }
 
-            int message = 34 + objects.Properties[GameConstants.Grate];
+            int message = 34 + objects.PropertyOf(GameConstants.Grate);
             gameState.SetObjectProperty(GameConstants.Grate, command.Verb == GameConstants.Lock ? 0 : 1);
-            return message + 2 * objects.Properties[GameConstants.Grate];
+            return message + 2 * objects.PropertyOf(GameConstants.Grate);
         }
 
         private void VSay()
@@ -1841,8 +1841,8 @@ public class AdventureGame
             }
             else
             {
-                gameState.SetObjectProperty(GameConstants.Fissure, 1 - objects.Properties[GameConstants.Fissure]);
-                PrintObjectMessage(GameConstants.Fissure, 2 - objects.Properties[GameConstants.Fissure]);
+                gameState.SetObjectProperty(GameConstants.Fissure, 1 - objects.PropertyOf(GameConstants.Fissure));
+                PrintObjectMessage(GameConstants.Fissure, 2 - objects.PropertyOf(GameConstants.Fissure));
             }
         }
 
@@ -1864,7 +1864,7 @@ public class AdventureGame
                     {
                         gameState.Destroy(GameConstants.Bird);
                         gameState.SetObjectProperty(GameConstants.Bird, 0);
-                        if (objects.Locations[GameConstants.Snake] == 19)
+                        if (objects.LocationOf(GameConstants.Snake) == 19)
                             progress.TreasuresLostToEndgame++;
                         message = 45;
                     }
@@ -1888,10 +1888,10 @@ public class AdventureGame
                     message = 157;
                     break;
                 case GameConstants.Bear:
-                    message = 165 + (objects.Properties[GameConstants.Bear] + 1) / 2;
+                    message = 165 + (objects.PropertyOf(GameConstants.Bear) + 1) / 2;
                     break;
                 case GameConstants.Dragon:
-                    if (objects.Properties[GameConstants.Dragon] != 0)
+                    if (objects.PropertyOf(GameConstants.Dragon) != 0)
                     {
                         message = 167;
                         break;
@@ -1909,7 +1909,7 @@ public class AdventureGame
                     gameState.MoveObject(GameConstants.Rug, 120);
                     for (int item = 1; item < GameConstants.MaxObjects; item++)
                     {
-                        if (objects.Locations[item] == 119 || objects.Locations[item] == 121)
+                        if (objects.LocationOf(item) == 119 || objects.LocationOf(item) == 121)
                             gameState.MoveObject(item, 120);
                     }
 
@@ -1962,16 +1962,16 @@ public class AdventureGame
                 }
                 else
                 {
-                    PrintObjectMessage(GameConstants.Plant, objects.Properties[GameConstants.Plant] + 1);
-                    gameState.SetObjectProperty(GameConstants.Plant, (objects.Properties[GameConstants.Plant] + 2) % 6);
-                    gameState.SetObjectProperty(GameConstants.Plant2, objects.Properties[GameConstants.Plant] / 2);
+                    PrintObjectMessage(GameConstants.Plant, objects.PropertyOf(GameConstants.Plant) + 1);
+                    gameState.SetObjectProperty(GameConstants.Plant, (objects.PropertyOf(GameConstants.Plant) + 2) % 6);
+                    gameState.SetObjectProperty(GameConstants.Plant2, objects.PropertyOf(GameConstants.Plant) / 2);
                     ShowLocationDescription();
                 }
             }
             else if (gameState.At(GameConstants.Door))
             {
                 gameState.SetObjectProperty(GameConstants.Door, objectId == GameConstants.Oil ? 1 : 0);
-                Speak(113 + objects.Properties[GameConstants.Door]);
+                Speak(113 + objects.PropertyOf(GameConstants.Door));
             }
             else
             {
@@ -2085,7 +2085,7 @@ public class AdventureGame
                         message = 149;
                 }
             }
-            else if (gameState.At(GameConstants.Dragon) && objects.Properties[GameConstants.Dragon] == 0)
+            else if (gameState.At(GameConstants.Dragon) && objects.PropertyOf(GameConstants.Dragon) == 0)
             {
                 message = 152;
             }
@@ -2093,11 +2093,11 @@ public class AdventureGame
             {
                 message = 158;
             }
-            else if (gameState.Here(GameConstants.Bear) && objects.Properties[GameConstants.Bear] == 0)
+            else if (gameState.Here(GameConstants.Bear) && objects.PropertyOf(GameConstants.Bear) == 0)
             {
                 Speak(164);
                 gameState.Drop(GameConstants.Axe, position.Location);
-                objects.FixedLocations[GameConstants.Axe] = -1;
+                objects.SetFixedLocation(GameConstants.Axe, -1);
                 gameState.SetObjectProperty(GameConstants.Axe, 1);
                 GameState.Juggle(GameConstants.Bear);
                 return;
@@ -2214,9 +2214,9 @@ public class AdventureGame
                 case GameConstants.Bear:
                     if (!gameState.Here(GameConstants.Food))
                     {
-                        if (objects.Properties[GameConstants.Bear] == 0)
+                        if (objects.PropertyOf(GameConstants.Bear) == 0)
                             message = 102;
-                        else if (objects.Properties[GameConstants.Bear] == 3)
+                        else if (objects.PropertyOf(GameConstants.Bear) == 3)
                             message = 110;
                         else
                         {
@@ -2228,12 +2228,12 @@ public class AdventureGame
 
                     gameState.Destroy(GameConstants.Food);
                     gameState.SetObjectProperty(GameConstants.Bear, 1);
-                    objects.FixedLocations[GameConstants.Axe] = 0;
+                    objects.SetFixedLocation(GameConstants.Axe, 0);
                     gameState.SetObjectProperty(GameConstants.Axe, 0);
                     message = 168;
                     break;
                 case GameConstants.Dragon:
-                    message = objects.Properties[GameConstants.Dragon] != 0 ? 110 : 102;
+                    message = objects.PropertyOf(GameConstants.Dragon) != 0 ? 110 : 102;
                     break;
                 case GameConstants.Troll:
                     message = 182;
@@ -2315,7 +2315,7 @@ public class AdventureGame
             TreasureProgressState progress = gameState.TreasureProgress;
             ParsedCommandState command = gameState.Command;
 
-            if (objects.Properties[GameConstants.Rod2] < 0 || !cave.Closed)
+            if (objects.IsPropertyNegative(GameConstants.Rod2) || !cave.Closed)
             {
                 ActSpeak(command.Verb);
                 return;
@@ -2349,12 +2349,12 @@ public class AdventureGame
 
                 Speak(148);
             }
-            else if (command.Object == GameConstants.Vase && objects.Properties[GameConstants.Vase] == 0)
+            else if (command.Object == GameConstants.Vase && objects.PropertyOf(GameConstants.Vase) == 0)
             {
                 if (gameState.Toting(GameConstants.Vase))
                     gameState.Drop(GameConstants.Vase, position.Location);
                 gameState.SetObjectProperty(GameConstants.Vase, 2);
-                objects.FixedLocations[GameConstants.Vase] = -1;
+                objects.SetFixedLocation(GameConstants.Vase, -1);
                 Speak(198);
             }
             else
@@ -2529,9 +2529,9 @@ public class AdventureGame
             for (int item = GameConstants.Nugget; item <= GameConstants.MaxTreasures; item++)
             {
                 int itemScore = item == GameConstants.Chest ? 14 : item > GameConstants.Chest ? 16 : 12;
-                if (objects.Properties[item] >= 0)
+                if (objects.PropertyOf(item) >= 0)
                     treasures += 2;
-                if (objects.Locations[item] == GameConstants.WellHouse && objects.Properties[item] == 0)
+                if (objects.LocationOf(item) == GameConstants.WellHouse && objects.PropertyOf(item) == 0)
                     treasures += itemScore - 2;
             }
 
@@ -2566,7 +2566,7 @@ public class AdventureGame
                 score += bonus;
             }
 
-            if (objects.Locations[GameConstants.Magazine] == 108)
+            if (objects.LocationOf(GameConstants.Magazine) == 108)
                 score += 1;
 
             int hints = -15 * progress.HintsAccepted;
@@ -2681,21 +2681,21 @@ public class AdventureGame
                 if (objectId == GameConstants.Steps && gameState.Toting(GameConstants.Nugget))
                     continue;
 
-                if (objects.Properties[objectId] < 0)
+                if (objects.IsPropertyNegative(objectId))
                 {
                     if (cave.Closed)
                         continue;
 
                     gameState.SetObjectProperty(objectId, 0);
                     if (objectId == GameConstants.Rug || objectId == GameConstants.Chain)
-                        gameState.SetObjectProperty(objectId, objects.Properties[objectId] + 1);
+                        gameState.SetObjectProperty(objectId, objects.PropertyOf(objectId) + 1);
                     progress.UndiscoveredTreasureCount--;
                 }
 
                 int state = objectId == GameConstants.Steps &&
-                    position.Location == objects.FixedLocations[GameConstants.Steps]
+                    position.Location == objects.FixedLocationOf(GameConstants.Steps)
                     ? 1
-                    : objects.Properties[objectId];
+                    : objects.PropertyOf(objectId);
 
                 if (!printedAny && (position.Detail & 2) == 0)
                 {
