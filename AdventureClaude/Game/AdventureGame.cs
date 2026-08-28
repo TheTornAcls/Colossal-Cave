@@ -50,12 +50,12 @@ public class AdventureGame
             if (IsYesResponse(response))
             {
                 ShowInstructions();
-                gameState.Cave.LampLimit = 1000;
+                gameState.Cave.LampLimit = GameConstants.InstructionLampLimit;
                 gameState.TreasureProgress.HintsAccepted++;
             }
             else
             {
-                gameState.Cave.LampLimit = 330;
+                gameState.Cave.LampLimit = GameConstants.DefaultLampLimit;
             }
 
             // Main game loop
@@ -147,7 +147,7 @@ public class AdventureGame
                 case GameConstants.Look:
                     if (position.Detail == 0)
                     {
-                        Console.WriteLine(AdventureData.Message(15));
+                        Console.WriteLine(AdventureData.Message(GameConstants.MsgLookDetailLimit));
                         position.Detail |= 1;
                     }
 
@@ -159,7 +159,9 @@ public class AdventureGame
                     position.Location = 0;
                     break;
                 case GameConstants.Cave:
-                    Console.WriteLine(AdventureData.Message(position.Location < 8 ? 57 : 58));
+                    Console.WriteLine(AdventureData.Message(position.Location < GameConstants.DepressionLocation
+                        ? GameConstants.MsgTryStreamForCave
+                        : GameConstants.MsgNeedMoreDetailedInstructions));
                     break;
                 default:
                     position.OldLocation2 = position.OldLocation;
@@ -186,7 +188,7 @@ public class AdventureGame
 
             if (want == position.Location)
             {
-                Console.WriteLine(AdventureData.Message(91));
+                Console.WriteLine(AdventureData.Message(GameConstants.MsgCantRememberRoute));
                 return;
             }
 
@@ -230,7 +232,7 @@ public class AdventureGame
             }
             else
             {
-                Console.WriteLine(AdventureData.Message(140));
+                Console.WriteLine(AdventureData.Message(GameConstants.MsgCantGetThereFromHere));
             }
         }
 
@@ -255,7 +257,7 @@ public class AdventureGame
                 int verb = entry.Verb;
                 int condition = entry.Condition;
 
-                if (verb != 1 && verb != command.Motion && !hit)
+                if (verb != GameConstants.DefaultTravelVerb && verb != command.Motion && !hit)
                     continue;
 
                 hit = true;
@@ -271,11 +273,11 @@ public class AdventureGame
             {
                 BadMove();
             }
-            else if (selectedDestination > 500)
+            else if (selectedDestination > GameConstants.TravelMessageDestinationOffset)
             {
-                Console.WriteLine(AdventureData.Message(selectedDestination - 500));
+                Console.WriteLine(AdventureData.Message(selectedDestination - GameConstants.TravelMessageDestinationOffset));
             }
-            else if (selectedDestination > 300)
+            else if (selectedDestination > GameConstants.SpecialTravelDestinationOffset)
             {
                 SpecialMove(selectedDestination);
             }
@@ -311,21 +313,28 @@ public class AdventureGame
         {
             ParsedCommandState command = gameState.Command;
 
-            int message = 12;
-            if (command.Motion >= 43 && command.Motion <= 50)
-                message = 9;
-            if (command.Motion == 29 || command.Motion == 30)
-                message = 9;
-            if (command.Motion == 7 || command.Motion == 36 || command.Motion == 37)
-                message = 10;
-            if (command.Motion == 11 || command.Motion == 19)
-                message = 11;
+            int message = GameConstants.MsgCannotApplyWordHere;
+            if (command.Motion >= GameConstants.FirstCompassDirectionMotion &&
+                command.Motion <= GameConstants.LastCompassDirectionMotion)
+            {
+                message = GameConstants.MsgNoWayThatDirection;
+            }
+            if (command.Motion == GameConstants.MotionUp || command.Motion == GameConstants.MotionDown)
+                message = GameConstants.MsgNoWayThatDirection;
+            if (command.Motion == GameConstants.MotionForward ||
+                command.Motion == GameConstants.MotionLeft ||
+                command.Motion == GameConstants.MotionRight)
+            {
+                message = GameConstants.MsgUseCompassOrObjects;
+            }
+            if (command.Motion == GameConstants.MotionOut || command.Motion == GameConstants.MotionInside)
+                message = GameConstants.MsgDontKnowInFromOut;
             if (command.Verb == GameConstants.Find || command.Verb == GameConstants.Inventory)
-                message = 59;
-            if (command.Motion == 62 || command.Motion == 65)
-                message = 42;
-            if (command.Motion == 17)
-                message = 80;
+                message = GameConstants.MsgCannotLocateRemoteThings;
+            if (command.Motion == GameConstants.MotionXyzzy || command.Motion == GameConstants.MotionPlugh)
+                message = GameConstants.MsgNothingHappens;
+            if (command.Motion == GameConstants.MotionCrawl)
+                message = GameConstants.MsgWhichWay;
 
             Console.WriteLine(AdventureData.Message(message));
         }
@@ -339,45 +348,47 @@ public class AdventureGame
             ObjectPlacementState objects = gameState.Objects;
             TreasureProgressState progress = gameState.TreasureProgress;
 
-            switch (destination - 300)
+            switch (destination - GameConstants.SpecialTravelDestinationOffset)
             {
-                case 1:
+                case GameConstants.SpecialMovePloverPassage:
                     if (objects.Holding == 0 ||
                         (objects.Holding == 1 && gameState.Toting(GameConstants.Emerald)))
                     {
-                        position.NewLocation = 199 - position.Location;
+                        position.NewLocation = GameConstants.PloverRoomLocationSum - position.Location;
                     }
                     else
                     {
-                        Console.WriteLine(AdventureData.Message(117));
+                        Console.WriteLine(AdventureData.Message(GameConstants.MsgCarriedObjectWontFitPlover));
                     }
                     break;
-                case 2:
+                case GameConstants.SpecialMovePloverDropEmerald:
                     gameState.Drop(GameConstants.Emerald, position.Location);
-                    Console.WriteLine(AdventureData.Message(54));
+                    Console.WriteLine(AdventureData.Message(GameConstants.MsgOk));
                     break;
-                case 3:
+                case GameConstants.SpecialMoveTrollBridge:
                     if (objects.PropertyOf(GameConstants.Troll) == 1)
                     {
                         PrintObjectMessage(GameConstants.Troll, 1);
                         gameState.SetObjectProperty(GameConstants.Troll, 0);
                         gameState.MoveObject(GameConstants.Troll2, 0);
                         gameState.MoveObject(GameConstants.Troll2 + GameConstants.MaxObjects, 0);
-                        gameState.MoveObject(GameConstants.Troll, 117);
-                        gameState.MoveObject(GameConstants.Troll + GameConstants.MaxObjects, 122);
+                        gameState.MoveObject(GameConstants.Troll, GameConstants.TrollBridgeNearSideLocation);
+                        gameState.MoveObject(GameConstants.Troll + GameConstants.MaxObjects, GameConstants.TrollBridgeFarSideLocation);
                         GameState.Juggle(GameConstants.Chasm);
                         position.NewLocation = position.Location;
                     }
                     else
                     {
-                        position.NewLocation = position.Location == 117 ? 122 : 117;
+                        position.NewLocation = position.Location == GameConstants.TrollBridgeNearSideLocation
+                            ? GameConstants.TrollBridgeFarSideLocation
+                            : GameConstants.TrollBridgeNearSideLocation;
                         if (objects.PropertyOf(GameConstants.Troll) == 0)
                             gameState.SetObjectProperty(GameConstants.Troll, objects.PropertyOf(GameConstants.Troll) + 1);
 
                         if (!gameState.Toting(GameConstants.Bear))
                             return;
 
-                        Console.WriteLine(AdventureData.Message(162));
+                        Console.WriteLine(AdventureData.Message(GameConstants.MsgBearBreaksBridge));
                         gameState.SetObjectProperty(GameConstants.Chasm, 1);
                         gameState.SetObjectProperty(GameConstants.Troll, 2);
                         gameState.Drop(GameConstants.Bear, position.NewLocation);
@@ -426,13 +437,13 @@ public class AdventureGame
             GamePositionState position = gameState.Position;
             CaveTimingState cave = gameState.Cave;
 
-            if (position.NewLocation >= 9 || position.NewLocation == 0 || !cave.Closing)
+            if (position.NewLocation >= GameConstants.BelowGrateLocation || position.NewLocation == 0 || !cave.Closing)
                 return;
 
-            Speak(130);
+            Speak(GameConstants.MsgExitClosedUseMainOffice);
             position.NewLocation = position.Location;
             if (!cave.Panic)
-                cave.Clock2 = 15;
+                cave.Clock2 = GameConstants.ClosingExitPanicClock;
             cave.Panic = true;
         }
 
@@ -453,7 +464,7 @@ public class AdventureGame
                 if (dwarves.PreviousLocations[i] == position.NewLocation && dwarves.Seen[i])
                 {
                     position.NewLocation = position.Location;
-                    Speak(2);
+                    Speak(GameConstants.MsgDwarfBlocksWay);
                     return;
                 }
             }
@@ -474,21 +485,22 @@ public class AdventureGame
 
             if (dwarves.ActivationLevel == 0)
             {
-                if (position.NewLocation > 15)
+                if (position.NewLocation > GameConstants.DwarfActiveLocationThreshold)
                     dwarves.ActivationLevel++;
                 return;
             }
 
             if (dwarves.ActivationLevel == 1)
             {
-                if (position.NewLocation < 15 || GameState.Pct(random, 95))
+                if (position.NewLocation < GameConstants.DwarfActiveLocationThreshold ||
+                    GameState.Pct(random, GameConstants.DwarfActivationChance))
                     return;
 
                 dwarves.ActivationLevel++;
                 for (int i = 1; i < 3; i++)
                 {
                     if (GameState.Pct(random, 50))
-                        dwarves.Locations[GameState.RRand(random, 1, 5)] = 0;
+                        dwarves.Locations[GameState.RRand(random, 1, GameConstants.DwarfCullRollUpperBound)] = 0;
                 }
 
                 for (int i = 1; i < GameConstants.MaxDwarves - 1; i++)
@@ -498,7 +510,7 @@ public class AdventureGame
                     dwarves.PreviousLocations[i] = dwarves.Locations[i];
                 }
 
-                Speak(3);
+                Speak(GameConstants.MsgDwarfWarningAxeMissed);
                 gameState.Drop(GameConstants.Axe, position.NewLocation);
                 return;
             }
@@ -513,9 +525,12 @@ public class AdventureGame
                     continue;
 
                 int candidateLocation = dwarves.PreviousLocations[i];
-                for (int attempt = 1; attempt < 20; attempt++)
+                for (int attempt = 1; attempt < GameConstants.DwarfLocationRollAttempts; attempt++)
                 {
-                    candidateLocation = GameState.RRand(random, 15, 120);
+                    candidateLocation = GameState.RRand(
+                        random,
+                        GameConstants.DwarfLocationRollLow,
+                        GameConstants.DwarfLocationRollHigh);
                     if (candidateLocation != dwarves.PreviousLocations[i] &&
                         candidateLocation != dwarves.Locations[i])
                     {
@@ -527,7 +542,7 @@ public class AdventureGame
                 dwarves.Locations[i] = candidateLocation;
 
                 dwarves.Seen[i] =
-                    (dwarves.Seen[i] && position.NewLocation >= 15) ||
+                    (dwarves.Seen[i] && position.NewLocation >= GameConstants.DwarfActiveLocationThreshold) ||
                     dwarves.Locations[i] == position.NewLocation ||
                     dwarves.PreviousLocations[i] == position.NewLocation;
 
@@ -547,7 +562,8 @@ public class AdventureGame
                     attacks++;
                     if (objects.KnifeLocation >= 0)
                         objects.KnifeLocation = position.NewLocation;
-                    if (GameState.RRand(random, 0, 999) < 95 * (dwarves.ActivationLevel - 2))
+                    if (GameState.RRand(random, 0, GameConstants.DwarfKnifeRollHigh) <
+                        GameConstants.DwarfKnifeHitChancePerLevel * (dwarves.ActivationLevel - 2))
                         hits++;
                 }
             }
@@ -558,7 +574,7 @@ public class AdventureGame
             if (dwarfCount > 1)
                 Console.WriteLine($"There are {dwarfCount} threatening little dwarves in the room with you!");
             else
-                Speak(4);
+                Speak(GameConstants.MsgThreateningDwarfHere);
 
             if (attacks == 0)
                 return;
@@ -570,12 +586,12 @@ public class AdventureGame
             if (attacks > 1)
             {
                 Console.WriteLine($"{attacks} of them throw knives at you!!");
-                messageBase = 6;
+                messageBase = GameConstants.MsgNoDwarvesHit;
             }
             else
             {
-                Speak(5);
-                messageBase = 52;
+                Speak(GameConstants.MsgKnifeThrown);
+                messageBase = GameConstants.MsgKnifeMisses;
             }
 
             if (hits <= 1)
@@ -632,7 +648,7 @@ public class AdventureGame
                 gameState.Here(GameConstants.Lamp) &&
                 objects.PropertyOf(GameConstants.Lamp) == 1)
             {
-                Speak(186);
+                Speak(GameConstants.MsgPirateSpottedChest);
                 gameState.MoveObject(GameConstants.Chest, objects.ChestLocation);
                 gameState.MoveObject(GameConstants.Message, objects.ChestLocation2);
                 dwarves.Locations[GameConstants.MaxDwarves - 1] = objects.ChestLocation;
@@ -643,9 +659,9 @@ public class AdventureGame
 
             if (dwarves.PreviousLocations[GameConstants.MaxDwarves - 1] !=
                 dwarves.Locations[GameConstants.MaxDwarves - 1] &&
-                GameState.Pct(random, 20))
+                GameState.Pct(random, GameConstants.PirateRustleChance))
             {
-                Speak(127);
+                Speak(GameConstants.MsgPirateRustling);
             }
         }
 
@@ -655,7 +671,7 @@ public class AdventureGame
             DwarfPirateState dwarves = gameState.Dwarves;
             ObjectPlacementState objects = gameState.Objects;
 
-            Speak(128);
+            Speak(GameConstants.MsgPirateStealsBooty);
             if (objects.LocationOf(GameConstants.Message) == 0)
                 gameState.MoveObject(GameConstants.Chest, objects.ChestLocation);
             gameState.MoveObject(GameConstants.Message, objects.ChestLocation2);
@@ -682,7 +698,6 @@ public class AdventureGame
 
         private void ApplyLocationChange()
         {
-            const int MaxForcedMoves = 20;
             int forcedMoves = 0;
             GamePositionState position = gameState.Position;
             WorldMapState world = gameState.World;
@@ -708,9 +723,9 @@ public class AdventureGame
                 if (gameState.Forced(position.Location))
                 {
                     ShowLocationDescription(forceLongDescription);
-                    command.Motion = 1;
+                    command.Motion = GameConstants.DefaultTravelVerb;
                     DoMove();
-                    if (++forcedMoves >= MaxForcedMoves)
+                    if (++forcedMoves >= GameConstants.MaxForcedMoves)
                     {
                         Console.WriteLine("[Warning: Maximum forced movement cascade depth reached]");
                         return;
@@ -720,7 +735,7 @@ public class AdventureGame
 
                 if (cave.WizardDark && DarknessManager.IsDark(gameState) && GameState.Pct(random, 35))
                 {
-                    Console.WriteLine(AdventureData.Message(23));
+                    Console.WriteLine(AdventureData.Message(GameConstants.MsgFellIntoPit));
                     position.OldLocation2 = position.Location;
                     HandleDeath();
                     return;
@@ -768,7 +783,9 @@ public class AdventureGame
             progress.FooBar = progress.FooBar > 0 ? -progress.FooBar : 0;
             progress.DescriptionDetailMask = 2;
 
-            if (progress.UndiscoveredTreasureCount == 0 && position.Location >= 15 && position.Location != 33)
+            if (progress.UndiscoveredTreasureCount == 0 &&
+                position.Location >= GameConstants.HallOfMistsLocation &&
+                position.Location != GameConstants.Y2Location)
                 cave.Clock1--;
 
             if (cave.Clock1 == 0)
@@ -780,8 +797,8 @@ public class AdventureGame
 
                 gameState.MoveObject(GameConstants.Troll, 0);
                 gameState.MoveObject(GameConstants.Troll + GameConstants.MaxObjects, 0);
-                gameState.MoveObject(GameConstants.Troll2, 117);
-                gameState.MoveObject(GameConstants.Troll2 + GameConstants.MaxObjects, 122);
+                gameState.MoveObject(GameConstants.Troll2, GameConstants.TrollBridgeNearSideLocation);
+                gameState.MoveObject(GameConstants.Troll2 + GameConstants.MaxObjects, GameConstants.TrollBridgeFarSideLocation);
                 GameState.Juggle(GameConstants.Chasm);
                 if (objects.PropertyOf(GameConstants.Bear) != 3)
                     gameState.Destroy(GameConstants.Bear);
@@ -789,7 +806,7 @@ public class AdventureGame
                 objects.SetFixedLocation(GameConstants.Chain, 0);
                 gameState.SetObjectProperty(GameConstants.Axe, 0);
                 objects.SetFixedLocation(GameConstants.Axe, 0);
-                Speak(129);
+                Speak(GameConstants.MsgCaveClosingSoon);
                 cave.Clock1 = -1;
                 cave.Closing = true;
                 return false;
@@ -807,16 +824,16 @@ public class AdventureGame
             if (objects.PropertyOf(GameConstants.Lamp) == 1)
                 cave.LampLimit--;
 
-            if (cave.LampLimit <= 30 &&
+            if (cave.LampLimit <= GameConstants.LampWarningTurns &&
                 gameState.Here(GameConstants.Batteries) &&
                 objects.PropertyOf(GameConstants.Batteries) == 0 &&
                 gameState.Here(GameConstants.Lamp))
             {
-                Speak(188);
+                Speak(GameConstants.MsgReplaceBatteries);
                 gameState.SetObjectProperty(GameConstants.Batteries, 1);
                 if (gameState.Toting(GameConstants.Batteries))
                     gameState.Drop(GameConstants.Batteries, position.Location);
-                cave.LampLimit += 2500;
+                cave.LampLimit += GameConstants.FreshBatteryExtraTurns;
                 cave.LampWarning = 0;
                 return false;
             }
@@ -826,29 +843,29 @@ public class AdventureGame
                 cave.LampLimit--;
                 gameState.SetObjectProperty(GameConstants.Lamp, 0);
                 if (gameState.Here(GameConstants.Lamp))
-                    Speak(184);
+                    Speak(GameConstants.MsgLampOut);
                 return false;
             }
 
-            if (cave.LampLimit < 0 && position.Location <= 8)
+            if (cave.LampLimit < 0 && position.Location <= GameConstants.DepressionLocation)
             {
-                Speak(185);
+                Speak(GameConstants.MsgLampOutAboveGroundEnd);
                 progress.GaveUp = true;
                 NormalEnd();
                 return true;
             }
 
-            if (cave.LampLimit <= 30)
+            if (cave.LampLimit <= GameConstants.LampWarningTurns)
             {
                 if (cave.LampWarning != 0 || !gameState.Here(GameConstants.Lamp))
                     return false;
 
                 cave.LampWarning = 1;
-                int message = 187;
+                int message = GameConstants.MsgLampGettingDimNeedBatteries;
                 if (objects.LocationOf(GameConstants.Batteries) == 0)
-                    message = 183;
+                    message = GameConstants.MsgLampDimNeedFreshBatteries;
                 if (objects.PropertyOf(GameConstants.Batteries) == 1)
-                    message = 189;
+                    message = GameConstants.MsgLampDimNoBatteries;
                 Speak(message);
             }
 
@@ -861,25 +878,25 @@ public class AdventureGame
             ObjectPlacementState objects = gameState.Objects;
             CaveTimingState cave = gameState.Cave;
 
-            gameState.SetObjectProperty(GameConstants.Bottle, gameState.Put(GameConstants.Bottle, 115, 1));
-            gameState.SetObjectProperty(GameConstants.Plant, gameState.Put(GameConstants.Plant, 115, 0));
-            gameState.SetObjectProperty(GameConstants.Oyster, gameState.Put(GameConstants.Oyster, 115, 0));
-            gameState.SetObjectProperty(GameConstants.Lamp, gameState.Put(GameConstants.Lamp, 115, 0));
-            gameState.SetObjectProperty(GameConstants.Rod, gameState.Put(GameConstants.Rod, 115, 0));
-            gameState.SetObjectProperty(GameConstants.Dwarf, gameState.Put(GameConstants.Dwarf, 115, 0));
+            gameState.SetObjectProperty(GameConstants.Bottle, gameState.Put(GameConstants.Bottle, GameConstants.RepositoryNortheastLocation, 1));
+            gameState.SetObjectProperty(GameConstants.Plant, gameState.Put(GameConstants.Plant, GameConstants.RepositoryNortheastLocation, 0));
+            gameState.SetObjectProperty(GameConstants.Oyster, gameState.Put(GameConstants.Oyster, GameConstants.RepositoryNortheastLocation, 0));
+            gameState.SetObjectProperty(GameConstants.Lamp, gameState.Put(GameConstants.Lamp, GameConstants.RepositoryNortheastLocation, 0));
+            gameState.SetObjectProperty(GameConstants.Rod, gameState.Put(GameConstants.Rod, GameConstants.RepositoryNortheastLocation, 0));
+            gameState.SetObjectProperty(GameConstants.Dwarf, gameState.Put(GameConstants.Dwarf, GameConstants.RepositoryNortheastLocation, 0));
 
-            position.Location = 115;
-            position.OldLocation = 115;
-            position.NewLocation = 115;
+            position.Location = GameConstants.RepositoryNortheastLocation;
+            position.OldLocation = GameConstants.RepositoryNortheastLocation;
+            position.NewLocation = GameConstants.RepositoryNortheastLocation;
 
-            gameState.Put(GameConstants.Grate, 116, 0);
-            gameState.SetObjectProperty(GameConstants.Snake, gameState.Put(GameConstants.Snake, 116, 1));
-            gameState.SetObjectProperty(GameConstants.Bird, gameState.Put(GameConstants.Bird, 116, 1));
-            gameState.SetObjectProperty(GameConstants.Cage, gameState.Put(GameConstants.Cage, 116, 0));
-            gameState.SetObjectProperty(GameConstants.Rod2, gameState.Put(GameConstants.Rod2, 116, 0));
-            gameState.SetObjectProperty(GameConstants.Pillow, gameState.Put(GameConstants.Pillow, 116, 0));
-            gameState.SetObjectProperty(GameConstants.Mirror, gameState.Put(GameConstants.Mirror, 115, 0));
-            objects.SetFixedLocation(GameConstants.Mirror, 116);
+            gameState.Put(GameConstants.Grate, GameConstants.RepositorySouthwestLocation, 0);
+            gameState.SetObjectProperty(GameConstants.Snake, gameState.Put(GameConstants.Snake, GameConstants.RepositorySouthwestLocation, 1));
+            gameState.SetObjectProperty(GameConstants.Bird, gameState.Put(GameConstants.Bird, GameConstants.RepositorySouthwestLocation, 1));
+            gameState.SetObjectProperty(GameConstants.Cage, gameState.Put(GameConstants.Cage, GameConstants.RepositorySouthwestLocation, 0));
+            gameState.SetObjectProperty(GameConstants.Rod2, gameState.Put(GameConstants.Rod2, GameConstants.RepositorySouthwestLocation, 0));
+            gameState.SetObjectProperty(GameConstants.Pillow, gameState.Put(GameConstants.Pillow, GameConstants.RepositorySouthwestLocation, 0));
+            gameState.SetObjectProperty(GameConstants.Mirror, gameState.Put(GameConstants.Mirror, GameConstants.RepositoryNortheastLocation, 0));
+            objects.SetFixedLocation(GameConstants.Mirror, GameConstants.RepositorySouthwestLocation);
 
             for (int item = 1; item <= GameConstants.MaxObjects; item++)
             {
@@ -887,7 +904,7 @@ public class AdventureGame
                     gameState.Destroy(item);
             }
 
-            Speak(132);
+            Speak(GameConstants.MsgCaveNowClosed);
             cave.Closed = true;
             position.Location = 0;
         }
@@ -909,53 +926,56 @@ public class AdventureGame
             {
                 case GameConstants.HintF:
                     hints.LocationCounters[GameConstants.HintAreaF]++;
-                    if (hints.LocationCounters[GameConstants.HintAreaF] > 20 && world.VisitedLocations[8] == 0)
-                        TryHint(56, GameConstants.HintF, GameConstants.HintAreaF);
+                    if (hints.LocationCounters[GameConstants.HintAreaF] > GameConstants.HintFindCaveTurns &&
+                        world.VisitedLocations[GameConstants.DepressionLocation] == 0)
+                    {
+                        TryHint(GameConstants.MsgHintFindCave, GameConstants.HintF, GameConstants.HintAreaF);
+                    }
                     break;
                 case GameConstants.HintC:
                     hints.LocationCounters[GameConstants.HintAreaC]++;
-                    if (hints.LocationCounters[GameConstants.HintAreaC] > 3 &&
+                    if (hints.LocationCounters[GameConstants.HintAreaC] > GameConstants.HintGetIntoCaveTurns &&
                         objects.PropertyOf(GameConstants.Grate) == 0 &&
                         !gameState.Toting(GameConstants.Keys))
                     {
-                        TryHint(62, GameConstants.HintC, GameConstants.HintAreaC);
+                        TryHint(GameConstants.MsgHintGetIntoCave, GameConstants.HintC, GameConstants.HintAreaC);
                     }
                     break;
                 case GameConstants.HintB:
                     hints.LocationCounters[GameConstants.HintAreaB]++;
-                    if (hints.LocationCounters[GameConstants.HintAreaB] > 4 &&
+                    if (hints.LocationCounters[GameConstants.HintAreaB] > GameConstants.HintCatchBirdTurns &&
                         objects.LocationOf(GameConstants.Bird) == position.Location &&
                         gameState.Toting(GameConstants.Rod))
                     {
-                        TryHint(18, GameConstants.HintB, GameConstants.HintAreaB);
+                        TryHint(GameConstants.MsgHintCatchBird, GameConstants.HintB, GameConstants.HintAreaB);
                     }
                     break;
                 case GameConstants.HintS:
                     hints.LocationCounters[GameConstants.HintAreaS]++;
-                    if (hints.LocationCounters[GameConstants.HintAreaS] > 5 &&
+                    if (hints.LocationCounters[GameConstants.HintAreaS] > GameConstants.HintDealWithSnakeTurns &&
                         objects.LocationOf(GameConstants.Snake) == position.Location &&
                         !gameState.Toting(GameConstants.Bird))
                     {
-                        TryHint(20, GameConstants.HintS, GameConstants.HintAreaS);
+                        TryHint(GameConstants.MsgHintDealWithSnake, GameConstants.HintS, GameConstants.HintAreaS);
                     }
                     break;
                 case GameConstants.HintM:
                     hints.LocationCounters[GameConstants.HintAreaM]++;
-                    if (hints.LocationCounters[GameConstants.HintAreaM] > 15)
-                        TryHint(176, GameConstants.HintM, GameConstants.HintAreaM);
+                    if (hints.LocationCounters[GameConstants.HintAreaM] > GameConstants.HintOutOfMazeTurns)
+                        TryHint(GameConstants.MsgHintOutOfMaze, GameConstants.HintM, GameConstants.HintAreaM);
                     break;
                 case GameConstants.HintP:
                     hints.LocationCounters[GameConstants.HintAreaP]++;
-                    if (hints.LocationCounters[GameConstants.HintAreaP] > 5 &&
-                        objects.LocationOf(GameConstants.Emerald) != 100)
+                    if (hints.LocationCounters[GameConstants.HintAreaP] > GameConstants.HintExplorePloverTurns &&
+                        objects.LocationOf(GameConstants.Emerald) != GameConstants.PloverRoomLocation)
                     {
-                        TryHint(178, GameConstants.HintP, GameConstants.HintAreaP);
+                        TryHint(GameConstants.MsgHintExplorePlover, GameConstants.HintP, GameConstants.HintAreaP);
                     }
                     break;
                 case GameConstants.HintW:
                     hints.LocationCounters[GameConstants.HintAreaW]++;
-                    if (hints.LocationCounters[GameConstants.HintAreaW] > 15)
-                        TryHint(180, GameConstants.HintW, GameConstants.HintAreaW);
+                    if (hints.LocationCounters[GameConstants.HintAreaW] > GameConstants.HintOutOfHereTurns)
+                        TryHint(GameConstants.MsgHintOutOfHere, GameConstants.HintW, GameConstants.HintAreaW);
                     break;
             }
         }
@@ -966,8 +986,8 @@ public class AdventureGame
             TreasureProgressState progress = gameState.TreasureProgress;
 
             Console.WriteLine();
-            if (AskYesNo(promptMessage, 0, 54) &&
-                AskYesNo(87, promptMessage + 1, 54))
+            if (AskYesNo(promptMessage, 0, GameConstants.MsgOk) &&
+                AskYesNo(GameConstants.MsgPromptOfferHint, promptMessage + 1, GameConstants.MsgOk))
             {
                 progress.HintsAccepted++;
                 hints.AvailableMask &= ~mask;
@@ -993,14 +1013,17 @@ public class AdventureGame
 
             if (objectId == GameConstants.Grate)
             {
-                if (position.Location == 1 || position.Location == 4 || position.Location == 7)
+                if (position.Location == GameConstants.EndOfRoad ||
+                    position.Location == GameConstants.ValleyLocation ||
+                    position.Location == GameConstants.SlitInStreambedLocation)
                 {
                     command.Motion = GameConstants.Depression;
                     DoMove();
                     return;
                 }
 
-                if (position.Location > 9 && position.Location < 15)
+                if (position.Location >= GameConstants.FirstLowerGrateApproachLocation &&
+                    position.Location <= GameConstants.LastLowerGrateApproachLocation)
                 {
                     command.Motion = GameConstants.Entrance;
                     DoMove();
@@ -1029,7 +1052,7 @@ public class AdventureGame
             }
             else if (objectId == GameConstants.Knife && objects.KnifeLocation == position.Location)
             {
-                Speak(116);
+                Speak(GameConstants.MsgKnivesVanish);
                 objects.KnifeLocation = -1;
                 return;
             }
@@ -1096,7 +1119,7 @@ public class AdventureGame
                     VSay();
                     break;
                 case GameConstants.Nothing:
-                    Speak(54);
+                    Speak(GameConstants.MsgOk);
                     break;
                 case GameConstants.On:
                     VOn();
@@ -1121,7 +1144,7 @@ public class AdventureGame
                     break;
                 case GameConstants.Rub:
                     if (command.Object != GameConstants.Lamp)
-                        Speak(76);
+                        Speak(GameConstants.MsgNothingUnexpected);
                     else
                         ActSpeak(GameConstants.Rub);
                     break;
@@ -1182,7 +1205,7 @@ public class AdventureGame
                     IVOpen();
                     break;
                 case GameConstants.Nothing:
-                    Speak(54);
+                    Speak(GameConstants.MsgOk);
                     break;
                 case GameConstants.On:
                 case GameConstants.Off:
@@ -1234,7 +1257,7 @@ public class AdventureGame
                     ActSpeak(command.Verb);
                     break;
                 case GameConstants.Help:
-                    Speak(51);
+                    Speak(GameConstants.MsgHelp);
                     break;
                 default:
                     Console.WriteLine("This intransitive verb is not implemented yet.");
@@ -1300,7 +1323,7 @@ public class AdventureGame
 
             if (candidate == 0)
             {
-                Speak(28);
+                Speak(GameConstants.MsgNoLockHere);
                 return;
             }
 
@@ -1382,7 +1405,7 @@ public class AdventureGame
 
         private void IVQuit()
         {
-            gameState.TreasureProgress.GaveUp = AskYesNo(22, 0, 54);
+            gameState.TreasureProgress.GaveUp = AskYesNo(GameConstants.MsgPromptQuit, 0, GameConstants.MsgOk);
             if (gameState.TreasureProgress.GaveUp)
                 NormalEnd();
         }
@@ -1409,12 +1432,12 @@ public class AdventureGame
             ParsedCommandState command = gameState.Command;
 
             int k = command.Verb - GameConstants.Fee + 1;
-            int message = 42;
+            int message = GameConstants.MsgNothingHappens;
 
             if (progress.FooBar != 1 - k)
             {
                 if (progress.FooBar != 0)
-                    message = 151;
+                    message = GameConstants.MsgFooSequenceFailed;
                 Speak(message);
                 return;
             }
@@ -1424,8 +1447,8 @@ public class AdventureGame
                 return;
 
             progress.FooBar = 0;
-            if (objects.LocationOf(GameConstants.Eggs) == 92 ||
-                (gameState.Toting(GameConstants.Eggs) && position.Location == 92))
+            if (objects.LocationOf(GameConstants.Eggs) == GameConstants.GiantRoomLocation ||
+                (gameState.Toting(GameConstants.Eggs) && position.Location == GameConstants.GiantRoomLocation))
             {
                 Speak(message);
                 return;
@@ -1440,12 +1463,12 @@ public class AdventureGame
 
             if (gameState.Here(GameConstants.Eggs))
                 k = 1;
-            else if (position.Location == 92)
+            else if (position.Location == GameConstants.GiantRoomLocation)
                 k = 0;
             else
                 k = 2;
 
-            gameState.MoveObject(GameConstants.Eggs, 92);
+            gameState.MoveObject(GameConstants.Eggs, GameConstants.GiantRoomLocation);
             PrintObjectMessage(GameConstants.Eggs, k);
         }
 
@@ -1461,7 +1484,9 @@ public class AdventureGame
             if (gameState.Here(GameConstants.Message))
                 candidate = candidate * 100 + GameConstants.Message;
 
-            if (candidate > 100 || candidate == 0 || DarknessManager.IsDark(gameState))
+            if (candidate > GameConstants.ReadAmbiguousObjectAccumulatorThreshold ||
+                candidate == 0 ||
+                DarknessManager.IsDark(gameState))
             {
                 NeedObject();
                 return;
@@ -1484,13 +1509,13 @@ public class AdventureGame
                 return;
             }
 
-            int message = 25;
+            int message = GameConstants.MsgCantBeSerious;
             if (objectId == GameConstants.Plant && objects.PropertyOf(GameConstants.Plant) <= 0)
-                message = 115;
+                message = GameConstants.MsgPlantRoots;
             if (objectId == GameConstants.Bear && objects.PropertyOf(GameConstants.Bear) == 1)
-                message = 169;
+                message = GameConstants.MsgBearStillChained;
             if (objectId == GameConstants.Chain && objects.PropertyOf(GameConstants.Bear) != 0)
-                message = 170;
+                message = GameConstants.MsgChainStillLocked;
             if (objects.HasFixedLocation(objectId))
             {
                 Speak(message);
@@ -1509,9 +1534,9 @@ public class AdventureGame
                     }
 
                     if (objects.PropertyOf(GameConstants.Bottle) != 1)
-                        message = 105;
+                        message = GameConstants.MsgBottleAlreadyFull;
                     if (!gameState.Toting(GameConstants.Bottle))
-                        message = 104;
+                        message = GameConstants.MsgNothingToCarryLiquid;
                     Speak(message);
                     return;
                 }
@@ -1520,9 +1545,9 @@ public class AdventureGame
                 command.Object = objectId;
             }
 
-            if (objects.Holding >= 7)
+            if (objects.Holding >= GameConstants.MaxCarriedObjects)
             {
-                Speak(92);
+                Speak(GameConstants.MsgCantCarryMore);
                 return;
             }
 
@@ -1530,13 +1555,13 @@ public class AdventureGame
             {
                 if (gameState.Toting(GameConstants.Rod))
                 {
-                    Speak(26);
+                    Speak(GameConstants.MsgBirdDisturbedByRod);
                     return;
                 }
 
                 if (!gameState.Toting(GameConstants.Cage))
                 {
-                    Speak(27);
+                    Speak(GameConstants.MsgNeedCageForBird);
                     return;
                 }
 
@@ -1554,7 +1579,7 @@ public class AdventureGame
             if (objectId == GameConstants.Bottle && liquid != 0)
                 gameState.SetObjectLocation(liquid, -1);
 
-            Speak(54);
+            Speak(GameConstants.MsgOk);
         }
 
         private void VDrop()
@@ -1578,13 +1603,13 @@ public class AdventureGame
                 return;
             }
 
-            int message = 54;
+            int message = GameConstants.MsgOk;
             if (objectId == GameConstants.Bird && gameState.Here(GameConstants.Snake))
             {
-                Speak(30);
+                Speak(GameConstants.MsgBirdDrivesSnakeAway);
                 message = 0;
                 if (cave.Closed)
-                    DwarfEnd(136);
+                    DwarfEnd(GameConstants.MsgDwarvesAwakenGetYou);
                 gameState.Destroy(GameConstants.Snake);
                 gameState.SetObjectProperty(GameConstants.Snake, -1);
             }
@@ -1599,7 +1624,7 @@ public class AdventureGame
                 gameState.At(GameConstants.Dragon) &&
                 objects.PropertyOf(GameConstants.Dragon) == 0)
             {
-                Speak(154);
+                Speak(GameConstants.MsgBirdBurnedByDragon);
                 gameState.Destroy(GameConstants.Bird);
                 gameState.SetObjectProperty(GameConstants.Bird, 0);
                 if (objects.LocationOf(GameConstants.Snake) != 0)
@@ -1609,19 +1634,19 @@ public class AdventureGame
 
             if (objectId == GameConstants.Bear && gameState.At(GameConstants.Troll))
             {
-                Speak(163);
+                Speak(GameConstants.MsgBearScaresTroll);
                 message = 0;
                 gameState.MoveObject(GameConstants.Troll, 0);
                 gameState.MoveObject(GameConstants.Troll + GameConstants.MaxObjects, 0);
-                gameState.MoveObject(GameConstants.Troll2, 117);
-                gameState.MoveObject(GameConstants.Troll2 + GameConstants.MaxObjects, 122);
+                gameState.MoveObject(GameConstants.Troll2, GameConstants.TrollBridgeNearSideLocation);
+                gameState.MoveObject(GameConstants.Troll2 + GameConstants.MaxObjects, GameConstants.TrollBridgeFarSideLocation);
                 GameState.Juggle(GameConstants.Chasm);
                 gameState.SetObjectProperty(GameConstants.Troll, 2);
             }
             else if (objectId == GameConstants.Vase)
             {
-                if (position.Location == 96)
-                    Speak(54);
+                if (position.Location == GameConstants.SoftRoomLocation)
+                    Speak(GameConstants.MsgOk);
                 else
                 {
                     int vaseProperty = gameState.At(GameConstants.Pillow) ? 0 : 2;
@@ -1666,27 +1691,29 @@ public class AdventureGame
                 case GameConstants.Oyster:
                     int oysterOffset = command.Object == GameConstants.Oyster ? 1 : 0;
                     if (command.Verb == GameConstants.Lock)
-                        message = 61;
+                        message = GameConstants.MsgWhat;
                     else if (!gameState.Toting(GameConstants.Trident))
-                        message = 122 + oysterOffset;
+                        message = GameConstants.MsgNoClamOpener + oysterOffset;
                     else if (gameState.Toting(command.Object))
-                        message = 120 + oysterOffset;
+                        message = GameConstants.MsgPutDownClamBeforeOpen + oysterOffset;
                     else
                     {
-                        message = 124 + oysterOffset;
+                        message = GameConstants.MsgPearlFallsFromClam + oysterOffset;
                         gameState.Destroy(GameConstants.Clam);
                         gameState.Drop(GameConstants.Oyster, position.Location);
-                        gameState.Drop(GameConstants.Pearl, 105);
+                        gameState.Drop(GameConstants.Pearl, GameConstants.PearlDropLocation);
                     }
                     break;
                 case GameConstants.Door:
-                    message = objects.PropertyOf(GameConstants.Door) == 1 ? 54 : 111;
+                    message = objects.PropertyOf(GameConstants.Door) == 1
+                        ? GameConstants.MsgOk
+                        : GameConstants.MsgRustyDoorStuck;
                     break;
                 case GameConstants.Cage:
-                    message = 32;
+                    message = GameConstants.MsgNoLock;
                     break;
                 case GameConstants.Keys:
-                    message = 55;
+                    message = GameConstants.MsgCantUnlockKeys;
                     break;
                 case GameConstants.Chain:
                     message = OpenChain();
@@ -1695,7 +1722,7 @@ public class AdventureGame
                     message = OpenGrate();
                     break;
                 default:
-                    message = 33;
+                    message = GameConstants.MsgDontLockThat;
                     break;
             }
 
@@ -1709,33 +1736,33 @@ public class AdventureGame
             ParsedCommandState command = gameState.Command;
 
             if (!gameState.Here(GameConstants.Keys))
-                return 31;
+                return GameConstants.MsgNoKeys;
 
             if (command.Verb == GameConstants.Lock)
             {
                 if (objects.PropertyOf(GameConstants.Chain) != 0)
-                    return 34;
-                if (position.Location != 130)
-                    return 173;
+                    return GameConstants.MsgAlreadyLocked;
+                if (position.Location != GameConstants.BearRoomLocation)
+                    return GameConstants.MsgNothingToLockChainTo;
 
                 gameState.SetObjectProperty(GameConstants.Chain, 2);
                 if (gameState.Toting(GameConstants.Chain))
                     gameState.Drop(GameConstants.Chain, position.Location);
                 objects.SetFixedLocation(GameConstants.Chain, -1);
-                return 172;
+                return GameConstants.MsgChainLocked;
             }
 
-            if (objects.PropertyOf(GameConstants.Bear) == 400)
-                return 41;
+            if (objects.PropertyOf(GameConstants.Bear) == GameConstants.BearBlocksChainUnlockProperty)
+                return GameConstants.MsgBearBlocksChain;
             if (objects.PropertyOf(GameConstants.Chain) == 0)
-                return 37;
+                return GameConstants.MsgAlreadyUnlocked;
 
             gameState.SetObjectProperty(GameConstants.Chain, 0);
             objects.SetFixedLocation(GameConstants.Chain, 0);
             if (objects.PropertyOf(GameConstants.Bear) != 3)
                 gameState.SetObjectProperty(GameConstants.Bear, 2);
             objects.SetFixedLocation(GameConstants.Bear, 2 - objects.PropertyOf(GameConstants.Bear));
-            return 171;
+            return GameConstants.MsgChainUnlocked;
         }
 
         private int OpenGrate()
@@ -1745,20 +1772,20 @@ public class AdventureGame
             ParsedCommandState command = gameState.Command;
 
             if (!gameState.Here(GameConstants.Keys))
-                return 31;
+                return GameConstants.MsgNoKeys;
 
             if (cave.Closing)
             {
                 if (!cave.Panic)
                 {
-                    cave.Clock2 = 15;
+                    cave.Clock2 = GameConstants.ClosingExitPanicClock;
                     cave.Panic = true;
                 }
 
-                return 130;
+                return GameConstants.MsgExitClosedUseMainOffice;
             }
 
-            int message = 34 + objects.PropertyOf(GameConstants.Grate);
+            int message = GameConstants.MsgAlreadyLocked + objects.PropertyOf(GameConstants.Grate);
             gameState.SetObjectProperty(GameConstants.Grate, command.Verb == GameConstants.Lock ? 0 : 1);
             return message + 2 * objects.PropertyOf(GameConstants.Grate);
         }
@@ -1788,12 +1815,12 @@ public class AdventureGame
 
             if (cave.LampLimit < 0)
             {
-                Speak(184);
+                Speak(GameConstants.MsgLampOut);
                 return;
             }
 
             gameState.SetObjectProperty(GameConstants.Lamp, 1);
-            Speak(39);
+            Speak(GameConstants.MsgLampOn);
             if (cave.WizardDark)
             {
                 cave.WizardDark = false;
@@ -1812,7 +1839,7 @@ public class AdventureGame
             }
 
             gameState.SetObjectProperty(GameConstants.Lamp, 0);
-            Speak(40);
+            Speak(GameConstants.MsgLampOff);
         }
 
         private void VWave()
@@ -1825,7 +1852,7 @@ public class AdventureGame
             if (!gameState.Toting(objectId) &&
                 (objectId != GameConstants.Rod || !gameState.Toting(GameConstants.Rod2)))
             {
-                Speak(29);
+                Speak(GameConstants.MsgNotCarryingIt);
             }
             else if (objectId != GameConstants.Rod ||
                 !gameState.At(GameConstants.Fissure) ||
@@ -1854,45 +1881,45 @@ public class AdventureGame
             {
                 case GameConstants.Bird:
                     if (cave.Closed)
-                        message = 137;
+                        message = GameConstants.MsgLeaveBirdAlone;
                     else
                     {
                         gameState.Destroy(GameConstants.Bird);
                         gameState.SetObjectProperty(GameConstants.Bird, 0);
-                        if (objects.LocationOf(GameConstants.Snake) == 19)
+                        if (objects.LocationOf(GameConstants.Snake) == GameConstants.HallOfMountainKingLocation)
                             progress.TreasuresLostToEndgame++;
-                        message = 45;
+                        message = GameConstants.MsgBirdDies;
                     }
                     break;
                 case 0:
-                    message = 44;
+                    message = GameConstants.MsgNothingToAttack;
                     break;
                 case GameConstants.Clam:
                 case GameConstants.Oyster:
-                    message = 150;
+                    message = GameConstants.MsgShellImpervious;
                     break;
                 case GameConstants.Snake:
-                    message = 46;
+                    message = GameConstants.MsgAttackingSnakeDangerous;
                     break;
                 case GameConstants.Dwarf:
                     if (cave.Closed)
-                        DwarfEnd(136);
-                    message = 49;
+                        DwarfEnd(GameConstants.MsgDwarvesAwakenGetYou);
+                    message = GameConstants.MsgBareHands;
                     break;
                 case GameConstants.Troll:
-                    message = 157;
+                    message = GameConstants.MsgTrollTooTough;
                     break;
                 case GameConstants.Bear:
-                    message = 165 + (objects.PropertyOf(GameConstants.Bear) + 1) / 2;
+                    message = GameConstants.MsgBearBareHandsBase + (objects.PropertyOf(GameConstants.Bear) + 1) / 2;
                     break;
                 case GameConstants.Dragon:
                     if (objects.PropertyOf(GameConstants.Dragon) != 0)
                     {
-                        message = 167;
+                        message = GameConstants.MsgDragonAlreadyDead;
                         break;
                     }
 
-                    if (!AskYesNo(49, 0, 0))
+                    if (!AskYesNo(GameConstants.MsgBareHands, 0, 0))
                         return;
 
                     PrintObjectMessage(GameConstants.Dragon, 1);
@@ -1900,15 +1927,18 @@ public class AdventureGame
                     gameState.SetObjectProperty(GameConstants.Rug, 0);
                     gameState.MoveObject(GameConstants.Dragon + GameConstants.MaxObjects, -1);
                     gameState.MoveObject(GameConstants.Rug + GameConstants.MaxObjects, 0);
-                    gameState.MoveObject(GameConstants.Dragon, 120);
-                    gameState.MoveObject(GameConstants.Rug, 120);
+                    gameState.MoveObject(GameConstants.Dragon, GameConstants.DragonCenterLocation);
+                    gameState.MoveObject(GameConstants.Rug, GameConstants.DragonCenterLocation);
                     for (int item = 1; item < GameConstants.MaxObjects; item++)
                     {
-                        if (objects.LocationOf(item) == 119 || objects.LocationOf(item) == 121)
-                            gameState.MoveObject(item, 120);
+                        if (objects.LocationOf(item) == GameConstants.DragonSouthSideLocation ||
+                            objects.LocationOf(item) == GameConstants.DragonNorthSideLocation)
+                        {
+                            gameState.MoveObject(item, GameConstants.DragonCenterLocation);
+                        }
                     }
 
-                    position.NewLocation = 120;
+                    position.NewLocation = GameConstants.DragonCenterLocation;
                     return;
                 default:
                     ActSpeak(command.Verb);
@@ -1942,7 +1972,7 @@ public class AdventureGame
 
             if (objectId != GameConstants.Oil && objectId != GameConstants.Water)
             {
-                Speak(78);
+                Speak(GameConstants.MsgCantPourThat);
                 return;
             }
 
@@ -1953,7 +1983,7 @@ public class AdventureGame
             {
                 if (objectId != GameConstants.Water)
                 {
-                    Speak(112);
+                    Speak(GameConstants.MsgPlantWantsWater);
                 }
                 else
                 {
@@ -1966,11 +1996,11 @@ public class AdventureGame
             else if (gameState.At(GameConstants.Door))
             {
                 gameState.SetObjectProperty(GameConstants.Door, objectId == GameConstants.Oil ? 1 : 0);
-                Speak(113 + objects.PropertyOf(GameConstants.Door));
+                Speak(GameConstants.MsgDoorRustedBase + objects.PropertyOf(GameConstants.Door));
             }
             else
             {
-                Speak(77);
+                Speak(GameConstants.MsgBottleEmptyGroundWet);
             }
         }
 
@@ -1982,7 +2012,7 @@ public class AdventureGame
             {
                 case GameConstants.Food:
                     gameState.Destroy(GameConstants.Food);
-                    Speak(72);
+                    Speak(GameConstants.MsgFoodDelicious);
                     break;
                 case GameConstants.Bird:
                 case GameConstants.Snake:
@@ -1992,7 +2022,7 @@ public class AdventureGame
                 case GameConstants.Dragon:
                 case GameConstants.Troll:
                 case GameConstants.Bear:
-                    Speak(71);
+                    Speak(GameConstants.MsgLostAppetite);
                     break;
                 default:
                     ActSpeak(command.Verb);
@@ -2006,7 +2036,7 @@ public class AdventureGame
 
             if (command.Object != GameConstants.Water)
             {
-                Speak(110);
+                Speak(GameConstants.MsgDontBeRidiculous);
             }
             else if (gameState.Liq() != GameConstants.Water || !gameState.Here(GameConstants.Bottle))
             {
@@ -2016,7 +2046,7 @@ public class AdventureGame
             {
                 gameState.SetObjectProperty(GameConstants.Bottle, 1);
                 gameState.SetObjectLocation(GameConstants.Water, 0);
-                Speak(74);
+                Speak(GameConstants.MsgBottleWaterNowEmpty);
             }
         }
 
@@ -2042,12 +2072,12 @@ public class AdventureGame
 
             if (gameState.At(GameConstants.Troll) && objectId >= GameConstants.Nugget && objectId < GameConstants.MaxObjects)
             {
-                Speak(159);
+                Speak(GameConstants.MsgTrollTakesTreasure);
                 gameState.Drop(objectId, 0);
                 gameState.MoveObject(GameConstants.Troll, 0);
                 gameState.MoveObject(GameConstants.Troll + GameConstants.MaxObjects, 0);
-                gameState.Drop(GameConstants.Troll2, 117);
-                gameState.Drop(GameConstants.Troll2 + GameConstants.MaxObjects, 122);
+                gameState.Drop(GameConstants.Troll2, GameConstants.TrollBridgeNearSideLocation);
+                gameState.Drop(GameConstants.Troll2 + GameConstants.MaxObjects, GameConstants.TrollBridgeFarSideLocation);
                 GameState.Juggle(GameConstants.Chasm);
                 return;
             }
@@ -2069,28 +2099,28 @@ public class AdventureGame
             int dwarf = gameState.DCheck();
             if (dwarf != 0)
             {
-                message = 48;
-                if (GameState.Pct(random, 33))
+                message = GameConstants.MsgDwarfDodgesAxe;
+                if (GameState.Pct(random, GameConstants.AxeKillsDwarfChance))
                 {
                     dwarves.Seen[dwarf] = false;
                     dwarves.Locations[dwarf] = 0;
-                    message = 47;
+                    message = GameConstants.MsgKilledDwarf;
                     dwarves.KillCount++;
                     if (dwarves.KillCount == 1)
-                        message = 149;
+                        message = GameConstants.MsgKilledDwarfSmoke;
                 }
             }
             else if (gameState.At(GameConstants.Dragon) && objects.PropertyOf(GameConstants.Dragon) == 0)
             {
-                message = 152;
+                message = GameConstants.MsgAxeBouncesOffDragon;
             }
             else if (gameState.At(GameConstants.Troll))
             {
-                message = 158;
+                message = GameConstants.MsgTrollRejectsAxe;
             }
             else if (gameState.Here(GameConstants.Bear) && objects.PropertyOf(GameConstants.Bear) == 0)
             {
-                Speak(164);
+                Speak(GameConstants.MsgAxeMissesBear);
                 gameState.Drop(GameConstants.Axe, position.Location);
                 objects.SetFixedLocation(GameConstants.Axe, -1);
                 gameState.SetObjectProperty(GameConstants.Axe, 1);
@@ -2119,15 +2149,15 @@ public class AdventureGame
 
             int objectId = command.Object;
             if (gameState.Toting(objectId))
-                Speak(24);
+                Speak(GameConstants.MsgAlreadyCarryingIt);
             else if (cave.Closed)
-                Speak(138);
+                Speak(GameConstants.MsgDaresayNearby);
             else if (gameState.DCheck() != 0 && dwarves.ActivationLevel >= 2 && objectId == GameConstants.Dwarf)
-                Speak(94);
+                Speak(GameConstants.MsgWantRightHere);
             else if (gameState.At(objectId) ||
                 (gameState.Liq() == objectId && gameState.Here(GameConstants.Bottle)) ||
                 objectId == gameState.LiqLoc(position.Location))
-                Speak(94);
+                Speak(GameConstants.MsgWantRightHere);
             else
                 ActSpeak(command.Verb);
         }
@@ -2143,14 +2173,14 @@ public class AdventureGame
                 case GameConstants.Bottle:
                     if (gameState.Liq() != 0)
                     {
-                        Speak(105);
+                        Speak(GameConstants.MsgBottleAlreadyFull);
                     }
                     else
                     {
                         int liquidHere = gameState.LiqLoc(position.Location);
                         if (liquidHere == 0)
                         {
-                            Speak(106);
+                            Speak(GameConstants.MsgNothingToFillBottle);
                         }
                         else
                         {
@@ -2158,27 +2188,29 @@ public class AdventureGame
                             int liquid = gameState.Liq();
                             if (gameState.Toting(GameConstants.Bottle))
                                 gameState.SetObjectLocation(liquid, -1);
-                            Speak(liquid == GameConstants.Oil ? 108 : 107);
+                            Speak(liquid == GameConstants.Oil
+                                ? GameConstants.MsgBottleFullOil
+                                : GameConstants.MsgBottleFullWater);
                         }
                     }
                     break;
                 case GameConstants.Vase:
                     if (gameState.LiqLoc(position.Location) == 0)
                     {
-                        Speak(144);
+                        Speak(GameConstants.MsgNoWaterForVase);
                     }
                     else if (!gameState.Toting(GameConstants.Vase))
                     {
-                        Speak(29);
+                        Speak(GameConstants.MsgNotCarryingIt);
                     }
                     else
                     {
-                        Speak(145);
+                        Speak(GameConstants.MsgVaseShatteredByTemperature);
                         VDrop();
                     }
                     break;
                 default:
-                    Speak(29);
+                    Speak(GameConstants.MsgNotCarryingIt);
                     break;
             }
         }
@@ -2195,7 +2227,7 @@ public class AdventureGame
             switch (command.Object)
             {
                 case GameConstants.Bird:
-                    message = 100;
+                    message = GameConstants.MsgBirdNotHungry;
                     break;
                 case GameConstants.Dwarf:
                     if (!gameState.Here(GameConstants.Food))
@@ -2204,15 +2236,15 @@ public class AdventureGame
                         return;
                     }
                     dwarves.ActivationLevel++;
-                    message = 103;
+                    message = GameConstants.MsgDwarfFoodAngers;
                     break;
                 case GameConstants.Bear:
                     if (!gameState.Here(GameConstants.Food))
                     {
                         if (objects.PropertyOf(GameConstants.Bear) == 0)
-                            message = 102;
+                            message = GameConstants.MsgNothingWantsFood;
                         else if (objects.PropertyOf(GameConstants.Bear) == 3)
-                            message = 110;
+                            message = GameConstants.MsgDontBeRidiculous;
                         else
                         {
                             ActSpeak(command.Verb);
@@ -2225,28 +2257,30 @@ public class AdventureGame
                     gameState.SetObjectProperty(GameConstants.Bear, 1);
                     objects.SetFixedLocation(GameConstants.Axe, 0);
                     gameState.SetObjectProperty(GameConstants.Axe, 0);
-                    message = 168;
+                    message = GameConstants.MsgBearEatsFood;
                     break;
                 case GameConstants.Dragon:
-                    message = objects.PropertyOf(GameConstants.Dragon) != 0 ? 110 : 102;
+                    message = objects.PropertyOf(GameConstants.Dragon) != 0
+                        ? GameConstants.MsgDontBeRidiculous
+                        : GameConstants.MsgNothingWantsFood;
                     break;
                 case GameConstants.Troll:
-                    message = 182;
+                    message = GameConstants.MsgTrollWantsTreasure;
                     break;
                 case GameConstants.Snake:
                     if (cave.Closed || !gameState.Here(GameConstants.Bird))
                     {
-                        message = 102;
+                        message = GameConstants.MsgNothingWantsFood;
                         break;
                     }
 
-                    message = 101;
+                    message = GameConstants.MsgSnakeDevoursBird;
                     gameState.Destroy(GameConstants.Bird);
                     gameState.SetObjectProperty(GameConstants.Bird, 0);
                     progress.TreasuresLostToEndgame++;
                     break;
                 default:
-                    message = 14;
+                    message = GameConstants.MsgExplainHow;
                     break;
             }
 
@@ -2269,13 +2303,13 @@ public class AdventureGame
             switch (command.Object)
             {
                 case GameConstants.Magazine:
-                    Speak(190);
+                    Speak(GameConstants.MsgMagazineDwarvish);
                     break;
                 case GameConstants.Tablet:
-                    Speak(196);
+                    Speak(GameConstants.MsgTabletCongratulations);
                     break;
                 case GameConstants.Message:
-                    Speak(191);
+                    Speak(GameConstants.MsgPirateMazeMessage);
                     break;
                 case GameConstants.Oyster:
                     if (!gameState.Toting(GameConstants.Oyster) || !cave.Closed)
@@ -2286,7 +2320,7 @@ public class AdventureGame
 
                     if ((hints.AvailableMask & GameConstants.HintO) != 0)
                     {
-                        if (AskYesNo(192, 193, 54))
+                        if (AskYesNo(GameConstants.MsgPromptReadOysterClue, GameConstants.MsgOysterClue, GameConstants.MsgOk))
                         {
                             progress.HintsAccepted++;
                             hints.AvailableMask &= ~GameConstants.HintO;
@@ -2294,7 +2328,7 @@ public class AdventureGame
                     }
                     else
                     {
-                        Speak(194);
+                        Speak(GameConstants.MsgOysterClueRepeated);
                     }
                     break;
                 default:
@@ -2316,11 +2350,11 @@ public class AdventureGame
                 return;
             }
 
-            progress.Bonus = 133;
-            if (gameState.Position.Location == 115)
-                progress.Bonus = 134;
+            progress.Bonus = GameConstants.MsgBlastWins;
+            if (gameState.Position.Location == GameConstants.RepositoryNortheastLocation)
+                progress.Bonus = GameConstants.MsgBlastLavaDeath;
             if (gameState.Here(GameConstants.Rod2))
-                progress.Bonus = 135;
+                progress.Bonus = GameConstants.MsgBlastSelfDeath;
 
             Speak(progress.Bonus);
             NormalEnd();
@@ -2337,12 +2371,12 @@ public class AdventureGame
             {
                 if (cave.Closed)
                 {
-                    Speak(197);
-                    DwarfEnd(136);
+                    Speak(GameConstants.MsgMirrorBreaks);
+                    DwarfEnd(GameConstants.MsgDwarvesAwakenGetYou);
                     return;
                 }
 
-                Speak(148);
+                Speak(GameConstants.MsgTooFarToReach);
             }
             else if (command.Object == GameConstants.Vase && objects.PropertyOf(GameConstants.Vase) == 0)
             {
@@ -2350,7 +2384,7 @@ public class AdventureGame
                     gameState.Drop(GameConstants.Vase, position.Location);
                 gameState.SetObjectProperty(GameConstants.Vase, 2);
                 objects.SetFixedLocation(GameConstants.Vase, -1);
-                Speak(198);
+                Speak(GameConstants.MsgVaseHurledGround);
             }
             else
             {
@@ -2365,7 +2399,7 @@ public class AdventureGame
             if (command.Object != GameConstants.Dwarf || !gameState.Cave.Closed)
                 ActSpeak(command.Verb);
             else
-                DwarfEnd(199);
+                DwarfEnd(GameConstants.MsgWakeDwarfClosed);
         }
 
         private void AddCandidate(int objectId, bool condition, ref int candidate, ref bool ambiguous)
@@ -2394,7 +2428,7 @@ public class AdventureGame
             if (messageId == 0)
                 return;
 
-            if (messageId == 54)
+            if (messageId == GameConstants.MsgOk)
             {
                 Console.WriteLine("OK");
                 return;
@@ -2458,7 +2492,7 @@ public class AdventureGame
 
                 if (string.IsNullOrEmpty(normalized))
                 {
-                    Speak(89);
+                    Speak(GameConstants.MsgPleaseAnswerQuestion);
                     continue;
                 }
 
@@ -2476,7 +2510,7 @@ public class AdventureGame
                     return true;
                 }
 
-                Speak(89);
+                Speak(GameConstants.MsgPleaseAnswerQuestion);
             }
         }
 
@@ -2492,14 +2526,14 @@ public class AdventureGame
         {
             int total = PrintScore();
             TreasureProgressState progress = gameState.TreasureProgress;
-            int[] limits = [35, 100, 200, 250, 300, 330, 350, 1000];
+            int[] limits = GameConstants.RatingThresholds;
             int ratingIndex = 0;
             while (ratingIndex < limits.Length && limits[ratingIndex] <= total)
                 ratingIndex++;
 
             Console.WriteLine();
-            int ratingMessage = 202 + ratingIndex;
-            if (ratingMessage <= 209)
+            int ratingMessage = GameConstants.MsgFirstRating + ratingIndex;
+            if (ratingMessage <= GameConstants.MsgLastRating)
                 Speak(ratingMessage);
 
             int next = ratingIndex < limits.Length ? limits[ratingIndex] - total : 0;
@@ -2521,55 +2555,61 @@ public class AdventureGame
 
             for (int item = GameConstants.Nugget; item <= GameConstants.MaxTreasures; item++)
             {
-                int itemScore = item == GameConstants.Chest ? 14 : item > GameConstants.Chest ? 16 : 12;
+                int itemScore = item == GameConstants.Chest
+                    ? GameConstants.ChestTreasureScore
+                    : item > GameConstants.Chest
+                        ? GameConstants.TreasureScoreAfterChest
+                        : GameConstants.TreasureScoreBeforeChest;
                 if (objects.PropertyOf(item) >= 0)
-                    treasures += 2;
+                    treasures += GameConstants.TreasureDiscoveryScore;
                 if (objects.LocationOf(item) == GameConstants.WellHouse && objects.PropertyOf(item) == 0)
-                    treasures += itemScore - 2;
+                    treasures += itemScore - GameConstants.TreasureDiscoveryScore;
             }
 
             PrintScoreLine("Treasures:", treasures);
             score += treasures;
 
-            int survival = (GameConstants.MaxDeaths - progress.DeathCount) * 10;
+            int survival = (GameConstants.MaxDeaths - progress.DeathCount) * GameConstants.SurvivalScorePerDeathRemaining;
             if (survival != 0)
                 PrintScoreLine("Survival:", survival);
             score += survival;
 
             if (!progress.GaveUp)
-                score += 4;
+                score += GameConstants.DidNotQuitScore;
 
-            int gettingIn = world.VisitedLocations[19] != 0 ? 25 : 0;
+            int gettingIn = world.VisitedLocations[GameConstants.HallOfMountainKingLocation] != 0
+                ? GameConstants.GettingWellInScore
+                : 0;
             if (gettingIn != 0)
                 PrintScoreLine("Getting well in:", gettingIn);
             score += gettingIn;
 
-            int masters = cave.Closing ? 25 : 0;
+            int masters = cave.Closing ? GameConstants.MastersSectionScore : 0;
             if (masters != 0)
                 PrintScoreLine("Masters section:", masters);
             score += masters;
 
             if (cave.Closed)
             {
-                int bonus = progress.Bonus == 0 ? 10 :
-                    progress.Bonus == 135 ? 25 :
-                    progress.Bonus == 134 ? 30 :
-                    progress.Bonus == 133 ? 45 : 0;
+                int bonus = progress.Bonus == 0 ? GameConstants.ClosedBonusScoreDefault :
+                    progress.Bonus == GameConstants.MsgBlastSelfDeath ? GameConstants.ClosedBonusScoreSelfBlast :
+                    progress.Bonus == GameConstants.MsgBlastLavaDeath ? GameConstants.ClosedBonusScoreLava :
+                    progress.Bonus == GameConstants.MsgBlastWins ? GameConstants.ClosedBonusScoreWin : 0;
                 PrintScoreLine("Bonus:", bonus);
                 score += bonus;
             }
 
-            if (objects.LocationOf(GameConstants.Magazine) == 108)
-                score += 1;
+            if (objects.LocationOf(GameConstants.Magazine) == GameConstants.MagazineBonusLocation)
+                score += GameConstants.MagazineInWittsEndScore;
 
-            int hints = -15 * progress.HintsAccepted;
+            int hints = -GameConstants.HintScorePenalty * progress.HintsAccepted;
             if (hints != 0)
             {
                 PrintScoreLine("Hints & instructions:", hints);
                 score += hints;
             }
 
-            score += 2;
+            score += GameConstants.BaseScore;
             if (score < 0)
                 score = 0;
 
@@ -2620,11 +2660,11 @@ public class AdventureGame
             TreasureProgressState progress = gameState.TreasureProgress;
 
             if (gameState.Toting(GameConstants.Bear))
-                Speak(141);
+                Speak(GameConstants.MsgBearFollowing);
 
             if (DarknessManager.IsDark(gameState))
             {
-                Speak(16);
+                Speak(GameConstants.MsgPitchDark);
             }
             else
             {
@@ -2650,8 +2690,12 @@ public class AdventureGame
                     ShowObjectsHere();
             }
 
-            if (position.Location == 33 && GameState.Pct(random, 25) && !cave.Closing)
-                Speak(8);
+            if (position.Location == GameConstants.Y2Location &&
+                GameState.Pct(random, GameConstants.Y2PlughChance) &&
+                !cave.Closing)
+            {
+                Speak(GameConstants.MsgHollowVoicePlugh);
+            }
         }
 
         /// <summary>
@@ -2701,9 +2745,9 @@ public class AdventureGame
 
             if (progress.UndiscoveredTreasureCount == progress.TreasuresLostToEndgame &&
                 progress.UndiscoveredTreasureCount != 0 &&
-                cave.LampLimit > 35)
+                cave.LampLimit > GameConstants.AllTreasuresDiscoveredLampLimit)
             {
-                cave.LampLimit = 35;
+                cave.LampLimit = GameConstants.AllTreasuresDiscoveredLampLimit;
             }
         }
 
@@ -2712,7 +2756,7 @@ public class AdventureGame
         /// </summary>
         private void ShowInstructions()
         {
-            Console.WriteLine(AdventureData.Message(1));
+            Console.WriteLine(AdventureData.Message(GameConstants.MsgInstructions));
         }
 
         /// <summary>
@@ -2765,7 +2809,10 @@ public class AdventureGame
 
             if (!cave.Closing)
             {
-                bool reincarnate = AskYesNo(81 + progress.DeathCount * 2, 82 + progress.DeathCount * 2, 54);
+                bool reincarnate = AskYesNo(
+                    GameConstants.MsgFirstDeathPrompt + progress.DeathCount * GameConstants.DeathMessageStep,
+                    GameConstants.MsgFirstReincarnation + progress.DeathCount * GameConstants.DeathMessageStep,
+                    GameConstants.MsgOk);
                 progress.DeathCount++;
 
                 if (progress.DeathCount >= GameConstants.MaxDeaths || !reincarnate)
@@ -2791,7 +2838,7 @@ public class AdventureGame
                 return;
             }
 
-            Speak(131);
+            Speak(GameConstants.MsgDeathNearClosing);
             progress.DeathCount++;
             NormalEnd();
         }
