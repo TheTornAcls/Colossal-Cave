@@ -150,6 +150,11 @@ Rebuild C reference, if Visual Studio command-line tools are available:
 3. Once behavior is better locked down:
    - add focused unit tests for parser/vocabulary, object placement, scoring, dwarf/pirate state, and turn lifecycle
 
+4. Improve readability by replacing remaining magic numeric ids with named constants:
+   - start with message ids in `AdventureGame.cs`, such as `AdventureData.Message(15)`
+   - continue through key location ids, special travel destinations/thresholds, timer thresholds, and scoring/status values
+   - preserve the original numeric values in the constants so C reference parity remains easy to audit
+
 ## Important Notes
 
 - Do not make the C# port mimic known-broken C behavior from before the C reference rebuild.
