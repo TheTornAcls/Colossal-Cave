@@ -88,6 +88,8 @@ Clearer object/location helper APIs have been added to `ObjectPlacementState`: `
 
 The data lookup refactor is complete. `Data\AdventureData.cs` is now the central facade for generated table lookups: messages, object data, object room descriptions, long/short location descriptions, travel options, vocabulary analysis, and known motion/verb words. `AdventureGame`, `InputParser`, `DarknessManager`, and `GameState` now call through this facade instead of reaching into individual generated data tables directly.
 
+The readability pass for `AdventureGame` constants is complete. Direct message ids, key location ids, encoded travel offsets, cave/dwarf/pirate timer thresholds, hint thresholds, scoring values, rating thresholds, and the reference RNG seed now have named constants in `Models\GameConstants.cs`. The intent is to preserve C reference values while making the remaining game logic easier to audit and debug.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
@@ -146,11 +148,6 @@ Rebuild C reference, if Visual Studio command-line tools are available:
    - fix C# behavior if parity fails
    - add the passing route to `tests\TranscriptTests\Program.cs`
    - rerun `dotnet run --project tests\TranscriptTests\TranscriptTests.csproj`
-
-3. Improve readability by replacing remaining magic numeric ids with named constants:
-   - start with message ids in `AdventureGame.cs`, such as `AdventureData.Message(15)`
-   - continue through key location ids, special travel destinations/thresholds, timer thresholds, and scoring/status values
-   - preserve the original numeric values in the constants so C reference parity remains easy to audit
 
 ## Important Notes
 
