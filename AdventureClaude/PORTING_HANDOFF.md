@@ -98,6 +98,8 @@ The third focused engine extraction is complete. `Game\DwarfPirateEngine.cs` now
 
 The fourth focused engine extraction is complete. `Game\VerbHandlers.cs` now owns parsed command dispatch, object resolution, transitive/intransitive verb dispatch, the object-heavy `IV*`/`V*` handlers, action-message fallback, object-not-here prompts, and inventory display. `AdventureGame` delegates command processing to `VerbHandlers` and keeps scoring/endgame, prompts, descriptions, and death handling as shared callbacks for now.
 
+The fifth focused service extraction is complete. `Game\ScoringService.cs` now owns score calculation, rating output, closed-cave bonus calculation, and normal end bookkeeping. `AdventureGame` keeps thin private wrappers for reflection-based score/endgame tests and delegates scoring callbacks to `ScoringService`.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
@@ -148,15 +150,12 @@ Rebuild C reference, if Visual Studio command-line tools are available:
 
 ## Next Steps
 
-1. Continue extracting focused engine/service classes from `AdventureGame`, one behavior-preserving slice at a time:
-   - next recommended slice: `ScoringService` for score/rating/bonus calculation and normal end handling
+1. Reduce or remove old `GameState` compatibility pass-through properties where they are no longer needed, so new code consistently uses the named state groups.
 
-2. After the extraction slices, reduce or remove old `GameState` compatibility pass-through properties where they are no longer needed, so new code consistently uses the named state groups.
-
-3. Continue adding/fixing deeper parity routes for systems not yet fully exercised, if more behavior gaps are found:
+2. Continue adding/fixing deeper parity routes for systems not yet fully exercised, if more behavior gaps are found:
    - optionally add a full natural public C-vs-C# transcript route for cave closing and closed-state behavior if/when we want all-treasure endgame transcript coverage beyond the focused route-style state regression
 
-4. For each new route or refactor slice:
+3. For each new route or refactor slice:
    - run C vs C# parity first
    - fix C# behavior if parity fails
    - add the passing route to `tests\TranscriptTests\Program.cs`
