@@ -92,6 +92,8 @@ The readability pass for `AdventureGame` constants is complete. Direct message i
 
 The first focused engine extraction is complete. `Game\TravelEngine.cs` now owns the original TURN.C travel slice: motion dispatch, `back` handling, travel-table evaluation, failed-move messages, and special plover/troll bridge travel. `AdventureGame` delegates motion commands and forced-move cascades to `TravelEngine`, while transcript parity remains green.
 
+The second focused engine extraction is complete. `Game\TurnLifecycleEngine.cs` now owns the per-turn lifecycle around player input: cave-closing exit guards, location-change application, forced-move cascades, closed-inventory decoding, special timers, lamp warnings, and final closed-cave repository setup. `AdventureGame` keeps small private wrappers for reflection-based regression tests while delegating the behavior to `TurnLifecycleEngine`.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
@@ -143,8 +145,7 @@ Rebuild C reference, if Visual Studio command-line tools are available:
 ## Next Steps
 
 1. Continue extracting focused engine/service classes from `AdventureGame`, one behavior-preserving slice at a time:
-   - next recommended slice: `TurnLifecycleEngine` for pre-input lifecycle, location-change application, closing timers, closed repository setup, and cave-closing guards
-   - then `DwarfPirateEngine` for dwarf movement/attacks and pirate theft/lurking behavior
+   - next recommended slice: `DwarfPirateEngine` for dwarf movement/attacks and pirate theft/lurking behavior
    - then `VerbHandlers` for object-heavy verb logic, possibly as one class first before splitting by concern
    - then `ScoringService` for score/rating/bonus calculation and normal end handling
 
