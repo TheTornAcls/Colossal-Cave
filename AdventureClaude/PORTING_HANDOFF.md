@@ -86,6 +86,8 @@ The object-heavy `AdventureGame` handler migration is complete. Object dispatch,
 
 Clearer object/location helper APIs have been added to `ObjectPlacementState`: `LocationOf`, `SetLocation`, `FixedLocationOf`, `SetFixedLocation`, `PropertyOf`, `SetProperty`, `ActionMessageFor`, `IsCarried`, `IsAtLocation`, `IsFixedAtLocation`, `IsAt`, `HasFixedLocation`, and `IsPropertyNegative`. `GameState`, `AdventureGame`, `DarknessManager`, and the closing state regressions now use these helpers instead of direct object array indexing outside `ObjectPlacementState`.
 
+The data lookup refactor is complete. `Data\AdventureData.cs` is now the central facade for generated table lookups: messages, object data, object room descriptions, long/short location descriptions, travel options, vocabulary analysis, and known motion/verb words. `AdventureGame`, `InputParser`, `DarknessManager`, and `GameState` now call through this facade instead of reaching into individual generated data tables directly.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
@@ -146,7 +148,6 @@ Rebuild C reference, if Visual Studio command-line tools are available:
    - rerun `dotnet run --project tests\TranscriptTests\TranscriptTests.csproj`
 
 3. Once behavior is better locked down:
-   - refactor `DataBase` / data lookup code for maintainability
    - add focused unit tests for parser/vocabulary, object placement, scoring, dwarf/pirate state, and turn lifecycle
 
 ## Important Notes
