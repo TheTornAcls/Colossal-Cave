@@ -72,15 +72,15 @@ The transcript test project also includes focused in-process tests for parser/vo
 
 The C# port now supports both native C# randomness for normal gameplay and `Models\CReferenceRandom.cs` for parity/regression runs. The transcript harness launches the game with `--reference-random`, which reproduces the MSVC C runtime `rand()` sequence used by the rebuilt C reference. You can also set `ADVENTURE_REFERENCE_RANDOM=1` for deterministic reference-random runs.
 
-`Models\GameState.cs` has started moving away from one flat C-style bag of globals. It now exposes named debugger-friendly groups (`Position`, `World`, `Objects`, `Cave`, `TreasureProgress`, `Dwarves`, `Hints`, `Command`, and `Debug`) while keeping the old property names as compatibility pass-throughs. This keeps current gameplay code stable and gives future refactors a safer migration path.
+`Models\GameState.cs` has moved away from one flat C-style bag of globals. It now exposes named debugger-friendly groups (`Position`, `World`, `Objects`, `Cave`, `TreasureProgress`, `Dwarves`, `Hints`, `Command`, and `Debug`). The old public compatibility pass-through properties have been removed, so new code must use the named state groups directly.
 
-The first `AdventureGame` call-site migration slice is complete. Startup flags, parsed command storage/dispatch, basic motion handling, travel selection, failed-move messaging, the pre-input lifecycle save/location checks, and the closing-exit guard now use the named `GameState` groups directly. Object-heavy verb logic still mostly uses the compatibility pass-throughs and should be migrated in smaller follow-up slices.
+The first `AdventureGame` call-site migration slice is complete. Startup flags, parsed command storage/dispatch, basic motion handling, travel selection, failed-move messaging, the pre-input lifecycle save/location checks, and the closing-exit guard now use the named `GameState` groups directly.
 
 The dwarf/pirate lifecycle slice is complete. `ApplyDwarfBlock`, `RunDwarves`, `DoPirate`, and `PirateStealsTreasure` now use the named `Position`, `Dwarves`, `Objects`, and `TreasureProgress` groups directly while keeping object movement through the existing `GameState` helpers so carrying/holding bookkeeping remains centralized.
 
 The location-change and cave timer lifecycle slice is complete. `ApplyLocationChange`, `ApplyClosedInventoryState`, `RunSpecialTimer`, and `CloseCave` now use the named `Position`, `World`, `Objects`, `Cave`, `TreasureProgress`, `Dwarves`, and `Command` groups directly while preserving the existing movement and object bookkeeping helpers.
 
-The hint and score/endgame bookkeeping slice is complete. `TryLocationHint`, `TryHint`, quit/suspend/brief bookkeeping, oyster hint reading, blast bonus selection, `NormalEnd`, `PrintScore`, `ShowLocationDescription`, `ShowObjectsHere`, `UpdateGameState`, and `HandleDeath` now use the named `Hints`, `TreasureProgress`, `Position`, `World`, `Objects`, and `Cave` groups directly. Remaining compatibility-property uses are mostly in object-heavy verb handlers and should move in the next `AdventureGame` refactor slice.
+The hint and score/endgame bookkeeping slice is complete. `TryLocationHint`, `TryHint`, quit/suspend/brief bookkeeping, oyster hint reading, blast bonus selection, `NormalEnd`, `PrintScore`, `ShowLocationDescription`, `ShowObjectsHere`, `UpdateGameState`, and `HandleDeath` now use the named `Hints`, `TreasureProgress`, `Position`, `World`, `Objects`, and `Cave` groups directly.
 
 The object-heavy `AdventureGame` handler migration is complete. Object dispatch, intransitive object selection, take/drop/open/lock, magic words, read setup, lamp actions, wave, kill, pour, eat/drink, throw, find, fill, feed, read/blast/break/wake, prompt helpers, and the object-heavy special movement branches now use the named `Command`, `Position`, `World`, `Objects`, `Cave`, `TreasureProgress`, and `Dwarves` groups directly. A targeted scan no longer finds legacy compatibility-property usage in `Game\AdventureGame.cs`.
 
@@ -99,6 +99,8 @@ The third focused engine extraction is complete. `Game\DwarfPirateEngine.cs` now
 The fourth focused engine extraction is complete. `Game\VerbHandlers.cs` now owns parsed command dispatch, object resolution, transitive/intransitive verb dispatch, the object-heavy `IV*`/`V*` handlers, action-message fallback, object-not-here prompts, and inventory display. `AdventureGame` delegates command processing to `VerbHandlers` and keeps scoring/endgame, prompts, descriptions, and death handling as shared callbacks for now.
 
 The fifth focused service extraction is complete. `Game\ScoringService.cs` now owns score calculation, rating output, closed-cave bonus calculation, and normal end bookkeeping. `AdventureGame` keeps thin private wrappers for reflection-based score/endgame tests and delegates scoring callbacks to `ScoringService`.
+
+The `GameState` compatibility pass-through cleanup is complete. `Models\GameState.cs`, `Models\DarknessManager.cs`, `Game\InputParser.cs`, and the focused closing regressions now use the named state groups directly instead of aliases such as `Location`, `Clock1`, `Tally`, `Holding`, `Word1`, or `DwarfSeen`.
 
 ## Recent C# Wording Fixes
 
@@ -150,12 +152,10 @@ Rebuild C reference, if Visual Studio command-line tools are available:
 
 ## Next Steps
 
-1. Reduce or remove old `GameState` compatibility pass-through properties where they are no longer needed, so new code consistently uses the named state groups.
-
-2. Continue adding/fixing deeper parity routes for systems not yet fully exercised, if more behavior gaps are found:
+1. Continue adding/fixing deeper parity routes for systems not yet fully exercised, if more behavior gaps are found:
    - optionally add a full natural public C-vs-C# transcript route for cave closing and closed-state behavior if/when we want all-treasure endgame transcript coverage beyond the focused route-style state regression
 
-3. For each new route or refactor slice:
+2. For each new route or refactor slice:
    - run C vs C# parity first
    - fix C# behavior if parity fails
    - add the passing route to `tests\TranscriptTests\Program.cs`
