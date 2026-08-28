@@ -52,7 +52,7 @@ public class InputParser
             if (string.IsNullOrEmpty(word1))
                 return false;
 
-            if (!Vocabulary.AnalyzeWord(word1, out int type1, out int val1))
+            if (!AdventureData.AnalyzeWord(word1, out int type1, out int val1))
             {
                 Console.WriteLine("I don't know that word.");
                 return false;
@@ -70,9 +70,9 @@ public class InputParser
             // Analyze second word if present
             if (!string.IsNullOrEmpty(word2))
             {
-                if (!Vocabulary.AnalyzeWord(word2, out type2, out val2))
+                if (!AdventureData.AnalyzeWord(word2, out type2, out val2))
                 {
-                    Console.WriteLine(GameMessages.GetMessage(13));
+                    Console.WriteLine(AdventureData.Message(13));
                     return false;
                 }
             }
@@ -135,13 +135,13 @@ public class InputParser
 
             if (type1 == Vocabulary.WordTypes.Special)
             {
-                Console.WriteLine(GameMessages.GetMessage(val1));
+                Console.WriteLine(AdventureData.Message(val1));
                 return false;
             }
 
             if (type2 == Vocabulary.WordTypes.Special)
             {
-                Console.WriteLine(GameMessages.GetMessage(val2));
+                Console.WriteLine(AdventureData.Message(val2));
                 return false;
             }
 
@@ -214,7 +214,7 @@ public class InputParser
         private void ShowKnownWords()
         {
             int column = 0;
-            foreach (string word in Vocabulary.GetMotionAndVerbWords())
+            foreach (string word in AdventureData.GetMotionAndVerbWords())
             {
                 Console.Write($"{word,-12}");
                 column++;
