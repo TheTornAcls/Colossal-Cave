@@ -23,7 +23,7 @@ public static class DarknessManager
         // 1. Location doesn't have LIGHT flag, AND
         // 2. Either lamp is off (prop[LAMP] == 0) OR lamp is not present here
         
-        bool locationHasLight = gameState.LocationHasFlag(gameState.Location, GameConstants.Light);
+        bool locationHasLight = gameState.LocationHasFlag(gameState.Position.Location, GameConstants.Light);
         bool lampIsOn = gameState.Objects.PropertyOf(GameConstants.Lamp) == 1;
         bool lampIsHere = gameState.Here(GameConstants.Lamp);
         
@@ -48,19 +48,20 @@ public static class DarknessManager
             return null;
 
         // Decrement battery life
-        gameState.Limit--;
+        CaveTimingState cave = gameState.Cave;
+        cave.LampLimit--;
 
         // Check for battery depletion (0 turns remaining)
-        if (gameState.Limit == 0)
+        if (cave.LampLimit == 0)
         {
             gameState.SetObjectProperty(GameConstants.Lamp, 0);
             return Data.AdventureData.Message(184); // "Your lamp has run out of power."
         }
 
         // Check for battery warning (≤30 turns remaining)
-        if (gameState.Limit <= 30 && gameState.LampWarning == 0)
+        if (cave.LampLimit <= 30 && cave.LampWarning == 0)
         {
-            gameState.LampWarning = 1; // Set flag to prevent repeated warnings
+            cave.LampWarning = 1; // Set flag to prevent repeated warnings
             
             // Check if batteries are available for replacement
             bool batteriesExist = gameState.Objects.LocationOf(GameConstants.Batteries) != 0;
@@ -70,8 +71,8 @@ public static class DarknessManager
             // Automatic battery replacement if batteries are at this location
             if (batteriesHere && lampIsHere)
             {
-                gameState.Limit += 2500; // Add 2500 turns from fresh batteries
-                gameState.LampWarning = 0; // Reset warning flag
+                cave.LampLimit += 2500; // Add 2500 turns from fresh batteries
+                cave.LampWarning = 0; // Reset warning flag
                 gameState.Destroy(GameConstants.Batteries);
                 return Data.AdventureData.Message(188); // "Your lamp is getting dim.. I'm taking the liberty of replacing the batteries."
             }
@@ -103,7 +104,7 @@ public static class DarknessManager
     public static bool CheckDarknessDanger(GameState gameState, Random random)
     {
         // Only check if previous location was dark AND current location is dark
-        if (!gameState.WizardDark || !IsDark(gameState))
+        if (!gameState.Cave.WizardDark || !IsDark(gameState))
             return false;
 
         // 35% chance of falling into pit
@@ -117,7 +118,7 @@ public static class DarknessManager
     /// <param name="gameState">Current game state</param>
     public static void UpdateDarknessState(GameState gameState)
     {
-        gameState.WizardDark = IsDark(gameState);
+        gameState.Cave.WizardDark = IsDark(gameState);
     }
 
     /// <summary>
