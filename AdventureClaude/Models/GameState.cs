@@ -74,131 +74,72 @@ public class GameState
         public ParsedCommandState Command { get; } = new();
         public DebugOptions Debug { get; } = new();
 
-        // Compatibility properties keep the existing port call sites stable while the
-        // state is grouped into debugger-friendly domains.
-        public int Turns { get => Position.Turns; set => Position.Turns = value; }
-        public int Location { get => Position.Location; set => Position.Location = value; }
-        public int OldLocation { get => Position.OldLocation; set => Position.OldLocation = value; }
-        public int OldLocation2 { get => Position.OldLocation2; set => Position.OldLocation2 = value; }
-        public int NewLocation { get => Position.NewLocation; set => Position.NewLocation = value; }
-        public int Detail { get => Position.Detail; set => Position.Detail = value; }
-
-        public short[] LocationConditions { get => World.LocationConditions; set => World.LocationConditions = value; }
-        public short[] VisitedLocations { get => World.VisitedLocations; set => World.VisitedLocations = value; }
-        public List<TravelOption> CurrentTravelOptions { get => World.CurrentTravelOptions; set => World.CurrentTravelOptions = value; }
-
-        public int[] ObjectLocations { get => Objects.Locations; set => Objects.Locations = value; }
-        public int[] FixedObjectLocations { get => Objects.FixedLocations; set => Objects.FixedLocations = value; }
-        public short[] ObjectProperties { get => Objects.Properties; set => Objects.Properties = value; }
-        public short[] ActionMessages { get => Objects.ActionMessages; set => Objects.ActionMessages = value; }
-        public int Holding { get => Objects.Holding; set => Objects.Holding = value; }
-        public int KnifeLocation { get => Objects.KnifeLocation; set => Objects.KnifeLocation = value; }
-        public int ChestLocation { get => Objects.ChestLocation; set => Objects.ChestLocation = value; }
-        public int ChestLocation2 { get => Objects.ChestLocation2; set => Objects.ChestLocation2 = value; }
-
-        public bool WizardDark { get => Cave.WizardDark; set => Cave.WizardDark = value; }
-        public bool Closed { get => Cave.Closed; set => Cave.Closed = value; }
-        public bool Closing { get => Cave.Closing; set => Cave.Closing = value; }
-        public int Limit { get => Cave.LampLimit; set => Cave.LampLimit = value; }
-        public int Clock1 { get => Cave.Clock1; set => Cave.Clock1 = value; }
-        public int Clock2 { get => Cave.Clock2; set => Cave.Clock2 = value; }
-        public bool Panic { get => Cave.Panic; set => Cave.Panic = value; }
-        public int LampWarning { get => Cave.LampWarning; set => Cave.LampWarning = value; }
-
-        public int Tally { get => TreasureProgress.UndiscoveredTreasureCount; set => TreasureProgress.UndiscoveredTreasureCount = value; }
-        public int Tally2 { get => TreasureProgress.TreasuresLostToEndgame; set => TreasureProgress.TreasuresLostToEndgame = value; }
-        public int Bonus { get => TreasureProgress.Bonus; set => TreasureProgress.Bonus = value; }
-        public int NumDie { get => TreasureProgress.DeathCount; set => TreasureProgress.DeathCount = value; }
-        public bool GaveUp { get => TreasureProgress.GaveUp; set => TreasureProgress.GaveUp = value; }
-        public bool SaveFlag { get => TreasureProgress.SaveRequested; set => TreasureProgress.SaveRequested = value; }
-        public int HintTaken { get => TreasureProgress.HintsAccepted; set => TreasureProgress.HintsAccepted = value; }
-        public int FooBar { get => TreasureProgress.FooBar; set => TreasureProgress.FooBar = value; }
-        public int TestBr { get => TreasureProgress.DescriptionDetailMask; set => TreasureProgress.DescriptionDetailMask = value; }
-
-        public int[] DwarfLocations { get => Dwarves.Locations; set => Dwarves.Locations = value; }
-        public int[] OldDwarfLocations { get => Dwarves.PreviousLocations; set => Dwarves.PreviousLocations = value; }
-        public int DwarfKill { get => Dwarves.KillCount; set => Dwarves.KillCount = value; }
-        public bool[] DwarfSeen { get => Dwarves.Seen; set => Dwarves.Seen = value; }
-        public int DwarfAlternateLocation { get => Dwarves.AlternateLocation; set => Dwarves.AlternateLocation = value; }
-        public int DwarfFlag { get => Dwarves.ActivationLevel; set => Dwarves.ActivationLevel = value; }
-
-        public int HintAvailable { get => Hints.AvailableMask; set => Hints.AvailableMask = value; }
-        public int[] HintLocations { get => Hints.LocationCounters; set => Hints.LocationCounters = value; }
-
-        public int Verb { get => Command.Verb; set => Command.Verb = value; }
-        public int Object { get => Command.Object; set => Command.Object = value; }
-        public int Motion { get => Command.Motion; set => Command.Motion = value; }
-        public string Word1 { get => Command.Word1; set => Command.Word1 = value; }
-        public string Word2 { get => Command.Word2; set => Command.Word2 = value; }
-
-        public int DebugFlag { get => Debug.Flag; set => Debug.Flag = value; }
-
         /// <summary>
         /// Initializes the game state to starting values.
         /// Equivalent to the initplay() function in the C version.
         /// </summary>
         public void InitializeGame()
         {
-            LocationConditions = CopyLocationConditions();
-            ObjectLocations = CopyObjectLocations(InitialObjectLocations);
-            FixedObjectLocations = CopyObjectLocations(InitialFixedObjectLocations);
-            VisitedLocations = new short[GameConstants.LocationArraySize];
-            ObjectProperties = new short[GameConstants.ObjectArraySize];
+            World.LocationConditions = CopyLocationConditions();
+            Objects.Locations = CopyObjectLocations(InitialObjectLocations);
+            Objects.FixedLocations = CopyObjectLocations(InitialFixedObjectLocations);
+            World.VisitedLocations = new short[GameConstants.LocationArraySize];
+            Objects.Properties = new short[GameConstants.ObjectArraySize];
             for (int i = GameConstants.Nugget; i < GameConstants.MaxObjects; i++)
             {
                 Objects.SetProperty(i, -1);
             }
 
-            DwarfLocations = CopyDwarfLocations();
-            OldDwarfLocations = new int[GameConstants.DwarfArraySize];
-            DwarfSeen = new bool[GameConstants.DwarfArraySize];
-            HintLocations = new int[GameConstants.HintArraySize];
-            ActionMessages = CopyActionMessages();
+            Dwarves.Locations = CopyDwarfLocations();
+            Dwarves.PreviousLocations = new int[GameConstants.DwarfArraySize];
+            Dwarves.Seen = new bool[GameConstants.DwarfArraySize];
+            Hints.LocationCounters = new int[GameConstants.HintArraySize];
+            Objects.ActionMessages = CopyActionMessages();
 
             // Set default values
-            Turns = 0;
-            NewLocation = 1;
-            Location = 2;
-            OldLocation = 2;
-            OldLocation2 = 2;
+            Position.Turns = 0;
+            Position.NewLocation = 1;
+            Position.Location = 2;
+            Position.OldLocation = 2;
+            Position.OldLocation2 = 2;
             
-            WizardDark = false;
-            Closed = false;
-            Closing = false;
-            Holding = 0;
-            Detail = 0;
-            Limit = 100;
-            Tally = 15;
-            Tally2 = 0;
+            Cave.WizardDark = false;
+            Cave.Closed = false;
+            Cave.Closing = false;
+            Objects.Holding = 0;
+            Position.Detail = 0;
+            Cave.LampLimit = 100;
+            TreasureProgress.UndiscoveredTreasureCount = 15;
+            TreasureProgress.TreasuresLostToEndgame = 0;
             
-            KnifeLocation = 0;
-            ChestLocation = 114;
-            ChestLocation2 = 140;
+            Objects.KnifeLocation = 0;
+            Objects.ChestLocation = 114;
+            Objects.ChestLocation2 = 140;
             
-            DwarfKill = 0;
-            Clock1 = 30;
-            Clock2 = 50;
-            Panic = false;
-            Bonus = 0;
-            NumDie = 0;
-            DwarfAlternateLocation = 18;
-            LampWarning = 0;
-            FooBar = 0;
+            Dwarves.KillCount = 0;
+            Cave.Clock1 = 30;
+            Cave.Clock2 = 50;
+            Cave.Panic = false;
+            TreasureProgress.Bonus = 0;
+            TreasureProgress.DeathCount = 0;
+            Dwarves.AlternateLocation = 18;
+            Cave.LampWarning = 0;
+            TreasureProgress.FooBar = 0;
             
-            DwarfFlag = 0;
-            GaveUp = false;
-            SaveFlag = false;
-            HintTaken = 0;
-            HintAvailable = GameConstants.Hint;
-            TestBr = 2;
+            Dwarves.ActivationLevel = 0;
+            TreasureProgress.GaveUp = false;
+            TreasureProgress.SaveRequested = false;
+            TreasureProgress.HintsAccepted = 0;
+            Hints.AvailableMask = GameConstants.Hint;
+            TreasureProgress.DescriptionDetailMask = 2;
             
-            Verb = 0;
-            Object = 0;
-            Motion = 0;
-            Word1 = string.Empty;
-            Word2 = string.Empty;
+            Command.Verb = 0;
+            Command.Object = 0;
+            Command.Motion = 0;
+            Command.Word1 = string.Empty;
+            Command.Word2 = string.Empty;
             
-            DebugFlag = 0;
+            Debug.Flag = 0;
         }
 
         private static short[] CopyLocationConditions()
@@ -242,7 +183,7 @@ public class GameState
         /// </summary>
         public bool Here(int item)
         {
-            return Objects.IsAtLocation(item, Location) || Toting(item);
+            return Objects.IsAtLocation(item, Position.Location) || Toting(item);
         }
 
         /// <summary>
@@ -250,7 +191,7 @@ public class GameState
         /// </summary>
         public bool At(int item)
         {
-            return Objects.IsAt(item, Location);
+            return Objects.IsAt(item, Position.Location);
         }
 
         /// <summary>
@@ -258,12 +199,12 @@ public class GameState
         /// </summary>
         public bool Forced(int atLocation)
         {
-            return (LocationConditions[atLocation] & GameConstants.Forced) != 0;
+            return (World.LocationConditions[atLocation] & GameConstants.Forced) != 0;
         }
 
         public bool LocationHasFlag(int location, int flag)
         {
-            return (LocationConditions[location] & flag) != 0;
+            return (World.LocationConditions[location] & flag) != 0;
         }
 
         /// <summary>
@@ -286,7 +227,7 @@ public class GameState
                 return;
 
             Objects.SetLocation(obj, -1);
-            Holding++;
+            Objects.Holding++;
         }
 
         /// <summary>
@@ -297,7 +238,7 @@ public class GameState
             if (obj < GameConstants.MaxObjects)
             {
                 if (Objects.IsCarried(obj))
-                    Holding--;
+                    Objects.Holding--;
 
                 Objects.SetLocation(obj, where);
             }
@@ -338,7 +279,7 @@ public class GameState
         {
             for (int i = 1; i < GameConstants.MaxDwarves - 1; i++)
             {
-                if (DwarfLocations[i] == Location)
+                if (Dwarves.Locations[i] == Position.Location)
                     return i;
             }
 
@@ -360,8 +301,8 @@ public class GameState
         /// </summary>
         public int LiqLoc(int location)
         {
-            if ((LocationConditions[location] & GameConstants.Liquid) != 0)
-                return Liq2(LocationConditions[location] & GameConstants.WatOil);
+            if ((World.LocationConditions[location] & GameConstants.Liquid) != 0)
+                return Liq2(World.LocationConditions[location] & GameConstants.WatOil);
 
             return Liq2(1);
         }
@@ -430,7 +371,7 @@ public class GameState
         /// <returns>True if the object is at the current location</returns>
         public bool IsObjectHere(int objectId)
         {
-            return Here(objectId) || Objects.IsFixedAtLocation(objectId, Location);
+            return Here(objectId) || Objects.IsFixedAtLocation(objectId, Position.Location);
         }
 
         /// <summary>
@@ -476,7 +417,7 @@ public class GameState
         /// <returns>List of valid travel entries</returns>
         public List<TravelEntry> GetAvailableTravelOptions(int verb, Random random)
         {
-            var allOptions = AdventureClaude.Data.AdventureData.GetTravelOptions(Location);
+            var allOptions = AdventureClaude.Data.AdventureData.GetTravelOptions(Position.Location);
             var availableOptions = new List<TravelEntry>();
 
             foreach (var option in allOptions)
