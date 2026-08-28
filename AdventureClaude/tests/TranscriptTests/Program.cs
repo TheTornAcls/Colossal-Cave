@@ -311,17 +311,23 @@ internal static class Program
             Console.WriteLine("---- end output ----");
         }
 
-        StateRegressionCase[] stateTests =
+        InProcessTestCase[] inProcessTests =
         [
-            new StateRegressionCase("Closing timer starts cave closing", ClosingTimerStartsCaveClosing),
-            new StateRegressionCase("Closing exit guard blocks surface exits", ClosingExitGuardBlocksSurfaceExits),
-            new StateRegressionCase("Closed timer moves objects to repository", ClosedTimerMovesObjectsToRepository),
-            new StateRegressionCase("Closed inventory decodes carried objects", ClosedInventoryDecodesCarriedObjects),
-            new StateRegressionCase("Closing turn route reaches closed repository", ClosingTurnRouteReachesClosedRepository),
+            new InProcessTestCase("Parser vocabulary parses commands", ParserVocabularyParsesCommands),
+            new InProcessTestCase("Object placement preserves holding bookkeeping", ObjectPlacementPreservesHoldingBookkeeping),
+            new InProcessTestCase("Score bookkeeping includes survival and closing bonus", ScoreBookkeepingIncludesSurvivalAndClosingBonus),
+            new InProcessTestCase("Dwarf block prevents moving into seen dwarf", DwarfBlockPreventsMovingIntoSeenDwarf),
+            new InProcessTestCase("Pirate steals carried treasure to chest", PirateStealsCarriedTreasureToChest),
+            new InProcessTestCase("Turn lifecycle applies location change", TurnLifecycleAppliesLocationChange),
+            new InProcessTestCase("Closing timer starts cave closing", ClosingTimerStartsCaveClosing),
+            new InProcessTestCase("Closing exit guard blocks surface exits", ClosingExitGuardBlocksSurfaceExits),
+            new InProcessTestCase("Closed timer moves objects to repository", ClosedTimerMovesObjectsToRepository),
+            new InProcessTestCase("Closed inventory decodes carried objects", ClosedInventoryDecodesCarriedObjects),
+            new InProcessTestCase("Closing turn route reaches closed repository", ClosingTurnRouteReachesClosedRepository),
         ];
 
-        int stateFailures = 0;
-        foreach (StateRegressionCase test in stateTests)
+        int inProcessFailures = 0;
+        foreach (InProcessTestCase test in inProcessTests)
         {
             try
             {
@@ -330,7 +336,7 @@ internal static class Program
             }
             catch (Exception ex)
             {
-                stateFailures++;
+                inProcessFailures++;
                 Console.WriteLine($"FAIL {test.Name}");
                 Console.WriteLine(ex.Message);
             }
@@ -338,8 +344,8 @@ internal static class Program
 
         Console.WriteLine();
         Console.WriteLine($"{tests.Length - transcriptFailures}/{tests.Length} transcript tests passed.");
-        Console.WriteLine($"{stateTests.Length - stateFailures}/{stateTests.Length} state regression tests passed.");
-        return transcriptFailures == 0 && stateFailures == 0 ? 0 : 1;
+        Console.WriteLine($"{inProcessTests.Length - inProcessFailures}/{inProcessTests.Length} in-process tests passed.");
+        return transcriptFailures == 0 && inProcessFailures == 0 ? 0 : 1;
     }
 
     private static TestResult RunTranscript(string gameProjectPath, TestCase test)
@@ -410,6 +416,135 @@ internal static class Program
     private static string Normalize(string value)
     {
         return value.Replace("\r\n", "\n").Replace('\r', '\n');
+    }
+
+    private static void ParserVocabularyParsesCommands()
+    {
+        InputParser parser = new();
+        GameState state = new();
+        state.InitializeGame();
+
+        bool parsed = parser.ParseInput("TAKE LAMP", state, out int verb, out int objectId, out int motion);
+
+        AssertTrue(parsed, "Expected TAKE LAMP to parse.");
+        AssertEqual(GameConstants.Take, verb, "Verb");
+        AssertEqual(GameConstants.Lamp, objectId, "Object");
+        AssertEqual(0, motion, "Motion");
+        AssertEqual("take", state.Command.Word1, "Word1");
+        AssertEqual("lamp", state.Command.Word2, "Word2");
+
+        parsed = parser.ParseInput("west", state, out verb, out objectId, out motion);
+
+        AssertTrue(parsed, "Expected WEST to parse.");
+        AssertEqual(0, verb, "Verb");
+        AssertEqual(0, objectId, "Object");
+        AssertEqual(44, motion, "Motion");
+
+        string output = CaptureConsoleOutput(() =>
+        {
+            bool unknownSecondWord = parser.ParseInput("take blorple", state, out _, out _, out _);
+            AssertFalse(unknownSecondWord, "Expected unknown second word to fail parsing.");
+        });
+
+        AssertContains(output, "I don't understand that!");
+    }
+
+    private static void ObjectPlacementPreservesHoldingBookkeeping()
+    {
+        GameState state = new();
+        state.InitializeGame();
+        state.Position.Location = GameConstants.WellHouse;
+
+        AssertEqual(GameConstants.WellHouse, state.Objects.LocationOf(GameConstants.Lamp), "Initial lamp location");
+        AssertEqual(0, state.Objects.Holding, "Initial holding");
+
+        state.Carry(GameConstants.Lamp, state.Objects.LocationOf(GameConstants.Lamp));
+
+        AssertTrue(state.Toting(GameConstants.Lamp), "Lamp should be carried.");
+        AssertTrue(state.Here(GameConstants.Lamp), "Carried lamp should be here.");
+        AssertEqual(1, state.Objects.Holding, "Holding after carry");
+        AssertEqual(-1, state.Objects.LocationOf(GameConstants.Lamp), "Lamp carried location");
+
+        state.Drop(GameConstants.Lamp, GameConstants.DepressionLocation);
+        state.Position.Location = GameConstants.DepressionLocation;
+
+        AssertFalse(state.Toting(GameConstants.Lamp), "Lamp should no longer be carried.");
+        AssertTrue(state.Here(GameConstants.Lamp), "Dropped lamp should be here.");
+        AssertEqual(0, state.Objects.Holding, "Holding after drop");
+        AssertEqual(GameConstants.DepressionLocation, state.Objects.LocationOf(GameConstants.Lamp), "Lamp dropped location");
+    }
+
+    private static void ScoreBookkeepingIncludesSurvivalAndClosingBonus()
+    {
+        AdventureGame game = CreateInitializedGame(out GameState state);
+
+        string output = CaptureConsoleOutput(() =>
+        {
+            int score = InvokePrivate<int>(game, "PrintScore");
+            AssertEqual(36, score, "Initial score");
+        });
+
+        AssertContains(output, "Survival:               30");
+        AssertContains(output, "Score:                  36");
+
+        state.Cave.Closing = true;
+        output = CaptureConsoleOutput(() =>
+        {
+            int score = InvokePrivate<int>(game, "PrintScore");
+            AssertEqual(61, score, "Closing score");
+        });
+
+        AssertContains(output, "Masters section:        25");
+        AssertContains(output, "Score:                  61");
+    }
+
+    private static void DwarfBlockPreventsMovingIntoSeenDwarf()
+    {
+        AdventureGame game = CreateInitializedGame(out GameState state);
+        state.Position.Location = 15;
+        state.Position.NewLocation = 19;
+        state.Dwarves.PreviousLocations[1] = 19;
+        state.Dwarves.Seen[1] = true;
+
+        string output = CaptureConsoleOutput(() => InvokePrivate(game, "ApplyDwarfBlock"));
+
+        AssertContains(output, "A little dwarf with a big knife blocks your way.");
+        AssertEqual(15, state.Position.NewLocation, "NewLocation");
+    }
+
+    private static void PirateStealsCarriedTreasureToChest()
+    {
+        AdventureGame game = CreateInitializedReferenceGame(out GameState state);
+        state.Position.Location = 19;
+        state.Position.NewLocation = 19;
+        state.Carry(GameConstants.Nugget, state.Objects.LocationOf(GameConstants.Nugget));
+
+        string output = CaptureConsoleOutput(() => InvokePrivate(game, "DoPirate"));
+
+        AssertContains(output, "Out from the shadows behind you pounces a bearded pirate!");
+        AssertEqual(state.Objects.ChestLocation, state.Objects.LocationOf(GameConstants.Nugget), "Nugget location");
+        AssertEqual(state.Objects.ChestLocation, state.Dwarves.Locations[GameConstants.MaxDwarves - 1], "Pirate location");
+        AssertFalse(state.Toting(GameConstants.Nugget), "Nugget should no longer be carried.");
+    }
+
+    private static void TurnLifecycleAppliesLocationChange()
+    {
+        AdventureGame game = CreateInitializedGame(out GameState state);
+        state.Position.Location = GameConstants.EndOfRoad;
+        state.Position.NewLocation = GameConstants.WellHouse;
+        state.Position.OldLocation = GameConstants.EndOfRoad;
+        state.Position.OldLocation2 = GameConstants.EndOfRoad;
+
+        string output = CaptureConsoleOutput(() =>
+        {
+            bool keepPlaying = InvokePrivate<bool>(game, "RunTurnLifecycleBeforeInput");
+            AssertTrue(keepPlaying, "Turn lifecycle should continue to input.");
+        });
+
+        AssertContains(output, "You are inside a building, a well house for a large spring.");
+        AssertEqual(GameConstants.WellHouse, state.Position.Location, "Location");
+        AssertEqual(1, state.Position.Turns, "Turns");
+        AssertEqual(1, state.World.VisitedLocations[GameConstants.WellHouse], "Visited well house");
     }
 
     private static void ClosingTimerStartsCaveClosing()
@@ -675,7 +810,7 @@ internal static class Program
 
     private sealed record TestCase(string Name, string Input, IReadOnlyList<string> ExpectedSnippets);
 
-    private sealed record StateRegressionCase(string Name, Action Run);
+    private sealed record InProcessTestCase(string Name, Action Run);
 
     private sealed record TestResult(bool Passed, string Output, string ErrorMessage)
     {
