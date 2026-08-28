@@ -317,6 +317,7 @@ internal static class Program
             new StateRegressionCase("Closing exit guard blocks surface exits", ClosingExitGuardBlocksSurfaceExits),
             new StateRegressionCase("Closed timer moves objects to repository", ClosedTimerMovesObjectsToRepository),
             new StateRegressionCase("Closed inventory decodes carried objects", ClosedInventoryDecodesCarriedObjects),
+            new StateRegressionCase("Closing turn route reaches closed repository", ClosingTurnRouteReachesClosedRepository),
         ];
 
         int stateFailures = 0;
@@ -521,9 +522,65 @@ internal static class Program
         AssertEqual(0, state.Objects.PropertyOf(GameConstants.Nugget), "Nugget property");
     }
 
+    private static void ClosingTurnRouteReachesClosedRepository()
+    {
+        AdventureGame game = CreateInitializedReferenceGame(out GameState state);
+        state.Position.Location = 15;
+        state.Position.NewLocation = 15;
+        state.Position.OldLocation = 15;
+        state.Position.OldLocation2 = 15;
+        state.TreasureProgress.UndiscoveredTreasureCount = 0;
+        state.Cave.Clock1 = 1;
+        state.Cave.Clock2 = 50;
+        state.Cave.LampLimit = 330;
+        state.Carry(GameConstants.Lamp, state.Objects.LocationOf(GameConstants.Lamp));
+        state.Objects.SetProperty(GameConstants.Lamp, 1);
+
+        string output = RunTurnScript(
+            game,
+            [
+                "y2",
+                "down",
+                "plugh",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+                "look",
+            ]);
+
+        AssertContains(output, "Cave closing soon.");
+        AssertContains(output, "This exit is\nclosed.  Please leave via main office.");
+        AssertContains(output, "The cave is now closed.");
+        AssertContains(output, "You are at the northeast end of an immense room");
+        AssertTrue(state.Cave.Closing, "Closing flag");
+        AssertTrue(state.Cave.Closed, "Closed flag");
+    }
+
     private static AdventureGame CreateInitializedGame(out GameState state)
     {
         AdventureGame game = new();
+        state = GetGameState(game);
+        state.InitializeGame();
+        return game;
+    }
+
+    private static AdventureGame CreateInitializedReferenceGame(out GameState state)
+    {
+        AdventureGame game = AdventureGame.CreateForReferenceParity();
         state = GetGameState(game);
         state.InitializeGame();
         return game;
@@ -562,6 +619,30 @@ internal static class Program
         }
         finally
         {
+            Console.SetOut(originalOut);
+        }
+
+        return Normalize(writer.ToString());
+    }
+
+    private static string RunTurnScript(AdventureGame game, IReadOnlyList<string> commands)
+    {
+        TextReader originalIn = Console.In;
+        TextWriter originalOut = Console.Out;
+        using StringWriter writer = new();
+        Console.SetOut(writer);
+
+        try
+        {
+            foreach (string command in commands)
+            {
+                Console.SetIn(new StringReader(command + Environment.NewLine));
+                InvokePrivate(game, "Turn");
+            }
+        }
+        finally
+        {
+            Console.SetIn(originalIn);
             Console.SetOut(originalOut);
         }
 
