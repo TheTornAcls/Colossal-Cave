@@ -1,6 +1,6 @@
 # AdventureClaude Port Handoff
 
-Last updated: 2026-08-27
+Last updated: 2026-08-28
 
 ## Current Status
 
@@ -34,7 +34,7 @@ Most recent result:
 
 ```text
 23/23 transcript tests passed.
-4/4 state regression tests passed.
+5/5 state regression tests passed.
 ```
 
 The suite now includes 10 starter parity routes:
@@ -68,7 +68,7 @@ It also includes 13 deeper parity routes:
 
 These deeper routes were checked against both the rebuilt C executable and the C# port before being added to the regression suite.
 
-The transcript test project also includes focused state regressions for cave closing / closed-state behavior. These exercise the C# port's closing timers, blocked exits during closing, final repository setup, and closed-inventory encoded property decoding. This was added as a narrow in-process regression because a natural public transcript route to discover every treasure and run out both closing clocks is much longer than the current parity suite.
+The transcript test project also includes focused state regressions for cave closing / closed-state behavior. These exercise the C# port's closing timers, blocked exits during closing, final repository setup, closed-inventory encoded property decoding, and a route-style turn script that starts from a near-closing cave state and then uses normal player commands (`y2`, `down`, `plugh`, repeated `look`) to reach the closed repository. This was added as narrow in-process coverage because a natural public transcript route to discover every treasure and run out both closing clocks is much longer than the current parity suite.
 
 The C# port now supports both native C# randomness for normal gameplay and `Models\CReferenceRandom.cs` for parity/regression runs. The transcript harness launches the game with `--reference-random`, which reproduces the MSVC C runtime `rand()` sequence used by the rebuilt C reference. You can also set `ADVENTURE_REFERENCE_RANDOM=1` for deterministic reference-random runs.
 
@@ -139,7 +139,7 @@ Rebuild C reference, if Visual Studio command-line tools are available:
 ## Next Steps
 
 1. Continue adding/fixing deeper parity routes for systems not yet fully exercised:
-   - add a longer public C-vs-C# transcript route for cave closing and closed-state behavior if/when we want full endgame transcript coverage beyond the focused state regressions
+   - optionally add a full natural public C-vs-C# transcript route for cave closing and closed-state behavior if/when we want all-treasure endgame transcript coverage beyond the focused route-style state regression
 
 2. For each new route:
    - run C vs C# parity first
