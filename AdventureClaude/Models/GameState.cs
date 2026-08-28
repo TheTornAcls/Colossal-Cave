@@ -476,7 +476,7 @@ public class GameState
         /// <returns>List of valid travel entries</returns>
         public List<TravelEntry> GetAvailableTravelOptions(int verb, Random random)
         {
-            var allOptions = AdventureClaude.Data.TravelData.GetTravelOptions(Location);
+            var allOptions = AdventureClaude.Data.AdventureData.GetTravelOptions(Location);
             var availableOptions = new List<TravelEntry>();
 
             foreach (var option in allOptions)
