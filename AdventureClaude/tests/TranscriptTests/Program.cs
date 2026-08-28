@@ -431,16 +431,16 @@ internal static class Program
         AssertEqual(-1, state.Clock1, "Clock1");
         AssertTrue(state.Closing, "Closing flag");
         AssertFalse(state.DwarfSeen.Skip(1).Any(seen => seen), "DwarfSeen flags should be reset.");
-        AssertEqual(0, state.ObjectProperties[GameConstants.Grate], "Grate property");
-        AssertEqual(0, state.ObjectProperties[GameConstants.Fissure], "Fissure property");
-        AssertEqual(0, state.ObjectLocations[GameConstants.Troll], "Troll location");
-        AssertEqual(0, state.FixedObjectLocations[GameConstants.Troll], "Troll fixed location");
-        AssertEqual(117, state.ObjectLocations[GameConstants.Troll2], "Troll2 location");
-        AssertEqual(122, state.FixedObjectLocations[GameConstants.Troll2], "Troll2 fixed location");
-        AssertEqual(0, state.ObjectProperties[GameConstants.Chain], "Chain property");
-        AssertEqual(0, state.FixedObjectLocations[GameConstants.Chain], "Chain fixed location");
-        AssertEqual(0, state.ObjectProperties[GameConstants.Axe], "Axe property");
-        AssertEqual(0, state.FixedObjectLocations[GameConstants.Axe], "Axe fixed location");
+        AssertEqual(0, state.Objects.PropertyOf(GameConstants.Grate), "Grate property");
+        AssertEqual(0, state.Objects.PropertyOf(GameConstants.Fissure), "Fissure property");
+        AssertEqual(0, state.Objects.LocationOf(GameConstants.Troll), "Troll location");
+        AssertEqual(0, state.Objects.FixedLocationOf(GameConstants.Troll), "Troll fixed location");
+        AssertEqual(117, state.Objects.LocationOf(GameConstants.Troll2), "Troll2 location");
+        AssertEqual(122, state.Objects.FixedLocationOf(GameConstants.Troll2), "Troll2 fixed location");
+        AssertEqual(0, state.Objects.PropertyOf(GameConstants.Chain), "Chain property");
+        AssertEqual(0, state.Objects.FixedLocationOf(GameConstants.Chain), "Chain fixed location");
+        AssertEqual(0, state.Objects.PropertyOf(GameConstants.Axe), "Axe property");
+        AssertEqual(0, state.Objects.FixedLocationOf(GameConstants.Axe), "Axe fixed location");
     }
 
     private static void ClosingExitGuardBlocksSurfaceExits()
@@ -466,7 +466,7 @@ internal static class Program
         state.NewLocation = 15;
         state.Clock1 = -1;
         state.Clock2 = 1;
-        state.Carry(GameConstants.Nugget, state.ObjectLocations[GameConstants.Nugget]);
+        state.Carry(GameConstants.Nugget, state.Objects.LocationOf(GameConstants.Nugget));
 
         string output = CaptureConsoleOutput(() =>
         {
@@ -479,29 +479,29 @@ internal static class Program
         AssertEqual(0, state.Location, "Location");
         AssertEqual(115, state.OldLocation, "OldLocation");
         AssertEqual(115, state.NewLocation, "NewLocation");
-        AssertEqual(115, state.ObjectLocations[GameConstants.Bottle], "Bottle location");
-        AssertEqual(-2, state.ObjectProperties[GameConstants.Bottle], "Bottle property");
-        AssertEqual(115, state.ObjectLocations[GameConstants.Plant], "Plant location");
-        AssertEqual(-1, state.ObjectProperties[GameConstants.Plant], "Plant property");
-        AssertEqual(115, state.ObjectLocations[GameConstants.Oyster], "Oyster location");
-        AssertEqual(-1, state.ObjectProperties[GameConstants.Oyster], "Oyster property");
-        AssertEqual(115, state.ObjectLocations[GameConstants.Lamp], "Lamp location");
-        AssertEqual(-1, state.ObjectProperties[GameConstants.Lamp], "Lamp property");
-        AssertEqual(115, state.ObjectLocations[GameConstants.Rod], "Rod location");
-        AssertEqual(-1, state.ObjectProperties[GameConstants.Rod], "Rod property");
-        AssertEqual(115, state.ObjectLocations[GameConstants.Dwarf], "Dwarf location");
-        AssertEqual(-1, state.ObjectProperties[GameConstants.Dwarf], "Dwarf property");
-        AssertEqual(116, state.ObjectLocations[GameConstants.Grate], "Grate location");
-        AssertEqual(116, state.ObjectLocations[GameConstants.Snake], "Snake location");
-        AssertEqual(-2, state.ObjectProperties[GameConstants.Snake], "Snake property");
-        AssertEqual(116, state.ObjectLocations[GameConstants.Bird], "Bird location");
-        AssertEqual(-2, state.ObjectProperties[GameConstants.Bird], "Bird property");
-        AssertEqual(116, state.ObjectLocations[GameConstants.Cage], "Cage location");
-        AssertEqual(116, state.ObjectLocations[GameConstants.Rod2], "Rod2 location");
-        AssertEqual(116, state.ObjectLocations[GameConstants.Pillow], "Pillow location");
-        AssertEqual(115, state.ObjectLocations[GameConstants.Mirror], "Mirror location");
-        AssertEqual(116, state.FixedObjectLocations[GameConstants.Mirror], "Mirror fixed location");
-        AssertEqual(0, state.ObjectLocations[GameConstants.Nugget], "Carried nugget should be destroyed.");
+        AssertEqual(115, state.Objects.LocationOf(GameConstants.Bottle), "Bottle location");
+        AssertEqual(-2, state.Objects.PropertyOf(GameConstants.Bottle), "Bottle property");
+        AssertEqual(115, state.Objects.LocationOf(GameConstants.Plant), "Plant location");
+        AssertEqual(-1, state.Objects.PropertyOf(GameConstants.Plant), "Plant property");
+        AssertEqual(115, state.Objects.LocationOf(GameConstants.Oyster), "Oyster location");
+        AssertEqual(-1, state.Objects.PropertyOf(GameConstants.Oyster), "Oyster property");
+        AssertEqual(115, state.Objects.LocationOf(GameConstants.Lamp), "Lamp location");
+        AssertEqual(-1, state.Objects.PropertyOf(GameConstants.Lamp), "Lamp property");
+        AssertEqual(115, state.Objects.LocationOf(GameConstants.Rod), "Rod location");
+        AssertEqual(-1, state.Objects.PropertyOf(GameConstants.Rod), "Rod property");
+        AssertEqual(115, state.Objects.LocationOf(GameConstants.Dwarf), "Dwarf location");
+        AssertEqual(-1, state.Objects.PropertyOf(GameConstants.Dwarf), "Dwarf property");
+        AssertEqual(116, state.Objects.LocationOf(GameConstants.Grate), "Grate location");
+        AssertEqual(116, state.Objects.LocationOf(GameConstants.Snake), "Snake location");
+        AssertEqual(-2, state.Objects.PropertyOf(GameConstants.Snake), "Snake property");
+        AssertEqual(116, state.Objects.LocationOf(GameConstants.Bird), "Bird location");
+        AssertEqual(-2, state.Objects.PropertyOf(GameConstants.Bird), "Bird property");
+        AssertEqual(116, state.Objects.LocationOf(GameConstants.Cage), "Cage location");
+        AssertEqual(116, state.Objects.LocationOf(GameConstants.Rod2), "Rod2 location");
+        AssertEqual(116, state.Objects.LocationOf(GameConstants.Pillow), "Pillow location");
+        AssertEqual(115, state.Objects.LocationOf(GameConstants.Mirror), "Mirror location");
+        AssertEqual(116, state.Objects.FixedLocationOf(GameConstants.Mirror), "Mirror fixed location");
+        AssertEqual(0, state.Objects.LocationOf(GameConstants.Nugget), "Carried nugget should be destroyed.");
         AssertEqual(0, state.Holding, "Holding");
     }
 
@@ -509,16 +509,16 @@ internal static class Program
     {
         AdventureGame game = CreateInitializedGame(out GameState state);
         state.Closed = true;
-        state.Carry(GameConstants.Oyster, state.ObjectLocations[GameConstants.Oyster]);
-        state.ObjectProperties[GameConstants.Oyster] = -1;
-        state.Carry(GameConstants.Nugget, state.ObjectLocations[GameConstants.Nugget]);
-        state.ObjectProperties[GameConstants.Nugget] = -1;
+        state.Carry(GameConstants.Oyster, state.Objects.LocationOf(GameConstants.Oyster));
+        state.Objects.SetProperty(GameConstants.Oyster, -1);
+        state.Carry(GameConstants.Nugget, state.Objects.LocationOf(GameConstants.Nugget));
+        state.Objects.SetProperty(GameConstants.Nugget, -1);
 
         string output = CaptureConsoleOutput(() => InvokePrivate(game, "ApplyClosedInventoryState"));
 
         AssertContains(output, "Interesting.  There seems to be something written on the underside of the\noyster.");
-        AssertEqual(0, state.ObjectProperties[GameConstants.Oyster], "Oyster property");
-        AssertEqual(0, state.ObjectProperties[GameConstants.Nugget], "Nugget property");
+        AssertEqual(0, state.Objects.PropertyOf(GameConstants.Oyster), "Oyster property");
+        AssertEqual(0, state.Objects.PropertyOf(GameConstants.Nugget), "Nugget property");
     }
 
     private static AdventureGame CreateInitializedGame(out GameState state)
