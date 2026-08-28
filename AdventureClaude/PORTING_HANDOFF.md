@@ -90,6 +90,8 @@ The data lookup refactor is complete. `Data\AdventureData.cs` is now the central
 
 The readability pass for `AdventureGame` constants is complete. Direct message ids, key location ids, encoded travel offsets, cave/dwarf/pirate timer thresholds, hint thresholds, scoring values, rating thresholds, and the reference RNG seed now have named constants in `Models\GameConstants.cs`. The intent is to preserve C reference values while making the remaining game logic easier to audit and debug.
 
+The first focused engine extraction is complete. `Game\TravelEngine.cs` now owns the original TURN.C travel slice: motion dispatch, `back` handling, travel-table evaluation, failed-move messages, and special plover/troll bridge travel. `AdventureGame` delegates motion commands and forced-move cascades to `TravelEngine`, while transcript parity remains green.
+
 ## Recent C# Wording Fixes
 
 The C# port was adjusted to match C transcript wording:
@@ -140,10 +142,18 @@ Rebuild C reference, if Visual Studio command-line tools are available:
 
 ## Next Steps
 
-1. Continue adding/fixing deeper parity routes for systems not yet fully exercised, if more behavior gaps are found:
+1. Continue extracting focused engine/service classes from `AdventureGame`, one behavior-preserving slice at a time:
+   - next recommended slice: `TurnLifecycleEngine` for pre-input lifecycle, location-change application, closing timers, closed repository setup, and cave-closing guards
+   - then `DwarfPirateEngine` for dwarf movement/attacks and pirate theft/lurking behavior
+   - then `VerbHandlers` for object-heavy verb logic, possibly as one class first before splitting by concern
+   - then `ScoringService` for score/rating/bonus calculation and normal end handling
+
+2. After the extraction slices, reduce or remove old `GameState` compatibility pass-through properties where they are no longer needed, so new code consistently uses the named state groups.
+
+3. Continue adding/fixing deeper parity routes for systems not yet fully exercised, if more behavior gaps are found:
    - optionally add a full natural public C-vs-C# transcript route for cave closing and closed-state behavior if/when we want all-treasure endgame transcript coverage beyond the focused route-style state regression
 
-2. For each new route:
+4. For each new route or refactor slice:
    - run C vs C# parity first
    - fix C# behavior if parity fails
    - add the passing route to `tests\TranscriptTests\Program.cs`
