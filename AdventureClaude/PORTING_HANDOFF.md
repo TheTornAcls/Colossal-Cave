@@ -33,7 +33,7 @@ dotnet run --project tests\TranscriptTests\TranscriptTests.csproj
 Most recent result:
 
 ```text
-25/25 transcript tests passed.
+26/26 transcript tests passed.
 11/11 in-process tests passed.
 ```
 
@@ -50,7 +50,7 @@ The suite now includes 10 starter parity routes:
 - `inventory_empty`
 - `unknown_words`
 
-It also includes 15 deeper parity routes:
+It also includes 16 deeper parity routes:
 
 - `deeper_cave_entry_lamp_on`
 - `deeper_cobble_debris_xyzzy`
@@ -67,6 +67,7 @@ It also includes 15 deeper parity routes:
 - `deeper_fissure_jump_reincarnate_yes`
 - `deeper_plover_dark_room_pyramid`
 - `deeper_giant_room_eggs_after_reincarnation`
+- `deeper_trident_waterfall`
 
 These deeper routes were checked against both the rebuilt C executable and the C# port before being added to the regression suite.
 
@@ -107,6 +108,8 @@ The `GameState` compatibility pass-through cleanup is complete. `Models\GameStat
 The next deeper natural transcript route is complete. `deeper_plover_dark_room_pyramid` was checked against the rebuilt C executable and added to `tests\TranscriptTests\Program.cs`; it covers bird-vs-snake progression, Hall of the Mountain King side treasures, fissure bridge/diamonds, Oriental Room vase, Plover Room emerald, Dark Room pyramid handling, and score output after eight treasure discoveries. The transcript harness now uses asynchronous stdout/stderr reads with timeout truncation so bad redirected-input routes fail cleanly instead of flooding output.
 
 The full natural public cave-closing route has been extended past `deeper_plover_dark_room_pyramid`. `deeper_giant_room_eggs_after_reincarnation` was checked against the rebuilt C executable and added to `tests\TranscriptTests\Program.cs`; it leaves the Plover/Dark Room branch, waters the beanstalk twice, accepts the deterministic dwarf-death reincarnation after the second watering, recovers the lamp, returns via `plugh`, climbs to the Giant Room, discovers the golden eggs, and verifies the matching post-death score checkpoint.
+
+The trident/waterfall branch is covered by `deeper_trident_waterfall`. This focused public route was checked against the rebuilt C executable before being added; it reaches the west pit, grows the beanstalk, fills the bottle with oil from the east pit, oils the rusty door north of the Giant Room, enters the waterfall cavern, discovers/takes the jeweled trident, and verifies the matching score checkpoint. A longer all-treasure continuation through the Plover/Pyramid route exposed deeper dwarf RNG sensitivity after the oil detour, so keep extending the full all-treasure route in small parity-checked slices.
 
 ## Recent C# Wording Fixes
 
@@ -159,7 +162,8 @@ Rebuild C reference, if Visual Studio command-line tools are available:
 ## Next Steps
 
 1. Continue the full natural public C-vs-C# cave-closing route by extending the all-treasure walkthrough beyond `deeper_plover_dark_room_pyramid`:
-   - remaining natural route coverage should include trident/waterfall, pearl/clam, dragon/rug, volcano spices, bear/chain, pirate chest, and then waiting out cave closing/closed-state behavior from normal commands
+   - remaining natural route coverage should include pearl/clam, dragon/rug, volcano spices, bear/chain, pirate chest, and then waiting out cave closing/closed-state behavior from normal commands
+   - when folding trident/waterfall into the longer all-treasure path, watch the dwarf RNG sequence around the post-reincarnation oil detour
 
 2. For each new route or refactor slice:
    - run C vs C# parity first
