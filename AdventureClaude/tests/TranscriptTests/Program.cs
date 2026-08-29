@@ -369,6 +369,38 @@ internal static class Program
                     "Score:                  65",
                     "Your score qualifies you as a novice-class adventurer.",
                 ]),
+            new TestCase(
+                "Parity deeper_trident_waterfall",
+                InputLines(
+                    [
+                        "n", "enter", "take lamp", "take keys", "take bottle", "take food", "light lamp",
+                        "out", "depression", "unlock grate", "down",
+                        "west", "take cage", "west", "take rod", "west", "west", "drop rod", "take bird",
+                        "west", "down", "north", "north", "release bird", "north", "north",
+                        "south", "down", "west", "down", "west", "west", "west", "west", "down", "pour water",
+                        "out", "east", "east", "ne", "east", "up", "east", "east", "down", "fill bottle",
+                        "up", "west", "west", "down", "west", "slab", "south", "down", "pour water",
+                        "out", "east", "down", "fill bottle", "up", "west", "down", "climb", "west",
+                        "north", "pour oil", "north", "look", "take trident", "score", "quit", "y",
+                    ]),
+                [
+                    "The little bird attacks the green snake",
+                    "The plant spurts into furious growth for a few seconds.",
+                    "There is a 12-foot-tall beanstalk stretching up out of the pit",
+                    "Your bottle is now full of water.",
+                    "The plant grows explosively, almost filling the bottom of the pit.",
+                    "There is a gigantic beanstalk stretching all the way up to the hole.",
+                    "Your bottle is now full of oil.",
+                    "The way north is barred by a massive, rusty, iron door.",
+                    "The oil has freed up the hinges so that the door will now move",
+                    "You are in a magnificent cavern with a rushing stream",
+                    "There is a jewel-encrusted trident here!",
+                    "Treasures:               6",
+                    "Survival:               30",
+                    "Score:                  67",
+                    "Score:                  63",
+                    "Your score qualifies you as a novice-class adventurer.",
+                ]),
         ];
 
         int transcriptFailures = 0;
